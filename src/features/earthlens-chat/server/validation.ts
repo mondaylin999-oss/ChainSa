@@ -24,8 +24,8 @@ export const chatRequestSchema = z
       .max(20)
       .optional(),
     sessionId: z.string().max(100).optional(),
-    // Accepted (and ignored) so the original EarthLens chat panel can call this endpoint unchanged.
-    mode: z.enum(["live", "demo"]).optional(),
+    // Keep compatibility with live clients while rejecting retired sample-data requests.
+    mode: z.literal("live").optional(),
   })
   .strict();
 

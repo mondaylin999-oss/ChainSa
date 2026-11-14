@@ -20,7 +20,14 @@ const componentEnd = source.indexOf("var bj=", componentStart);
 if (componentStart < 0 || componentEnd < 0 || componentEnd > start) {
   throw new Error("The reference dashboard changed; review the dashboard adapter.");
 }
-const html = (source.slice(0, componentStart) + earthbeatCore + "\n" + earthbeatPanel + "\n" + dashboard + "\n" + source.slice(componentEnd, start) + adapter + source.slice(end))
+// Omit the archived reference's seeded sample generator from the production application.
+const liveReference = source.slice(componentEnd, start)
+  .replace('if(a==="demo")return N9e(e,t,r);', "")
+  .replace(/function Uj\(e\)\{[\s\S]*?(?=var B9e=)/, "");
+if (liveReference.includes("function N9e(") || liveReference.includes("return N9e(")) {
+  throw new Error("The reference sample generator changed; review live-only preparation.");
+}
+const html = (source.slice(0, componentStart) + earthbeatCore + "\n" + earthbeatPanel + "\n" + dashboard + "\n" + liveReference + adapter + source.slice(end))
   .replace("</head>", `<style>${dashboardCss}\n${earthbeatCss}</style></head>`)
   .replace("Myanmar EarthLens — Demo preview", "Myanmar EarthLens — NASA environmental insights")
   .replace('Naypyidaw shown as a point: bundled boundary data includes it within Mandalay. Run ', 'Naypyidaw is shown as a representative point. ')

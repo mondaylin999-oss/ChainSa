@@ -10,21 +10,22 @@ window.fetch = async (input, init) => {
     return Ni({ database: false, firms: false, llm: Boolean(status.openrouter?.configured || status.groq?.configured), llmProvider: null });
   }
   if (url === "/api/analyze") {
+    if (body.mode !== undefined && body.mode !== "live") return Ni({ error: "Only live NASA data is supported." }, 400);
     const parsed = iq.safeParse(body);
     if (!parsed.success) return Ni({ error: kg(parsed.error) }, 400);
     try {
-      const { regionId, params, mode, range } = parsed.data;
+      const { regionId, params, range } = parsed.data;
       const region = bo(regionId);
-      const data = await sm(region, params, mode, range);
+      const data = await sm(region, params, "live", range);
       return Ni(lm(region, params, data, crypto.randomUUID()));
     } catch {
       return Ni({ error: "Could not retrieve the data. Please try again." }, 502);
     }
   }
   if (url === "/api/chat") {
+    if (body.mode !== undefined && body.mode !== "live") return Ni({ error: "Only live NASA data is supported." }, 400);
     const parsed = oq.safeParse(body);
     if (!parsed.success) return Ni({ error: kg(parsed.error) }, 400);
-    if (parsed.data.mode === "demo") return Ni(await Zj(parsed.data.message, parsed.data));
     const response = await nativeFetch("/api/earthlens-chat", {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ ...parsed.data, history: parsed.data.history?.slice(-6).map(item => ({ ...item, content: item.content.slice(0, 2000) })) }),

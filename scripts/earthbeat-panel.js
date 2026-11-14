@@ -1,5 +1,5 @@
 /** EARTHBEAT graph/player, adapted to the host bundle's React and measurement model. */
-function TerraEarthbeatPanel({result, lang, mode, visible}) {
+function TerraEarthbeatPanel({result, lang, visible}) {
   const h = ft.createElement;
   const text = (en, my) => lang === "my" ? my : en;
   const [code, setCode] = ft.useState(result.codes[0]);
@@ -113,7 +113,7 @@ function TerraEarthbeatPanel({result, lang, mode, visible}) {
       h("div",{className:"earthbeat-settings"},h("label",null,text("Volume", "အသံအတိုးအကျယ်"),h("input",{type:"range",min:0,max:1,step:0.01,value:volume,onChange:event=>setVolume(Number(event.target.value)),"aria-label":text("Sound volume", "အသံအတိုးအကျယ်")})),
         h("label",null,text("Speed", "အမြန်နှုန်း"),h("select",{value:speed,onChange:event=>setSpeed(Number(event.target.value))},[1,2,4,8].map(value=>h("option",{key:value,value},`${value}/s`))))),
       h("p",{className:"earthbeat-help"},text("Tap or drag to hear a point; Play continues from there. Arrow keys select points. Higher value = higher pitch.", "အမှတ်တစ်ခု၏ အသံကြားရန် ထိပါ သို့မဟုတ် ဆွဲပါ။ Play သည် ထိုနေရာမှ ဆက်ဖွင့်သည်။ မြှားခလုတ်များဖြင့် ရွေးနိုင်သည်။ တန်ဖိုးမြင့်လျှင် အသံမြင့်သည်။")),
-      h("p",{className:"earthbeat-scale"},text(`Relative pitch: ${format(range[0])}–${format(range[1])} ${unit} → 220–880 Hz. Equal playback steps; date gaps remain visible in the graph. Missing data is silent. Synthesized tones${mode==="demo"?" from DEMO data":""}.`, `နှိုင်းရအသံ: ${format(range[0])}–${format(range[1])} ${unit} → 220–880 Hz။ ဒေတာတစ်ခုစီကို တူညီသောအချိန်ဖြင့် ဖွင့်သည်။ ဒေတာမရှိလျှင် အသံမရှိပါ။ ${mode==="demo"?"နမူနာဒေတာမှ ":""}ဖန်တီးထားသော အသံများ။`)),
+      h("p",{className:"earthbeat-scale"},text(`Relative pitch: ${format(range[0])}–${format(range[1])} ${unit} → 220–880 Hz. Equal playback steps; date gaps remain visible in the graph. Missing data is silent. Synthesized tones from NASA measurements.`, `နှိုင်းရအသံ: ${format(range[0])}–${format(range[1])} ${unit} → 220–880 Hz။ ဒေတာတစ်ခုစီကို တူညီသောအချိန်ဖြင့် ဖွင့်သည်။ ဒေတာမရှိလျှင် အသံမရှိပါ။ NASA ဒေတာမှ ဖန်တီးထားသော အသံများ။`)),
       !supported && h("p",{role:"status"},text("Sound is unavailable in this browser. The graph remains interactive.", "ဤဘရောက်ဇာတွင် အသံ မရရှိပါ။ ဂရပ်ကို ရွေးကြည့်နိုင်ပါသည်။")),
       error && h("p",{role:"alert",className:"terra-error"},error)));
 }

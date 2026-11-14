@@ -16,7 +16,7 @@ Adapted from the user-supplied `MODIS_NDVI_Integration_Handover.zip`, specifical
 
 The chart uses actual dates for horizontal positions and data-derived vertical bounds, including negative values and temperatures above 1. Explicit missing values break the line, and invalid or missing observations do not produce notes. Audio advances in equal steps per valid observation, not in proportion to elapsed calendar time. The displayed date spacing remains accurate.
 
-Each selected series maps its valid minimum and maximum to 220–880 Hz, with a constant series mapped to 550 Hz. The pitch scale is relative to this series, so equal pitches from different locations or periods do not imply equal measurements. The range is shown beside the controls. These sounds are representations of measurements, not recordings from nature. Demo data retains its demo label.
+Each selected series maps its valid minimum and maximum to 220–880 Hz, with a constant series mapped to 550 Hz. The pitch scale is relative to this series, so equal pitches from different locations or periods do not imply equal measurements. The range is shown beside the controls. These sounds are representations of measurements, not recordings from nature. The production application uses live data only; failed retrieval never falls back to sample observations.
 
 ## Implementation and verification
 

@@ -15,10 +15,7 @@ function Og() {
     }).then(data => setTownships(data.townships)).catch(() => setTownshipError(true));
   }, []);
   const [param, setParam] = ft.useState("rainfall");
-  const [mode, setMode] = ft.useState(() => {
-    try { return localStorage.getItem("earthlens-mode") === "demo" ? "demo" : "live"; }
-    catch { return "live"; }
-  });
+  const mode = "live";
   const [boundaries, setBoundaries] = ft.useState(null);
   const [boundaryError, setBoundaryError] = ft.useState(false);
   const [result, setResult] = ft.useState(null);
@@ -48,8 +45,8 @@ function Og() {
   const icon = (component, size = 18) => h(component, {width: size, height: size, "aria-hidden": true});
   ft.useEffect(() => { document.documentElement.lang = lang; }, [lang]);
   ft.useEffect(() => {
-    try { localStorage.setItem("earthlens-mode", mode); } catch {}
-  }, [mode]);
+    try { localStorage.removeItem("earthlens-mode"); } catch {}
+  }, []);
   ft.useEffect(() => {
     const controller = new AbortController();
     fetch("/api/regions", {signal: controller.signal}).then(response => {
@@ -101,9 +98,7 @@ function Og() {
         h("a", {className:"terra-nasa", href:"https://power.larc.nasa.gov/", target:"_blank", rel:"noreferrer", "aria-label":"NASA POWER data source"}, "NASA", h("small", null, "EARTH DATA"))),
       h("div", {className:"terra-header-actions"},
         h("a", {className:"terra-chat-shortcut", href:"#ai-chat", onClick:()=>setChatOpenRequest(value=>value+1)}, icon(vo, 16), text("AI chat", "AI စကားပြောရန်")),
-        h("div", {className:"terra-mode", role:"group", "aria-label":text("Data mode", "ဒေတာ အမျိုးအစား")},
-          ["live", "demo"].map(key => h("button", {key, "aria-pressed":mode===key, onClick:()=>setMode(key)},
-            h("span", {className:`terra-dot ${key}`, "aria-hidden":true}), t(key === "live" ? "modeLive" : "modeDemo")))),
+        h("span", {className:"terra-live-status"}, h("span", {className:"terra-dot live", "aria-hidden":true}), t("modeLive")),
         h("button", {className:"terra-language", onClick:()=>setLang(lang === "en" ? "my" : "en")}, icon(pd, 15), lang === "en" ? "မြန်မာ" : "English"))),
     h("div", {className:"terra-workspace"},
       h("aside", {className:"terra-sidebar", "aria-label":text("Topics", "ကဏ္ဍများ")},
@@ -160,7 +155,6 @@ function Og() {
               h("button", {className:"terra-analyze", onClick:()=>setRefresh(value=>value+1), disabled:busy || !regionId || (!latest && (!range.start || !range.end))},
                 icon(busy ? go : _d, 16), t(busy ? "analyzing" : "analyze")),
               h("p", {className:"terra-scope-note"}, text("State / region data. Township coverage is not available yet.", "ပြည်နယ် / တိုင်းဒေသကြီး ဒေတာ။ မြို့နယ်အဆင့် မရရှိသေးပါ။"))),
-            mode === "demo" && h("div", {className:"terra-demo", role:"status"}, t("demoBanner")),
             error && h("div", {className:"terra-error", role:"alert"}, error, h("button", {onClick:()=>setRefresh(value=>value+1)}, text("Try again", "ထပ်ကြိုးစားရန်"))),
             h("section", {className:"terra-panel terra-chart", "aria-busy":busy},
               panelTitle(text("Observation trend", "လေ့လာတွေ့ရှိချက် လမ်းကြောင်း"), Ha[param].unit),
@@ -210,7 +204,7 @@ function TerraDashboardChat({lang, t, region, param, mode, openRequest}) {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not retrieve an answer.");
       setMessages(previous=>[...previous, {role:"assistant", content:data.answer, evidence:data.evidence, sources:data.sources,
-        meta:`${data.region.name} · ${data.period?.start || ""} → ${data.period?.end || ""} · ${data.generator === "llm" ? "AI-written" : "template"}${mode === "demo" ? " · DEMO" : ""}`}]);
+        meta:`${data.region.name} · ${data.period?.start || ""} → ${data.period?.end || ""} · ${data.generator === "llm" ? "AI-written" : "template"}`}]);
     } catch (err) {
       if (!controller.signal.aborted) setMessages(previous=>[...previous, {role:"assistant", content:err.message, error:true}]);
     } finally { if (!controller.signal.aborted) setBusy(false); }

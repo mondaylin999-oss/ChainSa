@@ -4,7 +4,7 @@
 
 `scripts/prepare-earthlens.mjs` generates `public/earthlens.html` before development and production builds. It replaces the reference's preview-only network adapter with `scripts/earthlens-adapter.js`. Next.js serves this dashboard at `/` through a rewrite.
 
-Live analysis uses the reference's NASA POWER client and calculations. Live chat calls the existing `/api/earthlens-chat` server route, keeping credentials on the server. Demo analysis and chat use explicitly labelled sample data. The reference's map analysis does not currently support live FIRMS fire data or persistent database caching. The existing chat endpoint still supports FIRMS when configured.
+Analysis uses the reference's NASA POWER client and calculations. Chat calls the existing `/api/earthlens-chat` server route, keeping credentials on the server. The application supports live data only: the mode switch and seeded sample-data generator are removed, saved mode preferences are cleared, and retired sample-mode requests are rejected. The reference's map analysis does not currently support live FIRMS fire data or persistent database caching. The existing chat endpoint still supports FIRMS when configured.
 
 The supplied UI is a compiled artifact. Changes to its internal function names require reviewing the adapter. Its original source project would be needed to edit those components directly.
 
