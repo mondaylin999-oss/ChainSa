@@ -25,6 +25,15 @@ body, .earthlens-app { background: #040816; color: #e9edfa; }
 .earthlens-app .language-switch { background: #0c1532; border-color: #303e6b; }
 .earthlens-app .language-active { background: #29204e; color: #fff; }
 .earthlens-app :is(.panel,.topic-rail,.topic-list,.floating-ai-panel) { background: #0a1228; border: 1px solid #1f2b52; border-radius: 20px; box-shadow: 0 18px 40px #0003; }
+/* The explore map sits straight on the page, not in a card. */
+.earthlens-app .map-stage { background: none; border: 0; box-shadow: none; padding: 0; }
+/* Explore is a fixed-height workspace: keep the heading short so the map row gets the height. */
+.earthlens-app.is-exploring .explore-shell { padding-top: 18px; }
+.earthlens-app.is-exploring .page-heading { margin-bottom: 6px; }
+.earthlens-app.is-exploring .page-heading h1 { margin-top: 2px; }
+.earthlens-app.is-exploring .page-heading h1 { font-size: 28px; }
+.earthlens-app.is-exploring .page-heading p:not(.eyebrow) { display: none; }
+.earthlens-app .map-stage .myanmar-map { background: none; border: 0; box-shadow: none; }
 .earthlens-app :is(h1,h2,h3,.chart-stats strong,.detail-grid dd,.rail-indicator-title) { color: #e9edfa; }
 .earthlens-app :is(.eyebrow,.see-more-link,.text-button,.earthbeat-controls>strong) { color: #c3b6ff; }
 .earthlens-app :is(.page-heading p,.map-stage-note,.field-hint,.field-meta,.chart-heading p,.chart-state,.chart-legend,.chart-stats span,.chart-stats small,.detail-grid dt,.map-drilldown-actions,.chat-context,.loading-message,.message-evidence,.topic-info,.indicator-detail>p) { color: #a6b3d0; }
@@ -43,7 +52,7 @@ body, .earthlens-app { background: #040816; color: #e9edfa; }
 .earthlens-app :is(.button-primary:hover,.chat-compose button:hover:not(:disabled)) { background: #7c5dff; }
 .earthlens-app :is(.button-secondary,.explore-back,.suggested-questions button) { background: #0c1532; border-color: #3a4a86; color: #e9edfa; border-radius: 12px; }
 .earthlens-app :is(.button-secondary:hover,.explore-back:hover,.suggested-questions button:hover:not(:disabled)) { background: #191d42; border-color: #8872db; }
-.earthlens-app .explore-back { min-height: 44px; }
+.earthlens-app .explore-back { min-height: 44px; margin: 12px 0 0; }
 .earthlens-app .field-control label { color: #c5cee6; font-size: 12px; }
 .earthlens-app :is(.field-control input,.field-control select,.chat-compose input,.earthbeat-settings select) { background: #0c1532; color: #e9edfa; border: 1px solid #303e6b; border-radius: 12px; font-size: 12px; min-height: 44px; }
 .earthlens-app input::placeholder { color: #8291b6; }
@@ -87,7 +96,7 @@ body, .earthlens-app { background: #040816; color: #e9edfa; }
 .earthlens-app .earthbeat-chart svg line[stroke="#dce8e3"] { stroke: #26375b; }
 .earthlens-app .earthbeat-chart__tooltip { background: #211b46; border: 1px solid #5a488c; }
 @media(min-width:761px) and (max-width:1100px) {
- .earthlens-app .explore-grid { grid-template-columns: 175px minmax(240px,1fr) minmax(290px,1fr); gap: 12px; }
+ .earthlens-app .explore-grid { grid-template-columns: 175px minmax(240px,1.1fr) minmax(320px,1fr); gap: 12px; }
  .earthlens-app .rail-topic-button { flex-direction: column; gap: 9px; padding: 12px; }
  .earthlens-app .selection-grid { grid-template-columns: 1fr; }
  .earthlens-app .page-shell { width: calc(100% - 32px); }

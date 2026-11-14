@@ -264,6 +264,16 @@ export default function Page() {
     setRegionSearch(`${region.name} — ${region.type}`);
   }
 
+  function chooseTownship(nextTownshipId: string) {
+    // Clicking the selected township again steps back out to its state or region.
+    if (nextTownshipId && nextTownshipId === townshipId) {
+      setTownshipId("");
+      return;
+    }
+    setTownshipId(nextTownshipId);
+    setMapFocused(true);
+  }
+
   function askAI() {
     if (view === "explore") {setChatOpen(true);return;}
     setFocusChatOnHome(true);
@@ -303,14 +313,6 @@ export default function Page() {
 
       {(
         <div className="page-shell explore-shell">
-          <button type="button" className="explore-back" onClick={() => {
-            if (townshipId) setTownshipId("");
-            else if (mapFocused) setMapFocused(false);
-            else { setChatOpen(false); setView("home"); }
-          }} aria-label={townshipId ? "Back to region" : mapFocused ? "Back to all regions" : "Back to Home"}>
-            <ArrowLeft size={16} aria-hidden="true" />{lang === "my" ? "နောက်သို့" : "Back"}
-            <span>{townshipId ? "To region" : mapFocused ? "All regions" : "Home"}</span>
-          </button>
           <div className="page-heading">
             <div><p className="eyebrow">Explore Myanmar</p><h1>Map &amp; data workspace</h1><p>Choose a topic, then view a connected observation series and its source details.</p></div>
           </div>
@@ -369,7 +371,7 @@ export default function Page() {
             <section className="map-column" aria-label="Map">
               <section className="map-stage panel" aria-label="Select an area on the map">
                 <div className="map-stage-figure">
-                  <MyanmarMap selectedRegionId={regionId} onSelectRegion={chooseRegion} language={lang} focusRegion={mapFocused} townships={catalog?.townships} selectedTownshipId={townshipId} onSelectTownship={id=>{setTownshipId(id);setMapFocused(true);}} />
+                  <MyanmarMap selectedRegionId={regionId} onSelectRegion={chooseRegion} language={lang} focusRegion={mapFocused} townships={catalog?.townships} selectedTownshipId={townshipId} onSelectTownship={chooseTownship} />
                 </div>
                 <p className="map-stage-note">
                   {selectedRegion
@@ -514,6 +516,14 @@ export default function Page() {
               </div>
             </aside>
           </div>
+          <button type="button" className="explore-back" onClick={() => {
+            if (townshipId) setTownshipId("");
+            else if (mapFocused) setMapFocused(false);
+            else { setChatOpen(false); setView("home"); }
+          }} aria-label={townshipId ? "Back to region" : mapFocused ? "Back to all regions" : "Back to Home"}>
+            <ArrowLeft size={16} aria-hidden="true" />{lang === "my" ? "နောက်သို့" : "Back"}
+            <span>{townshipId ? "To region" : mapFocused ? "All regions" : "Home"}</span>
+          </button>
           <footer className="site-footer"><span>Natural Earth admin-1 boundaries · NASA POWER daily · NASA FIRMS when configured</span><a href="/earthlens.html">Original dashboard preview <ExternalLink size={13} /></a></footer>
         </div>
       )}

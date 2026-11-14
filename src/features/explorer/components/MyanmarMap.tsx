@@ -51,6 +51,28 @@ function featureBounds(geometry: Geometry) {
   return { minX, minY, maxX, maxY };
 }
 
+/** Bounding box of every state and region, so the resting view hugs the country. */
+const COUNTRY_BOUNDS = (() => {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const feature of boundaryData.features) {
+    const bounds = featureBounds(feature.geometry);
+    minX = Math.min(minX, bounds.minX);
+    minY = Math.min(minY, bounds.minY);
+    maxX = Math.max(maxX, bounds.maxX);
+    maxY = Math.max(maxY, bounds.maxY);
+  }
+  return { minX, minY, maxX, maxY };
+})();
+// Height is the usual limit, so pad the sides more than the top and bottom.
+const COUNTRY_PAD_X = 70;
+const COUNTRY_PAD_Y = 12;
+const COUNTRY_VIEWBOX = [
+  COUNTRY_BOUNDS.minX - COUNTRY_PAD_X,
+  COUNTRY_BOUNDS.minY - COUNTRY_PAD_Y,
+  COUNTRY_BOUNDS.maxX - COUNTRY_BOUNDS.minX + COUNTRY_PAD_X * 2,
+  COUNTRY_BOUNDS.maxY - COUNTRY_BOUNDS.minY + COUNTRY_PAD_Y * 2,
+].map((value) => value.toFixed(1)).join(" ");
+
 interface MyanmarMapProps {
   selectedRegionId?: string;
   onSelectRegion?: (id: string) => void;
@@ -106,7 +128,7 @@ export function MyanmarMap({
   const padding = selectedTownshipId ? 1.8 : 18;
   const viewBox = focusedBounds
     ? `${focusedBounds.minX - padding} ${focusedBounds.minY - padding} ${Math.max(padding * 2, focusedBounds.maxX - focusedBounds.minX + padding * 2)} ${Math.max(padding * 2, focusedBounds.maxY - focusedBounds.minY + padding * 2)}`
-    : `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`;
+    : COUNTRY_VIEWBOX;
   const markerRadius = focusedBounds
     ? Math.max(.05, Math.max(focusedBounds.maxX - focusedBounds.minX, focusedBounds.maxY - focusedBounds.minY) / 100)
     : .8;
@@ -151,10 +173,10 @@ export function MyanmarMap({
           </filter>
         </defs>
         <g className="map-zoom-layer" transform={zoomTransform}>
-          <text x="54" y="338" className="map-neighbor-label">INDIA</text>
+          <text x="100" y="338" className="map-neighbor-label">INDIA</text>
           <text x="148" y="235" className="map-neighbor-label">BANGLADESH</text>
           <text x="318" y="63" className="map-neighbor-label">CHINA</text>
-          <text x="493" y="351" className="map-neighbor-label">LAOS</text>
+          <text x="470" y="351" className="map-neighbor-label">LAOS</text>
           <text x="450" y="545" className="map-neighbor-label">THAILAND</text>
 
           <g aria-label="State and region boundaries">
