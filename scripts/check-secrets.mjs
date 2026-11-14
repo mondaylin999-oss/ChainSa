@@ -10,7 +10,7 @@ if (!existsSync(staticDir)) {
   process.exit(2);
 }
 
-const secretNames = ["OPENROUTER_API_KEY", "GROQ_API_KEY", "FIRMS_MAP_KEY"];
+const secretNames = ["OPENROUTER_API_KEY", "GROQ_API_KEY", "NASA_FIRMS_MAP_KEY", "FIRMS_MAP_KEY"];
 const values = [];
 for (const f of [".env.local", ".env"]) {
   const p = join(root, f);

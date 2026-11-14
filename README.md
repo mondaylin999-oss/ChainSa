@@ -1,12 +1,19 @@
-# Myanmar EarthLens — AI Chatbot module (prototype)
+# Myanmar EarthLens — website + AI chatbot
 
-A bilingual (Myanmar / English) chatbot that answers questions with **real NASA data**.
-It is built as one self-contained feature folder, so you can copy it into the original
-Myanmar EarthLens Next.js project.
+The Myanmar EarthLens website (map, dashboard, Myanmar/English switch) and its bilingual
+NASA-grounded AI assistant, as Next.js + TypeScript source.
 
-- **Frontend:** a React chat widget that copies the EarthLens demo's design (colours, fonts, panel, bubbles)
-- **Backend:** a Next.js Route Handler at `POST /api/earthlens-chat` (Node.js runtime)
-- **NASA data:** NASA POWER daily (rainfall, temperature, humidity, wind, root-zone soil wetness) and NASA FIRMS VIIRS fires (only when `FIRMS_MAP_KEY` is set)
+The website was **rebuilt from the compiled demo build** (`myanmar-earthlens-prototype.html`), because the
+original source was not available. That demo answered every `/api/*` call with built-in sample data; here
+those routes call NASA for real.
+
+- **Website** (`src/features/earthlens-site`): home page, Leaflet map of the 15 states/regions, dashboard
+  (Agriculture / Fishing / Environmental monitoring), results with charts, insights, sources and limitations.
+  Live NASA data only — there is no demo/sample-data mode.
+- **Chatbot** (`src/features/earthlens-chat`): floating chat panel connected to the site's language and selected region.
+- **API routes:** `GET /api/regions`, `GET /api/status`, `POST /api/analyze`, `POST /api/chat`
+  (same handler as `POST /api/earthlens-chat`), `GET /api/earthlens-chat/status`.
+- **NASA data:** NASA POWER daily (rainfall, temperature, humidity, wind, root-zone soil wetness) and NASA FIRMS VIIRS fires (only when `NASA_FIRMS_MAP_KEY` is set)
 - **AI providers:** OpenRouter **free** models first, then Groq **free-plan** models, then a template answer. There is no paid fallback.
 
 > **Status — please read.** Every test so far ran in a cloud sandbox **with no internet access to NASA,
@@ -18,11 +25,16 @@ Myanmar EarthLens Next.js project.
 
 ## 0. What's new: 30-day drought / flood / agriculture decision support (Phase 1)
 
-Every answer now has the same six sections in English and Myanmar:
-**1 Current Conditions · 2 30-Day Future Outlook · 3 Potential Impacts · 4 Decision Support · 5 Data Sources · 6 Important Disclaimer.**
+Every environmental answer has the same eight sections in English and Myanmar:
+**1 Direct Answer · 2 Current NASA Data · 3 Historical Data Comparison · 4 Next 30-Day Outlook · 5 Potential Risks and Impacts ·
+6 Decision Support and Recommendations · 7 Data Sources and Forecast Model · 8 Disclaimer.**
 
-- **Sections 1, 2, 4, 5 and 6 are built by the server**; the AI writes only section 3, so it cannot present history as a forecast, invent probabilities or add sources.
-- **No forecast yet.** Section 2 says a reliable 30-day forecast cannot be calculated yet. It then shows a **historical pattern**
+- **Sections 2, 3, 4, 6, 7 and 8 are built by the server.** The AI writes only the direct-answer sentence (section 1) and the
+  risks/impacts bullets (section 5), and its numbers are checked against the NASA facts. Without AI, both come from templates.
+- **The disclaimer is appended by the server and is always the last text of every answer**, using the exact wording from the
+  project brief. Questions that are not about the environment (e.g. "hello") get a short answer without NASA analysis and a
+  separate general disclaimer (`generalDisclaimer` in `config/answer-format.ts` — its wording is ours, please review).
+- **No forecast yet.** Section 4 says a reliable 30-day forecast cannot be calculated yet. It then shows a **historical pattern**
   (what happened on the same calendar dates in 1981–last year, from NASA POWER), clearly marked "NOT a forecast".
   The validation plan for adding a real forecast is in `docs/FORECAST_VALIDATION_PLAN.md`.
 - **Current conditions** compare the last 30/90 days of rain, soil wetness and recent heat with the same dates in past years (percentiles).
@@ -44,10 +56,10 @@ Browser (ChatWidget)  ──POST /api/earthlens-chat──►  Route Handler (se
                                                      3. fetch NASA POWER: last ~30 days (all variables) + 1981→today
                                                         (rain, soil wetness, max temperature) → facts, percentiles,
                                                         historical pattern, indicators, rule-based recommendations
-                                                     4. AI writes section 3 only: OpenRouter free → Groq free
+                                                     4. AI writes sections 1+5 only: OpenRouter free → Groq free
                                                      5. reject AI text with numbers not in the facts or forecast wording
-                                                     6. nothing works → template text for section 3
-                                                     7. server assembles the six sections
+                                                     6. nothing works → template text for sections 1+5
+                                                     7. server assembles the eight sections
 ```
 
 - The AI is **never called without NASA data**. If NASA is down, the user gets an honest "couldn't retrieve data" message.
@@ -65,7 +77,7 @@ src/
   features/earthlens-chat/               ← COPY THIS FOLDER INTO THE REAL PROJECT
     index.ts                             browser-safe exports (ChatWidget, types, regions)
     types.ts  regions.ts  params.ts  i18n.ts
-    config/answer-format.ts              ← YOUR ANSWER TEMPLATE (six headings, disclaimers, word limit…)
+    config/answer-format.ts              ← YOUR ANSWER TEMPLATE (eight headings, disclaimers, word limit…)
     components/ChatWidget.tsx            floating button + chat panel (EarthLens styling)
     client/useEarthLensChat.ts           browser state; talks only to /api/earthlens-chat
     server/                              server-only (import "server-only" blocks browser use)
@@ -76,7 +88,7 @@ src/
       grounding.ts      recent NASA data → facts
       climate/          1981–present comparison: percentiles, historical pattern, indicators
       recommendations.ts  rule-based decision support (reason + uncertainty)
-      answer-builder.ts   assembles the six sections
+      answer-builder.ts   assembles the eight sections
       forecast/validated-outlook.ts  Phase 3 hook for validated probabilities (returns null today)
       nasa/power.ts     NASA POWER client
       nasa/firms.ts     NASA FIRMS client + region polygons
@@ -121,11 +133,12 @@ npm run check:secrets       # after build: confirms no key is in browser files
 | Variable | Required | Purpose |
 |---|---|---|
 | `OPENROUTER_API_KEY` | for AI | Primary provider. Free key: https://openrouter.ai/keys |
-| `OPENROUTER_MODELS` | no | Comma list, tried in order. Only `openrouter/free` or IDs ending in `:free` are accepted. Default `openrouter/free` |
+| `OPENROUTER_MODEL` | no | Explicit model ID (comma list = fallbacks in order). Only `openrouter/free` or IDs ending in `:free` are accepted. Recommended `google/gemma-4-31b-it:free,openrouter/free` (free list checked 2026-11-14). Old name `OPENROUTER_MODELS` still works |
 | `GROQ_API_KEY` | for backup AI | Backup provider. Free key: https://console.groq.com/keys (keep the account on the Free plan) |
-| `GROQ_MODELS` | no | Default `openai/gpt-oss-20b,openai/gpt-oss-120b`. Only allow-listed free models are accepted |
+| `GROQ_MODEL` | no | Default `openai/gpt-oss-20b`. Only allow-listed free models are accepted. Old name `GROQ_MODELS` still works |
 | `GROQ_EXTRA_FREE_MODELS` | no | Add a new Groq free model to the allowlist yourself |
-| `FIRMS_MAP_KEY` | for fires | Free NASA FIRMS key: https://firms.modaps.eosdis.nasa.gov/api/map_key/ |
+| `NASA_FIRMS_MAP_KEY` | for fires | Free NASA FIRMS key: https://firms.modaps.eosdis.nasa.gov/api/map_key/ (old name `FIRMS_MAP_KEY` still works) |
+| `AI_ALLOW_PAID_MODELS` | no | Must be `false`. Paid models are never used; any other value is ignored with a warning |
 | `CHAT_RATE_LIMIT_MAX` / `CHAT_RATE_LIMIT_WINDOW_SECONDS` | no | Default 10 requests per 60 s |
 | `TRUST_PROXY` | no | `true` only behind a trusted proxy (e.g. Vercel), so each user gets their own limit |
 | `CHAT_ALLOWED_ORIGINS` | no | e.g. `https://your-site.org`; blocks other websites from calling the API |
@@ -154,7 +167,7 @@ Without any AI key the chatbot still works and answers with the template. NASA P
 2. Click the chat button. Try a suggested question or type one:
    - English: `Is there a drought risk for rice farmers in Magway in the next 30 days?`
    - Myanmar: `ဧရာဝတီတိုင်းဒေသကြီးတွင် လာမည့် တစ်လအတွင်း ရေကြီးနိုင်ခြေ မည်သို့ရှိပါသလဲ။`
-   - Check: the six numbered sections appear in the same order in both languages, section 2 says no forecast is
+   - Check: the eight numbered sections appear in the same order in both languages, section 2 says no forecast is
      available, the historical block says "NOT a forecast" / "ခန့်မှန်းချက် မဟုတ်ပါ", and section 6 has the exact disclaimer.
 3. Switch EN / မြန်မာ in the page. The UI changes, and the **answer language follows the question's script**.
 4. Under each answer, check the line showing the region, the dates, "AI-written (model)" or "template", and the
@@ -199,10 +212,10 @@ or `$env:MOCK_OPENROUTER="429"; $env:MOCK_GROQ="429"` (template answer). **Clear
 
 Edit `src/features/earthlens-chat/config/answer-format.ts`:
 
-- `sections` — the six headings (English + Myanmar); `numberHeadings` adds "1." … "6."
+- `sections` — the eight headings (English + Myanmar); `numberHeadings` adds "1." … "8."
 - `disclaimer` — the exact required texts (English and Myanmar); `noModelNote` — shown while no forecast model is used
 - `decisionSupportStatus` — the "pending expert review" line (set to `null` after review)
-- `aiMaxWords`, `extraRules` — limits and extra rules for the AI-written section 3
+- `aiMaxWords`, `extraRules` — limits and extra rules for the AI-written sections 1 and 5
 - `showUnits`, `showDates`, `showSourceLinks`
 
 ## 7. Integrate into the original EarthLens project (tomorrow)

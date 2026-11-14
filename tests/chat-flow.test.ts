@@ -12,8 +12,10 @@ const keys = (over = {}) =>
     groq: { name: "groq", apiKey: "gq-test", baseUrl: "https://groq.test/openai/v1", models: ["openai/gpt-oss-20b"], rejectedModels: [] },
     ...over,
   });
-const EN_HEADINGS = ["1. Current Conditions", "2. 30-Day Future Outlook", "3. Potential Impacts", "4. Decision Support", "5. Data Sources", "6. Important Disclaimer"];
-const MY_HEADINGS = ["1. လက်ရှိ အခြေအနေ", "2. လာမည့် ရက် ၃၀ အလားအလာ", "3. ဖြစ်နိုင်သော သက်ရောက်မှုများ", "4. ဆုံးဖြတ်ချက်ချရန် အထောက်အကူ", "5. အချက်အလက် ရင်းမြစ်များ", "6. အရေးကြီး သတိပေးချက်"];
+const EN_HEADINGS = ["1. Direct Answer", "2. Current NASA Data", "3. Historical Data Comparison", "4. Next 30-Day Outlook", "5. Potential Risks and Impacts", "6. Decision Support and Recommendations", "7. Data Sources and Forecast Model", "8. Disclaimer"];
+const MY_HEADINGS = answerFormat.sections.map((s, i) => `${i + 1}. ${s.heading.my}`);
+const DISCLAIMER_EN = "The analysis and forecasts provided are based on NASA Earth observation data, relevant historical records, and the forecasting models used. They represent estimated future possibilities and do not guarantee actual future conditions.";
+const DISCLAIMER_MY = "ဤအဖြေတွင် ဖော်ပြထားသော ခန့်မှန်းသုံးသပ်ချက်များသည် NASA မှ ရရှိသော ကမ္ဘာမြေလေ့လာရေးအချက်အလက်များ၊ သက်ဆိုင်ရာ အတိတ်မှတ်တမ်းများနှင့် အသုံးပြုထားသော ခန့်မှန်းမော်ဒယ်များအပေါ် အခြေခံထားခြင်းဖြစ်ပါသည်။ ၎င်းတို့သည် ဖြစ်နိုင်ခြေကို ခန့်မှန်းသုံးသပ်ထားခြင်းသာဖြစ်ပြီး အမှန်တကယ် ဖြစ်ပေါ်လာမည်ဟု အာမခံခြင်း မဟုတ်ပါ။";
 
 const inOrder = (text: string, parts: string[]) => {
   let pos = -1;
@@ -26,12 +28,16 @@ const inOrder = (text: string, parts: string[]) => {
 
 beforeEach(() => clearPowerCacheForTests());
 
-describe("six-section answer format", () => {
-  it("English: all six sections in order, exact disclaimer, no forecast claimed", async () => {
+describe("eight-section answer format", () => {
+  it("English: all eight sections in order, exact disclaimer, no forecast claimed", async () => {
     const { f } = mockFetch({ "https://power.larc.nasa.gov": nasa() });
     const r = await answerChat({ message: "Is there drought risk for rice farmers in Ayeyarwady in the next 30 days?" }, { config: baseConfig(), fetchImpl: f, today: TODAY });
     inOrder(r.answer, EN_HEADINGS);
-    expect(r.answer).toContain(answerFormat.disclaimer.en);
+    expect(r.answer).toContain(DISCLAIMER_EN);
+    expect(r.answer.endsWith(DISCLAIMER_EN)).toBe(true);
+    expect(r.sections.direct).toMatch(/^For Ayeyarwady: /);
+    expect(r.sections.history).toMatch(/Reference period: the same calendar dates in 1981–20\d\d/);
+    expect(r.sections.current).toContain("Location: Ayeyarwady");
     expect(r.answer).toContain("a reliable 30-day forecast cannot be calculated yet");
     expect(r.answer).toContain("NOT a forecast");
     expect(r.answer).not.toMatch(/\d+\s*%\s*(chance|probability)/i);
@@ -45,19 +51,19 @@ describe("six-section answer format", () => {
     expect(r.sections.sources).toContain("Forecasting model: none");
   });
 
-  it("Myanmar: same six sections in order and the exact Burmese disclaimer", async () => {
+  it("Myanmar: same eight sections in order and the exact Burmese disclaimer", async () => {
     const { f } = mockFetch({ "https://power.larc.nasa.gov": nasa() });
     const r = await answerChat({ message: "ရန်ကုန်မှာ လာမည့် ရက် ၃၀ အတွင်း ရေကြီးနိုင်ခြေ ရှိလား" }, { config: baseConfig(), fetchImpl: f, today: TODAY });
     expect(r.lang).toBe("my");
     expect(r.region.id).toBe("yangon");
     inOrder(r.answer, MY_HEADINGS);
-    expect(r.answer).toContain("ဤခန့်မှန်းချက်သည် NASA မှ ရရှိသော ကမ္ဘာမြေလေ့လာရေးအချက်အလက်များနှင့် အသုံးပြုထားသော ခန့်မှန်းမော်ဒယ်အပေါ် အခြေခံထားသည့် ခန့်မှန်းသုံးသပ်ချက်သာ ဖြစ်ပါသည်။ ရလဒ်များသည် အမှန်တကယ်ဖြစ်ပေါ်မည့် အခြေအနေကို အာမမခံပါ။");
-    expect(r.answer).not.toContain(answerFormat.disclaimer.en);
+    expect(r.answer.endsWith(DISCLAIMER_MY)).toBe(true);
+    expect(r.answer).not.toContain(DISCLAIMER_EN);
     expect(r.answer).toContain("ခန့်မှန်းချက် မဟုတ်ပါ");
     expect(r.topics).toContain("flood");
   });
 
-  it("keeps the six sections even when NASA is unavailable, and does not call the AI", async () => {
+  it("keeps the eight sections even when NASA is unavailable, and does not call the AI", async () => {
     const { f, calls } = mockFetch({ "https://power.larc.nasa.gov": () => new Response("down", { status: 503 }) });
     const r = await answerChat({ message: "drought in Bago" }, { config: keys(), fetchImpl: f, today: TODAY });
     inOrder(r.answer, EN_HEADINGS);
@@ -93,7 +99,7 @@ describe("indicators and decision support", () => {
   });
 });
 
-describe("AI provider chain (section 3 only)", () => {
+describe("AI provider chain (direct answer + impacts only)", () => {
   it("uses OpenRouter first and places the verified AI text in Potential Impacts only", async () => {
     let system = "";
     const { f } = mockFetch({
@@ -111,6 +117,17 @@ describe("AI provider chain (section 3 only)", () => {
     expect(r.sections.outlook).not.toContain("In past years these 30 days");
     expect(system).toContain("VALIDATED 30-DAY FORECAST: NONE");
     expect(system).toContain("NOT a forecast");
+  });
+
+  it("puts the AI's leading sentence in Direct Answer and its bullets in Risks and Impacts", async () => {
+    const { f } = mockFetch({
+      "https://power.larc.nasa.gov": nasa(),
+      "https://openrouter.test": () => completion("Rice fields in Ayeyarwady look normal for the season.\n• Water supply matters for rice."),
+    });
+    const r = await answerChat({ message: "rice farming Ayeyarwady" }, { config: keys(), fetchImpl: f, today: TODAY });
+    expect(r.sections.direct).toBe("Rice fields in Ayeyarwady look normal for the season.");
+    expect(r.sections.impacts).toBe("• Water supply matters for rice.");
+    expect(r.answer.endsWith(DISCLAIMER_EN)).toBe(true);
   });
 
   it("rejects AI text that turns history into a forecast or invents a probability", async () => {
@@ -147,6 +164,31 @@ describe("AI provider chain (section 3 only)", () => {
     const r = await answerChat({ message: "crops Yangon" }, { config: keys(), fetchImpl: f, today: TODAY });
     expect(r.provider).toBe("groq");
     expect(calls.filter((c) => c.url.startsWith("https://openrouter.test"))).toHaveLength(1);
+  });
+});
+
+describe("general (non-environmental) questions", () => {
+  it("answers briefly without NASA data and ends with the general disclaimer", async () => {
+    const { f, calls } = mockFetch({ "https://openrouter.test": () => completion("Mingalaba! I am happy to help.") });
+    const r = await answerChat({ message: "hello, who are you?" }, { config: keys(), fetchImpl: f, today: TODAY });
+    expect(r.kind).toBe("general");
+    expect(r.nasaDataAvailable).toBe(false);
+    expect(calls.some((c) => c.url.includes("power.larc"))).toBe(false);
+    expect(r.answer.endsWith(answerFormat.generalDisclaimer.en)).toBe(true);
+    expect(r.answer).not.toContain(DISCLAIMER_EN);
+  });
+
+  it("uses the template and Myanmar disclaimer when no AI is configured", async () => {
+    const r = await answerChat({ message: "မင်္ဂလာပါ" }, { config: baseConfig(), today: TODAY });
+    expect(r.generator).toBe("template");
+    expect(r.answer.endsWith(answerFormat.generalDisclaimer.my)).toBe(true);
+  });
+
+  it("treats a question naming a region as environmental", async () => {
+    const { f } = mockFetch({ "https://power.larc.nasa.gov": nasa() });
+    const r = await answerChat({ message: "Tell me about Shan" }, { config: baseConfig(), fetchImpl: f, today: TODAY });
+    expect(r.kind).toBe("environmental");
+    expect(r.answer).toContain(DISCLAIMER_EN);
   });
 });
 

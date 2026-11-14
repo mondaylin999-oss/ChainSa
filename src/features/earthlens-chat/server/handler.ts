@@ -1,7 +1,7 @@
 import "server-only";
 import type { ChatErrorBody, ChatResponseBody, Lang, ParamKey } from "../types";
 import { DEFAULT_REGION_ID, detectRegion, getRegion } from "../regions";
-import { audienceOf, detectLimitations, detectParams, detectTopics } from "../params";
+import { audienceOf, detectLimitations, detectParams, detectTopics, isEnvironmentalQuestion } from "../params";
 import { detectLang } from "../i18n";
 import { answerFormat as defaultFormat, type AnswerFormat } from "../config/answer-format";
 import { getConfig, type ServerConfig } from "./env";
@@ -12,7 +12,7 @@ import { buildAssessment } from "./climate/assessment";
 import { buildRecommendations } from "./recommendations";
 import { getValidatedOutlook } from "./forecast/validated-outlook";
 import { buildAnswer } from "./answer-builder";
-import { buildMessages, buildSystemPrompt } from "./prompt";
+import { buildGeneralPrompt, buildMessages, buildSystemPrompt } from "./prompt";
 import { runProviderChain } from "./providers/chain";
 import { buildAllowed, forbiddenClaims, verifyAnswer, type VerifyResult } from "./verify";
 
@@ -33,7 +33,9 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
   const fmt = deps.format ?? defaultFormat;
   const message = sanitizeText(req.message);
   const lang: Lang = detectLang(message, req.lang ?? "en");
-  const region = detectRegion(message) ?? getRegion(req.selectedRegionId) ?? getRegion(DEFAULT_REGION_ID)!;
+  const named = detectRegion(message);
+  if (!isEnvironmentalQuestion(message, Boolean(named))) return answerGeneral(message, lang, req, cfg, fmt, deps);
+  const region = named ?? getRegion(req.selectedRegionId) ?? getRegion(DEFAULT_REGION_ID)!;
   const params: ParamKey[] = [...CORE_PARAMS, ...(detectParams(message).includes("fires") ? (["fires"] as ParamKey[]) : [])];
   const topics = detectTopics(message);
   const limitations = detectLimitations(message, region.id, lang);
@@ -47,6 +49,7 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
   const nasaDataAvailable = g.nasaDataAvailable || a.available;
 
   let aiImpacts: string | null = null;
+  let aiDirect: string | null = null;
   let provider: ChatResponseBody["provider"] = null;
   let model: string | null = null;
   let attempts: ChatResponseBody["attempts"] = [];
@@ -84,13 +87,13 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
     );
     attempts = chain.attempts;
     if (chain.text) {
-      aiImpacts = chain.text;
+      ({ direct: aiDirect, impacts: aiImpacts } = splitAiText(chain.text));
       provider = chain.provider;
       model = chain.model;
     }
   }
 
-  const built = buildAnswer({ lang, fmt, g, a, recs, outlook, aiImpacts, limitations });
+  const built = buildAnswer({ lang, fmt, g, a, recs, outlook, aiImpacts, aiDirect, topics, limitations });
   const v = verification as VerifyResult | null;
 
   return {
@@ -102,18 +105,70 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
     facts: [...g.facts, ...a.facts],
     dataFooter: built.sections.sources,
     limitations: [...limitations, ...g.notes],
-    generator: aiImpacts ? "llm" : "template",
+    generator: aiImpacts || aiDirect ? "llm" : "template",
     provider,
     model,
     attempts,
     verification: v ? { numbersChecked: v.checked, numbersVerified: v.verified } : null,
     nasaDataAvailable,
     mode: "live",
+    kind: "environmental",
     topics,
     indicators: { drought: a.drought, wet: a.wet, heat: a.heat },
     outlook: { window: a.outlookWindow, forecastAvailable: !!outlook?.probabilities.length, historical: a.facts.filter((f) => f.kind === "historical") },
     recommendations: recs,
     sections: built.sections,
+  };
+}
+
+/** Splits the AI text into the leading direct-answer sentence(s) and the bullet points. */
+export function splitAiText(text: string): { direct: string | null; impacts: string | null } {
+  const lines = text.trim().split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const i = lines.findIndex((l) => /^[•\-*]\s/.test(l));
+  const lead = (i === -1 ? lines.slice(0, 1) : lines.slice(0, i)).join(" ");
+  const rest = (i === -1 ? lines.slice(1) : lines.slice(i)).map((l) => l.replace(/^[-*]\s/, "• ")).join("\n");
+  return { direct: lead || null, impacts: rest || null };
+}
+
+const GENERAL_TEMPLATE = {
+  en: "I'm the EarthLens Assistant. I can't give a reliable answer to that question right now. I can answer questions about rainfall, temperature, drought, floods, crops, soil moisture or fires in any Myanmar state or region, using NASA data.",
+  my: "ကျွန်ုပ်သည် EarthLens လက်ထောက် ဖြစ်ပါသည်။ ထိုမေးခွန်းကို ယခု ယုံကြည်စိတ်ချစွာ မဖြေနိုင်ပါ။ မြန်မာနိုင်ငံ မည်သည့် ပြည်နယ်/တိုင်းဒေသကြီး၏ မိုးရေချိန်၊ အပူချိန်၊ မိုးခေါင်မှု၊ ရေကြီးမှု၊ သီးနှံ၊ မြေစိုထိုင်းဆ သို့မဟုတ် မီးလောင်မှုအကြောင်းကို NASA အချက်အလက်ဖြင့် ဖြေနိုင်ပါသည်။",
+};
+
+/** Non-environmental questions: short answer, no NASA analysis, general disclaimer added by the server. */
+async function answerGeneral(message: string, lang: Lang, req: ValidChatRequest, cfg: ServerConfig, fmt: AnswerFormat, deps: HandlerDeps): Promise<ChatResponseBody> {
+  const chain = await runProviderChain(
+    buildMessages(buildGeneralPrompt(lang), req.history, message),
+    cfg,
+    (text) => (forbiddenClaims(text).length ? "forbidden_claim" : true),
+    deps.fetchImpl,
+  );
+  const body = chain.text?.trim() || GENERAL_TEMPLATE[lang];
+  const disclaimer = fmt.generalDisclaimer[lang];
+  const region = getRegion(req.selectedRegionId) ?? getRegion(DEFAULT_REGION_ID)!;
+  const empty = { direct: body, current: "", history: "", outlook: "", impacts: "", decision: "", sources: "", disclaimer };
+  return {
+    answer: `${body}\n\n${disclaimer}`,
+    lang,
+    region: { id: region.id, name: region.name, nameMy: region.nameMy },
+    period: null,
+    sources: [],
+    facts: [],
+    dataFooter: "",
+    limitations: [],
+    generator: chain.text ? "llm" : "template",
+    provider: chain.text ? chain.provider : null,
+    model: chain.text ? chain.model : null,
+    attempts: chain.attempts,
+    verification: null,
+    nasaDataAvailable: false,
+    mode: "live",
+    kind: "general",
+    topics: [],
+    indicators: { drought: "unknown", wet: "unknown", heat: "unknown" },
+    outlook: { window: { start: "", end: "" }, forecastAvailable: false, historical: [] },
+    recommendations: [],
+    sections: empty,
   };
 }
 

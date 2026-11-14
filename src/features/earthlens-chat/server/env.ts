@@ -69,8 +69,13 @@ export function getConfig(): ServerConfig {
   if (cached) return cached;
   const e = process.env;
 
-  const orModels = list(e.OPENROUTER_MODELS, ["openrouter/free"]);
-  const groqModels = list(e.GROQ_MODELS, ["openai/gpt-oss-20b", "openai/gpt-oss-120b"]);
+  // Brief names: OPENROUTER_MODEL / GROQ_MODEL (one explicit model each, optionally comma-separated).
+  // The older plural names are still read as a fallback.
+  const orModels = list(e.OPENROUTER_MODEL || e.OPENROUTER_MODELS, ["openrouter/free"]);
+  const groqModels = list(e.GROQ_MODEL || e.GROQ_MODELS, ["openai/gpt-oss-20b"]);
+  // Paid models are never used. AI_ALLOW_PAID_MODELS=true is refused on purpose, not just ignored silently.
+  if ((e.AI_ALLOW_PAID_MODELS ?? "false").trim().toLowerCase() !== "false")
+    console.warn("[earthlens-chat] AI_ALLOW_PAID_MODELS is not 'false'. This project only uses free models; the setting is ignored.");
   const extraGroq = list(e.GROQ_EXTRA_FREE_MODELS, []);
   const groqAllowed = new Set([...GROQ_FREE_ALLOWLIST, ...extraGroq]);
 
@@ -89,7 +94,7 @@ export function getConfig(): ServerConfig {
       models: groqModels.filter((m) => groqAllowed.has(m)),
       rejectedModels: groqModels.filter((m) => !groqAllowed.has(m)),
     },
-    firmsMapKey: (e.FIRMS_MAP_KEY ?? "").trim(),
+    firmsMapKey: (e.NASA_FIRMS_MAP_KEY || e.FIRMS_MAP_KEY || "").trim(),
     aiTimeoutMs: int(e.AI_TIMEOUT_MS, 25_000, 3_000, 60_000),
     verifyMode: (e.CHAT_VERIFY_MODE ?? "").toLowerCase() === "warn" ? "warn" : "strict",
     nasaTimeoutMs: int(e.NASA_TIMEOUT_MS, 20_000, 3_000, 60_000),

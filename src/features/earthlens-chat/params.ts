@@ -89,3 +89,12 @@ export function detectTopics(text: string): Topic[] {
   if (/farm|crop|rice|paddy|plant|harvest|seed|agri|လယ်|စပါး|သီးနှံ|စိုက်|ရိတ်/.test(t)) out.push("agriculture");
   return out.length ? out : ["agriculture", "drought", "flood"];
 }
+
+// Earth/environment vocabulary (English + Myanmar). Used to decide between the eight-section
+// NASA answer and a short general answer that must not invent environmental analysis.
+const ENV_WORDS =
+  /weather|climate|rain|precip|monsoon|temperat|heat|hot|cold|humid|wind|storm|cyclone|drought|dry|flood|water|river|irrigat|soil|crop|farm|rice|paddy|plant|harvest|seed|agri|fish|fire|smoke|burn|forest|environment|pollut|air quality|nasa|satellite|season|forecast|outlook|risk|မိုး|ရာသီ|အပူ|အအေး|စိုထိုင်း|လေတိုက်|မုန်တိုင်း|ခြောက်သွေ့|ရေကြီး|ရေလျှံ|ရေ|မြစ်|ဆည်|မြေ|သီးနှံ|လယ်|စပါး|စိုက်|ရိတ်|ငါး|မီး|သစ်တော|ပတ်ဝန်းကျင်/;
+
+export function isEnvironmentalQuestion(text: string, regionMentioned: boolean): boolean {
+  return regionMentioned || ENV_WORDS.test(text.toLowerCase());
+}

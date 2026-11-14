@@ -7,7 +7,7 @@ import type { Recommendation } from "./recommendations";
 import type { ValidatedOutlook } from "./forecast/validated-outlook";
 import { POWER_SOURCE } from "./nasa/power";
 
-/** Builds the fixed six-section answer. Only section 3 (impacts) may contain AI-written text. */
+/** Builds the fixed eight-section answer. Only sections 1 (direct) and 5 (impacts) may contain AI-written text. */
 
 type T = Record<Lang, string>;
 const UNIT_MY: Record<string, string> = { days: "ရက်", detections: "ကြိမ်", years: "နှစ်", percentile: "(ရာခိုင်နှုန်းအဆင့်)", "fraction (0–1)": "အချိုး (0–1)" };
@@ -45,6 +45,9 @@ export interface BuildInput {
   recs: Recommendation[];
   outlook: ValidatedOutlook | null;
   aiImpacts: string | null;
+  /** First sentence of the AI text, used as the direct answer. */
+  aiDirect: string | null;
+  topics: ("drought" | "flood" | "agriculture")[];
   limitations: string[];
 }
 
@@ -62,15 +65,29 @@ function current({ lang, fmt, g, a }: BuildInput): string[] {
     out.push(L({ en: `NASA measurements for ${name} could not be retrieved right now. Please try again later.`, my: `${name} အတွက် NASA တိုင်းတာချက်များကို ယခု မရယူနိုင်ပါ။ ခဏကြာမှ ထပ်မံ ကြိုးစားပါ။` }));
     return out;
   }
-  out.push(L({ en: `NASA observations for ${name} (one representative grid point):`, my: `${name} အတွက် NASA တိုင်းတာချက်များ (ကိုယ်စားပြု ဂရစ်အမှတ် တစ်ခု) -` }));
+  out.push(L({ en: `Location: ${name} — one representative NASA POWER grid point at ${g.region.lat.toFixed(2)}°N, ${g.region.lon.toFixed(2)}°E (not a regional average).`, my: `တည်နေရာ - ${name} — ${g.region.lat.toFixed(2)}°N, ${g.region.lon.toFixed(2)}°E ရှိ NASA POWER ကိုယ်စားပြု ဂရစ်အမှတ် (ဒေသတစ်ခုလုံး၏ ပျမ်းမျှ မဟုတ်ပါ)။` }));
+  out.push(L({ en: `Datasets: ${g.sources.map((s) => s.name).join("; ") || "NASA POWER (daily, AG community)"}. Measured/modelled values:`, my: `အချက်အလက်အစု - ${g.sources.map((s) => s.name).join("; ") || "NASA POWER (daily, AG community)"}။ တိုင်းတာ/မော်ဒယ် တန်ဖိုးများ -` }));
   for (const f of g.facts) out.push(`• ${factText(f, lang, fmt)}`);
   for (const f of a.facts.filter((x) => x.kind === "observation")) out.push(`• ${factText(f, lang, fmt)}`);
+  return out;
+}
+
+function history({ lang, fmt, a }: BuildInput): string[] {
+  const L = (t: T) => t[lang];
+  const out: string[] = [];
+  if (!a.available) {
+    out.push(L({ en: "The long-term NASA POWER record could not be retrieved, so no historical comparison is shown.", my: "ရေရှည် NASA POWER မှတ်တမ်းကို မရယူနိုင်သဖြင့် ယခင်မှတ်တမ်းနှင့် နှိုင်းယှဉ်ချက် မပြနိုင်ပါ။" }));
+    return out;
+  }
+  if (a.baseline)
+    out.push(L({ en: `Reference period: the same calendar dates in ${a.baseline.firstYear}–${a.baseline.lastYear} (NASA POWER daily). These are calculated ranks, not measurements.`, my: `ကိုးကားကာလ - ${a.baseline.firstYear}–${a.baseline.lastYear} ရှိ တူညီသော ပြက္ခဒိန်ရက်များ (NASA POWER နေ့စဉ်)။ ၎င်းတို့သည် တွက်ချက်ထားသော အဆင့်များ ဖြစ်ပြီး တိုင်းတာချက်များ မဟုတ်ပါ။` }));
   const ctx = a.facts.filter((f) => f.kind === "comparison");
   if (ctx.length) {
     out.push(L({ en: "Compared with the same dates in past years (percentile: 50 = typical, below 20 = unusually low, above 80 = unusually high):", my: "ယခင်နှစ်များ၏ တူညီသောရက်များနှင့် နှိုင်းယှဉ်ချက် (ရာခိုင်နှုန်းအဆင့် - ၅၀ = ပုံမှန်၊ ၂၀ အောက် = ပုံမှန်ထက် အလွန်နည်း၊ ၈၀ အထက် = ပုံမှန်ထက် အလွန်များ) -" }));
     for (const f of ctx) out.push(`• ${factText(f, lang, fmt)}`);
   }
   if (a.drySeasonNow) out.push(L({ en: "• The last 30 days fall in the usual dry season here, so a rainfall ranking is not meaningful.", my: "• ပြီးခဲ့သော ရက် ၃၀ သည် ဤနေရာ၏ ပုံမှန် ခြောက်သွေ့ရာသီ ဖြစ်သဖြင့် မိုးရေချိန် အဆင့်သတ်မှတ်ချက်သည် အဓိပ္ပာယ် မရှိပါ။" }));
+  if (!ctx.length && !a.drySeasonNow) out.push(L({ en: "No comparison could be calculated for the latest data.", my: "နောက်ဆုံး အချက်အလက်အတွက် နှိုင်းယှဉ်ချက် မတွက်ချက်နိုင်ပါ။" }));
   out.push(L({ en: "EarthLens indicators (not official declarations):", my: "EarthLens ညွှန်ကိန်းများ (တရားဝင် ကြေညာချက်များ မဟုတ်ပါ) -" }));
   out.push(`• ${L({ en: "Drought", my: "မိုးခေါင်မှု" })}: ${L(STATUS[`drought:${a.drought}`])}`);
   out.push(`• ${L({ en: "Wet conditions / flood risk from rainfall", my: "စိုစွတ်မှု / မိုးကြောင့် ရေကြီးနိုင်ခြေ" })}: ${L(STATUS[`wet:${a.wet}`])}`);
@@ -133,6 +150,30 @@ function outlookSection({ lang, fmt, a, outlook }: BuildInput): string[] {
   return out;
 }
 
+const PHRASE: Record<string, T> = {
+  "drought:none": { en: "NASA data shows no drought signal", my: "NASA အချက်အလက်တွင် မိုးခေါင်မှု အချက်ပြမှု မတွေ့ရပါ" },
+  "drought:watch": { en: "conditions are drier than usual for this time of year (drought watch)", my: "ယခုအချိန်အတွက် ပုံမှန်ထက် ခြောက်သွေ့နေပါသည် (မိုးခေါင်မှု စောင့်ကြည့်)" },
+  "drought:warning": { en: "conditions are much drier than usual (drought warning)", my: "ပုံမှန်ထက် အလွန်ခြောက်သွေ့နေပါသည် (မိုးခေါင်မှု သတိပေး)" },
+  "wet:none": { en: "there is no unusual heavy-rain or wet signal", my: "ပုံမှန်မဟုတ်သော မိုးသည်းမှု သို့မဟုတ် စိုစွတ်မှု မတွေ့ရပါ" },
+  "wet:watch": { en: "it has been unusually wet, so rain-related flooding needs watching", my: "ပုံမှန်ထက် စိုစွတ်နေသဖြင့် မိုးကြောင့် ရေကြီးနိုင်မှုကို စောင့်ကြည့်ရန် လိုပါသည်" },
+  "heat:unusual": { en: "it has been unusually hot for the season", my: "ဤရာသီအတွက် ပုံမှန်ထက် ပူနေပါသည်" },
+};
+
+/** Rule-based direct answer used when no AI text is available. */
+export function templateDirect({ lang, g, a, topics }: BuildInput): string {
+  const L = (t: T) => t[lang];
+  const name = lang === "my" ? g.region.nameMy : g.region.name;
+  if (!g.facts.length && !a.available)
+    return L({ en: `I could not retrieve NASA data for ${name} right now, so I cannot answer reliably. Please try again later.`, my: `${name} အတွက် NASA အချက်အလက်ကို ယခု မရယူနိုင်သဖြင့် ယုံကြည်စိတ်ချစွာ မဖြေနိုင်ပါ။ ခဏကြာမှ ထပ်ကြိုးစားပါ။` });
+  const parts: string[] = [];
+  if (topics.includes("drought") || topics.includes("agriculture")) parts.push(L(PHRASE[`drought:${a.drought}`] ?? PHRASE["drought:none"]));
+  if (topics.includes("flood") || a.wet === "watch") parts.push(L(PHRASE[`wet:${a.wet}`] ?? PHRASE["wet:none"]));
+  if (a.heat === "unusual") parts.push(L(PHRASE["heat:unusual"]));
+  const joined = parts.join(lang === "my" ? "၊ " : "; ");
+  const tail = L({ en: " A reliable 30-day forecast is not available yet; the outlook below shows past-year patterns only.", my: " ယုံကြည်ရသော ရက် ၃၀ ခန့်မှန်းချက် မရှိသေးပါ။ အောက်ပါ အလားအလာတွင် ယခင်နှစ်များ၏ ပုံစံများကိုသာ ပြထားပါသည်။" });
+  return L({ en: `For ${name}: ${joined || "no unusual conditions are indicated"}.`, my: `${name} အတွက် - ${joined || "ပုံမှန်မဟုတ်သော အခြေအနေ မညွှန်ပြပါ"}။` }) + tail;
+}
+
 export function templateImpacts(a: Assessment, lang: Lang): string {
   const L = (t: T) => t[lang];
   const out: string[] = [];
@@ -184,17 +225,19 @@ function sourcesSection({ lang, fmt, g, a, outlook }: BuildInput): string[] {
 }
 
 function disclaimer({ lang, fmt, outlook, limitations, g }: BuildInput): string[] {
-  const out = [fmt.disclaimer[lang]];
+  // Notes first, so the required disclaimer is always the last text of every answer.
+  const out: string[] = [...limitations, ...g.notes].map((n) => `• ${n}`);
   if (!outlook?.probabilities.length) out.push(fmt.noModelNote[lang]);
-  const notes = [...limitations, ...g.notes];
-  if (notes.length) for (const n of notes) out.push(`• ${n}`);
+  out.push(fmt.disclaimer[lang]);
   return out;
 }
 
 export function buildAnswer(input: BuildInput): { text: string; sections: Record<SectionId, string> } {
   const { lang, fmt } = input;
   const bodies: Record<SectionId, string[]> = {
+    direct: [input.aiDirect ?? templateDirect(input)],
     current: current(input),
+    history: history(input),
     outlook: outlookSection(input),
     impacts: [input.aiImpacts ?? templateImpacts(input.a, lang)],
     decision: decision(input),

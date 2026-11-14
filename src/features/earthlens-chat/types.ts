@@ -86,6 +86,8 @@ export interface ChatResponseBody {
   nasaDataAvailable: boolean;
   /** Kept for compatibility with the original EarthLens chat panel. */
   mode: "live";
+  /** environmental = eight-section NASA answer; general = short answer without NASA data. */
+  kind: "environmental" | "general";
   /** Priority topics detected in the question. */
   topics: ("drought" | "flood" | "agriculture")[];
   /** EarthLens indicators (rule-based, not official declarations). */
@@ -93,8 +95,8 @@ export interface ChatResponseBody {
   /** 30-day outlook. `forecastAvailable` stays false until a model passes validation. */
   outlook: { window: { start: string; end: string }; forecastAvailable: boolean; historical: Fact[] };
   recommendations: { id: string; text: string; reason: string; uncertainty: string }[];
-  /** The six answer sections as separate strings (same text as `answer`). */
-  sections: Record<"current" | "outlook" | "impacts" | "decision" | "sources" | "disclaimer", string>;
+  /** The eight answer sections as separate strings (same text as `answer`). Empty for general questions, except direct + disclaimer. */
+  sections: Record<"direct" | "current" | "history" | "outlook" | "impacts" | "decision" | "sources" | "disclaimer", string>;
 }
 
 export interface ChatErrorBody {

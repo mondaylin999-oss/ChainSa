@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Myanmar EarthLens — Chatbot prototype",
-  description: "Bilingual NASA-grounded chatbot module for Myanmar EarthLens",
+  title: "Myanmar EarthLens",
+  description: "NASA Earth observation data, made useful for Myanmar's farmers, fishers and communities.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

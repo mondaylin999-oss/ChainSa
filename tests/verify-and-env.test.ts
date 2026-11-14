@@ -35,7 +35,25 @@ describe("free-only model configuration", () => {
   afterEach(() => {
     delete process.env.OPENROUTER_MODELS;
     delete process.env.GROQ_MODELS;
+    delete process.env.OPENROUTER_MODEL;
+    delete process.env.GROQ_MODEL;
+    delete process.env.NASA_FIRMS_MAP_KEY;
     resetConfigForTests();
+  });
+  it("reads the brief's variable names and still refuses paid models", () => {
+    process.env.OPENROUTER_MODEL = "openai/gpt-oss-120b:free";
+    process.env.GROQ_MODEL = "openai/gpt-oss-20b";
+    process.env.NASA_FIRMS_MAP_KEY = "test-map-key";
+    process.env.AI_ALLOW_PAID_MODELS = "true";
+    resetConfigForTests();
+    const c = getConfig();
+    expect(c.openrouter.models).toEqual(["openai/gpt-oss-120b:free"]);
+    expect(c.groq.models).toEqual(["openai/gpt-oss-20b"]);
+    expect(c.firmsMapKey).toBe("test-map-key");
+    process.env.OPENROUTER_MODEL = "openai/gpt-5";
+    resetConfigForTests();
+    expect(getConfig().openrouter.models).toEqual([]);
+    delete process.env.AI_ALLOW_PAID_MODELS;
   });
   it("only accepts OpenRouter free models", () => {
     expect(isFreeOpenRouterModel("openrouter/free")).toBe(true);

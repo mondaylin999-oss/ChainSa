@@ -20,3 +20,14 @@ html[lang="my"] body { font-family: var(--font-mm), var(--font-sans); line-heigh
 .card { @apply rounded-2xl border border-white/[0.07] bg-abyss-900/70 backdrop-blur; box-shadow: 0 0 0 1px rgba(124,199,255,.12), 0 12px 40px -12px rgba(0,0,0,.6); }
 .scrollbar-thin::-webkit-scrollbar { width: 6px; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: #22395f; border-radius: 3px; }
+
+/* Components and Leaflet overrides copied from the Myanmar EarthLens demo */
+.chip { @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium; }
+.label { @apply text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400; }
+.leaflet-container { background: transparent !important; font-family: var(--font-sans); }
+.leaflet-tooltip.region-tip { background: rgba(10,20,38,.92); color: #e2e8f0; border: 1px solid rgba(124,199,255,.25); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.4); padding: 4px 8px; font-size: 12px; }
+.leaflet-tooltip.region-tip:before { display: none; }
+.leaflet-control-attribution { background: rgba(5,11,24,.7) !important; color: #94a3b8 !important; font-size: 10px; }
+.leaflet-control-attribution a { color: #7cc7ff !important; }
+.leaflet-bar a { background: #0f1d35 !important; color: #cbd5e1 !important; border-color: #22395f !important; }
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(.8); }
