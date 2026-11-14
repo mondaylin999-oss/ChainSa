@@ -44,6 +44,8 @@ html[lang=my] .terra-app{font-family:var(--font-mm);line-height:1.8}html[lang=my
 .terra-map-panel{min-height:0}
 .terra-map-canvas{height:auto;min-height:0}
 .terra-inspector{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+/* Preserve each card's content height inside the scrolling inspector. */
+.terra-inspector>*{flex-shrink:0}
 @media(max-width:900px){.terra-workspace{height:calc(100dvh - 68px);grid-template-rows:auto minmax(0,1fr)}}
 @media(max-width:700px){
   .terra-main{padding:12px 14px 16px}
