@@ -248,6 +248,8 @@ export default function Page() {
   const selectedTownship = catalog?.townships.find(item=>item.id===townshipId);
   const dateError = observationDateError(draftStart,draftEnd);
 
+  if (view === "home") return <ReferenceHome onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={() => { setView("explore"); setChatOpen(true); }} onRegion={(id) => { chooseRegion(id); setView("explore"); }} />;
+
   return (
     <main className={`earthlens-app${view === "explore" ? " is-exploring" : ""}`} lang={lang}>
       <header className="site-header">
@@ -271,16 +273,7 @@ export default function Page() {
         </div>
       </header>
 
-      {view === "home" ? (
-        <div className="page-shell">
-          <ReferenceHome onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={askAI} onRegion={(id) => { chooseRegion(id); setView("explore"); }} />
-          <ChatPanel lang={lang} selectedRegionId={regionId} inputRef={chatInputRef} />
-          <footer className="site-footer">
-            <span>Myanmar EarthLens · Evidence first, limitations included</span>
-            <a href="/earthlens.html">Open the original dashboard preview <ExternalLink size={13} /></a>
-          </footer>
-        </div>
-      ) : (
+      {(
         <div className="page-shell explore-shell">
           <button type="button" className="explore-back" onClick={() => {
             if (townshipId) setTownshipId("");

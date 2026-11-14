@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Earth Trend Detective — Home</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#c3b6ff;text-decoration:none}a:hover{color:#ffffff}
+a:focus-visible,button:focus-visible{outline:2px solid #9fe870;outline-offset:3px}
+.lift{transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease}
+.lift:hover{transform:translateY(-5px);border-color:#5a6bd8;box-shadow:0 22px 48px rgba(0,0,0,.5)}
+.go{transition:transform .22s ease}
+.lift:hover .go{transform:translateX(5px)}
+.thumb{transition:transform .5s ease}
+.lift:hover .thumb{transform:scale(1.06)}
+@keyframes etd-spin{to{transform:rotate(360deg)}}
+@keyframes etd-drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes etd-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes etd-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #040816; color: #e9edfa; font-family: Inter, system-ui, sans-serif; font-size: 1rem; line-height: 1.5; overflow-x: hidden">
+
+<!-- NAV -->
+<header style="border-bottom: 1px solid #172142; background: #050a18">
+<div style="max-width: 1320px; margin: 0 auto; padding: 14px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; box-sizing: border-box">
+<a href="#top" style="display: flex; align-items: center; gap: 14px; color: #ffffff">
+<svg aria-hidden="true" width="46" height="46" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="22" r="17" fill="#123a8a" stroke="#4f8cff" stroke-width="2"></circle><path d="M12 18c4-3 8-1 10 2s6 3 9 0 5-5 8-3" stroke="#7fd0ff" stroke-width="2" stroke-linecap="round"></path><path d="M24 44c-7-1-11-6-11-12 6 0 10 3 11 8 1-5 5-8 11-8 0 6-4 11-11 12z" fill="#3ecf6e"></path></svg>
+<span style="display: flex; flex-direction: column">
+<span style="font-size: 1.3125rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2">Earth Trend Detective</span>
+<span style="font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em; color: #a9b6d8">MYANMAR EARTH INTELLIGENCE</span>
+</span>
+</a>
+<nav aria-label="Main" style="margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
+<a href="#top" aria-current="page" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 12px; background: {{accent}}; color: #ffffff; font-size: 0.9375rem; font-weight: 600; box-sizing: border-box">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>Home</a>
+<a href="#systems" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 12px; color: #e9edfa; font-size: 0.9375rem; font-weight: 500; box-sizing: border-box">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M15.5 8.5l-2 5-5 2 2-5z"></path></svg>Explore</a>
+<a href="#assistant" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 12px; color: #e9edfa; font-size: 0.9375rem; font-weight: 500; box-sizing: border-box">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path><path d="M19 16v4M17 18h4"></path></svg>AI Assistant</a>
+<a href="#history" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 12px; color: #e9edfa; font-size: 0.9375rem; font-weight: 500; box-sizing: border-box">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>History</a>
+<a href="#top" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 12px; color: #e9edfa; font-size: 0.9375rem; font-weight: 500; box-sizing: border-box">
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7.5v.5"></path></svg>About</a>
+<button type="button" aria-label="Account" style="width: 44px; height: 44px; margin-left: 8px; border-radius: 50%; border: 1px solid #2a3760; background: #121b38; color: #c9d2ea; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"></path></svg>
+</button>
+</nav>
+</div>
+</header>
+
+<!-- HERO -->
+<section id="top" style="position: relative; overflow: hidden; background: radial-gradient(900px 560px at 80% 45%, #12306e 0%, rgba(18,48,110,0) 70%), radial-gradient(1.5px 1.5px at 12% 22%, #ffffff 50%, transparent 51%), radial-gradient(1px 1px at 28% 68%, #cfe0ff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 46% 14%, #ffffff 50%, transparent 51%), radial-gradient(1px 1px at 6% 86%, #cfe0ff 50%, transparent 51%), radial-gradient(1px 1px at 38% 40%, #ffffff 50%, transparent 51%), #040816">
+<div style="max-width: 1320px; margin: 0 auto; padding: 64px 32px 56px; display: flex; flex-direction: column; gap: 36px; box-sizing: border-box">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 56px">
+
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 10px; padding: 7px 16px; border-radius: 999px; border: 1px solid #2f3f75; background: #0c1532; font-size: 0.8125rem; font-weight: 600; color: #d5dcf2">
+<span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #9fe870; animation: etd-pulse 1.8s ease-in-out infinite"></span>
+Satellite intelligence for every township</span>
+<h1 style="margin: 0; font-size: clamp(2rem, 4.4vw, 4rem); font-weight: 800; line-height: 1.06; letter-spacing: -0.03em; color: #ffffff">
+<span style="display: block; white-space: nowrap">Detect the Change.</span>
+<span style="display: block; white-space: nowrap"><span style="color: #9fe870">Understand</span> the Trend.</span>
+<span style="display: block; white-space: nowrap">Make Better <span style="color: #b79bff">Decisions.</span></span>
+</h1>
+<p style="margin: 0; font-size: 1.1875rem; color: #c5cee8; max-width: 540px">NASA Earth observation data for Myanmar, turned into clear trends and AI guidance you can act on.</p>
+
+</div>
+
+<div style="flex: 0 1 480px; min-width: 0; margin: 0 auto; display: flex; flex-direction: column; gap: 12px">
+<div style="position: relative">
+<div style="position: relative; width: 58%; margin: 0 auto">
+<img src="./assets/b98564cdfe1799dfa97488828a927337.png" alt="Map of Myanmar colored by vegetation, with Yangon marked" style="display: block; width: 100%; height: auto">
+<span style="position: absolute; left: 32%; top: 58.8%; width: 36%; height: 9%; border-radius: 10px; border: 1px solid #3a4a86; background: #0c1532; color: #ffffff; font-size: 0.9375rem; font-weight: 600; display: flex; align-items: center; justify-content: center; box-sizing: border-box">Yangon</span>
+</div>
+<div style="position: absolute; left: 0; top: 4%; width: 150px; padding: 10px 12px; border-radius: 14px; border: 1px solid #2f5a2a; background: rgba(4,8,22,0.94); box-shadow: 0 10px 24px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<span style="font-size: 0.75rem; color: #d5dcf2">Vegetation</span>
+<span style="font-size: 1.0625rem; font-weight: 700; color: #9fe870">↓ −12.5%</span>
+<svg aria-hidden="true" viewBox="0 0 120 30" preserveAspectRatio="none" style="width: 100%; height: 30px; display: block"><path d="M2 4L31 15L60 18L89 26L118 22V30H2z" fill="#9fe870" fill-opacity="0.16"></path><path d="M2 4L31 15L60 18L89 26L118 22" fill="none" stroke="#9fe870" stroke-width="2" vector-effect="non-scaling-stroke"></path></svg>
+</div>
+<div style="position: absolute; right: 0; top: 26%; width: 150px; padding: 10px 12px; border-radius: 14px; border: 1px solid #5a2f2a; background: rgba(4,8,22,0.94); box-shadow: 0 10px 24px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<span style="font-size: 0.75rem; color: #d5dcf2">Temperature</span>
+<span style="font-size: 1.0625rem; font-weight: 700; color: #ff9b8a">↗ +1.2 °C</span>
+<svg aria-hidden="true" viewBox="0 0 120 30" preserveAspectRatio="none" style="width: 100%; height: 30px; display: block"><path d="M2 24L25 20L48 21L72 14L95 10L118 5V30H2z" fill="#ff9b8a" fill-opacity="0.16"></path><path d="M2 24L25 20L48 21L72 14L95 10L118 5" fill="none" stroke="#ff9b8a" stroke-width="2" vector-effect="non-scaling-stroke"></path></svg>
+</div>
+<div style="position: absolute; left: 0; top: 66%; width: 150px; padding: 10px 12px; border-radius: 14px; border: 1px solid #4a2f66; background: rgba(4,8,22,0.94); box-shadow: 0 10px 24px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<span style="font-size: 0.75rem; color: #d5dcf2">Soil Moisture</span>
+<span style="font-size: 1.0625rem; font-weight: 700; color: #e39bff">↓ −8.7%</span>
+<svg aria-hidden="true" viewBox="0 0 120 30" preserveAspectRatio="none" style="width: 100%; height: 30px; display: block"><path d="M2 6L25 8L48 13L72 12L95 19L118 23V30H2z" fill="#e39bff" fill-opacity="0.16"></path><path d="M2 6L25 8L48 13L72 12L95 19L118 23" fill="none" stroke="#e39bff" stroke-width="2" vector-effect="non-scaling-stroke"></path></svg>
+</div>
+<div style="position: absolute; right: 0; top: 74%; width: 150px; padding: 10px 12px; border-radius: 14px; border: 1px solid #2a4a66; background: rgba(4,8,22,0.94); box-shadow: 0 10px 24px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<span style="font-size: 0.75rem; color: #d5dcf2">Rainfall</span>
+<span style="font-size: 1.0625rem; font-weight: 700; color: #5cc8ff">↓ −12.5%</span>
+<svg aria-hidden="true" viewBox="0 0 120 30" preserveAspectRatio="none" style="width: 100%; height: 30px; display: block"><path d="M2 5L25 10L48 8L72 17L95 20L118 25V30H2z" fill="#5cc8ff" fill-opacity="0.16"></path><path d="M2 5L25 10L48 8L72 17L95 20L118 25" fill="none" stroke="#5cc8ff" stroke-width="2" vector-effect="non-scaling-stroke"></path></svg>
+</div>
+</div>
+<p style="margin: 0; text-align: center; font-size: 0.8125rem; color: #a9b6d8">Yangon Township · sample figures</p>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 14px">
+<a href="#systems" style="display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 30px; border-radius: 16px; background: {{accent}}; color: #ffffff; font-size: 1.0625rem; font-weight: 700; box-sizing: border-box; box-shadow: 0 12px 36px rgba(109,74,255,0.45)">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M15.5 8.5l-2 5-5 2 2-5z"></path></svg>Explore Live Trends</a>
+<a href="#assistant" style="display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 26px; border-radius: 16px; border: 1px solid #3a4a86; background: #0c1532; color: #ffffff; font-size: 1.0625rem; font-weight: 600; box-sizing: border-box">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b79bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path><path d="M19 16v4M17 18h4"></path></svg>Ask AI Assistant</a>
+</div>
+</div>
+</section>
+
+<main style="max-width: 1320px; margin: 0 auto; padding: 24px 32px 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
+
+<!-- EARTH SYSTEMS -->
+<section id="systems" style="border: 1px solid #1f2b52; border-radius: 26px; background: #070d20; padding: 36px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.16em; color: #b79bff">EXPLORE</span>
+<h2 style="margin: 0; font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; line-height: 1.1">Explore by Earth System</h2>
+<p style="margin: 0; color: #c5cee8">Choose a category to detect trends, analyze changes, and get decision support.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px">
+
+<a href="#systems" class="lift" style="border: 1px solid #1f2b52; border-radius: 20px; background: #0a1228; overflow: hidden; display: flex; flex-direction: column; color: #e9edfa">
+<span style="display: block; height: 120px; overflow: hidden; background: #0b2417">
+<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><g fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"><path d="M-10 120C60 70 110 50 160 44" stroke-opacity="0.9"></path><path d="M40 120C90 80 130 58 172 48" stroke-opacity="0.7"></path><path d="M100 120C130 90 160 66 186 54" stroke-opacity="0.55"></path><path d="M170 120C180 96 192 74 202 60" stroke-opacity="0.45"></path><path d="M240 120C232 98 222 78 216 64" stroke-opacity="0.55"></path><path d="M320 120C286 92 252 72 230 62" stroke-opacity="0.7"></path></g><circle cx="256" cy="34" r="16" fill="#fbbf24" fill-opacity="0.85"></circle></svg></span>
+<span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: #123a26; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9"></path><path d="M12 12c0-4 3-7 8-7 0 5-3 8-8 7z"></path><path d="M12 15c0-3-2-5-7-5 0 4 2 6 7 5z"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 1.1875rem; font-weight: 700; color: #ffffff">Agriculture</span>
+<span style="font-size: 0.9375rem; color: #c5cee8">Crop health, rainfall, soil, temperature</span>
+</span>
+<svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</span></a>
+
+<a href="#systems" class="lift" style="border: 1px solid #1f2b52; border-radius: 20px; background: #0a1228; overflow: hidden; display: flex; flex-direction: column; color: #e9edfa">
+<span style="display: block; height: 120px; overflow: hidden; background: #111936">
+<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><g fill="#8fa2e8"><rect x="20" y="70" width="30" height="50" fill-opacity="0.35"></rect><rect x="58" y="46" width="34" height="74" fill-opacity="0.55"></rect><rect x="100" y="62" width="26" height="58" fill-opacity="0.4"></rect><rect x="134" y="24" width="38" height="96" fill-opacity="0.75"></rect><rect x="180" y="52" width="30" height="68" fill-opacity="0.5"></rect><rect x="218" y="36" width="34" height="84" fill-opacity="0.65"></rect><rect x="260" y="74" width="40" height="46" fill-opacity="0.35"></rect></g><g fill="#fde68a"><rect x="142" y="34" width="6" height="6"></rect><rect x="156" y="34" width="6" height="6"></rect><rect x="142" y="50" width="6" height="6"></rect><rect x="226" y="48" width="6" height="6"></rect><rect x="238" y="64" width="6" height="6"></rect><rect x="66" y="58" width="6" height="6"></rect></g></svg></span>
+<span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: #1c2440; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c9d2ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8l6-3v16M10 21V11l10 3v7M2 21h20"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 1.1875rem; font-weight: 700; color: #ffffff">Infrastructure &amp; Urban Change</span>
+<span style="font-size: 0.9375rem; color: #c5cee8">Land use, urban growth, construction</span>
+</span>
+<svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</span></a>
+
+<a href="#systems" class="lift" style="border: 1px solid #1f2b52; border-radius: 20px; background: #0a1228; overflow: hidden; display: flex; flex-direction: column; color: #e9edfa">
+<span style="display: block; height: 120px; overflow: hidden; background: #071c33">
+<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><g fill="none" stroke="#5cc8ff" stroke-width="3" stroke-linecap="round"><path d="M-10 36c30-16 50 16 80 0s50 16 80 0 50 16 80 0 50 16 100 0" stroke-opacity="0.45"></path><path d="M-10 62c30-16 50 16 80 0s50 16 80 0 50 16 80 0 50 16 100 0" stroke-opacity="0.7"></path><path d="M-10 88c30-16 50 16 80 0s50 16 80 0 50 16 80 0 50 16 100 0" stroke-opacity="0.95"></path></g></svg></span>
+<span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: #0f2f4d; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5cc8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 1.1875rem; font-weight: 700; color: #ffffff">Water</span>
+<span style="font-size: 0.9375rem; color: #c5cee8">Water resources, river, water supply</span>
+</span>
+<svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</span></a>
+
+<a href="#systems" class="lift" style="border: 1px solid #1f2b52; border-radius: 20px; background: #0a1228; overflow: hidden; display: flex; flex-direction: column; color: #e9edfa">
+<span style="display: block; height: 120px; overflow: hidden; background: #241a08">
+<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><circle cx="70" cy="56" r="22" fill="#fbbf24"></circle><g stroke="#fbbf24" stroke-width="3" stroke-linecap="round" stroke-opacity="0.7"><path d="M70 18v-10M70 104v-10M32 56H22M118 56h-10M43 29l-7-7M97 29l7-7M43 83l-7 7M97 83l7 7"></path></g><g fill="none" stroke="#fde68a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M190 110l14-70 14 70M196 80h16M184 52h40M256 110l12-58 12 58M261 86h14M250 62h36"></path><path d="M224 52c10 8 18 10 26 10" stroke-opacity="0.6"></path></g></svg></span>
+<span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: #3d2c0c; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L5 14h6l-1 8 8-12h-6z"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 1.1875rem; font-weight: 700; color: #ffffff">Energy &amp; Electricity</span>
+<span style="font-size: 0.9375rem; color: #c5cee8">Solar potential, electricity access, demand</span>
+</span>
+<svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</span></a>
+
+<a href="#systems" class="lift" style="border: 1px solid #1f2b52; border-radius: 20px; background: #0a1228; overflow: hidden; display: flex; flex-direction: column; color: #e9edfa">
+<span style="display: block; height: 120px; overflow: hidden; background: #08231c">
+<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><g fill="#34d399"><path d="M30 120l26-60 26 60z" fill-opacity="0.45"></path><path d="M70 120l34-84 34 84z" fill-opacity="0.75"></path><path d="M124 120l24-56 24 56z" fill-opacity="0.5"></path><path d="M160 120l38-96 38 96z" fill-opacity="0.9"></path><path d="M222 120l26-62 26 62z" fill-opacity="0.55"></path><path d="M262 120l22-50 22 50z" fill-opacity="0.4"></path></g></svg></span>
+<span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: #0f3a2c; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l6 8h-3l4 6H5l4-6H6z"></path><path d="M12 17v4"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 1.1875rem; font-weight: 700; color: #ffffff">Environmental Change</span>
+<span style="font-size: 0.9375rem; color: #c5cee8">Forest, biodiversity, land cover</span>
+</span>
+<svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</span></a>
+
+<a href="#systems" class="lift" style="border: 1px solid #1f2b52; border-radius: 20px; background: #0a1228; overflow: hidden; display: flex; flex-direction: column; color: #e9edfa">
+<span style="display: block; height: 120px; overflow: hidden; background: #2a0f1c">
+<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" style="width: 100%; height: 100%; display: block"><g fill="none" stroke="#ff8fb0" stroke-width="2.5"><circle cx="160" cy="60" r="12" stroke-opacity="1"></circle><circle cx="160" cy="60" r="30" stroke-opacity="0.7"></circle><circle cx="160" cy="60" r="52" stroke-opacity="0.45"></circle><circle cx="160" cy="60" r="78" stroke-opacity="0.28"></circle><circle cx="160" cy="60" r="108" stroke-opacity="0.16"></circle></g><circle cx="160" cy="60" r="5" fill="#ff8fb0"></circle></svg></span>
+<span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: #45162a; display: flex; align-items: center; justify-content: center">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff8fb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 1.1875rem; font-weight: 700; color: #ffffff">Disaster Intelligence</span>
+<span style="font-size: 0.9375rem; color: #c5cee8">Flood, landslide, earthquake, wildfire</span>
+</span>
+<svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</span></a>
+
+</div>
+<div style="display: flex; justify-content: flex-end">
+<a href="#systems" class="lift" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 14px; background: {{accent}}; color: #ffffff; font-weight: 700; box-sizing: border-box">Explore
+<svg aria-hidden="true" class="go" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</section>
+
+<!-- AI DECISION SUPPORT -->
+<section id="assistant" style="border: 1px solid #34307f; border-radius: 26px; background: radial-gradient(700px 360px at 0% 0%, #241c66 0%, rgba(36,28,102,0) 70%), #0b0f2c; padding: 36px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.16em; color: #b79bff">EARTH SYSTEM ASSISTANT</span>
+<h2 style="margin: 0; font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; line-height: 1.1">AI Decision Support</h2>
+<p style="margin: 0; color: #c5cee8">Pick who you are. The assistant reads the same data and answers for your decision.</p>
+</div>
+<div role="group" aria-label="Choose a stakeholder" style="display: flex; flex-wrap: wrap; gap: 10px">
+<sc-for list="{{tabs}}" as="tab" hint-placeholder-count="3">
+<button type="button" aria-pressed="{{tab.pressed}}" onClick="{{tab.pick}}" style="min-height: 46px; padding: 0 20px; border-radius: 999px; border: 1px solid {{tab.border}}; background: {{tab.bg}}; color: {{tab.fg}}; font: inherit; font-size: 0.9375rem; font-weight: 600; cursor: pointer">{{tab.label}}</button>
+</sc-for>
+</div>
+<div aria-live="polite" style="border: 1px solid #262d66; border-radius: 20px; background: #070b22; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 12px; color: #ffffff; font-weight: 600">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b79bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M4 5h16v11H9l-5 4z"></path></svg>
+<span>{{question}}</span>
+<span style="margin-left: auto; flex: none; padding: 4px 10px; border-radius: 999px; background: #18204a; font-size: 0.75rem; font-weight: 600; color: #c9d2ea">Sample</span>
+</div>
+<div style="border-top: 1px solid #1a2050; padding-top: 14px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 0.875rem; font-weight: 700; color: #ffffff">Recommended Actions</span>
+<sc-for list="{{actions}}" as="act" hint-placeholder-count="3">
+<div style="display: flex; gap: 10px; color: #dbe2f5"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9fe870" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 2px"><path d="M5 12l5 5 9-10"></path></svg><span>{{act.text}}</span></div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; justify-content: flex-end">
+<a href="#assistant" class="lift" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 14px; background: {{accent}}; color: #ffffff; font-weight: 700; box-sizing: border-box">Ask AI Assistant
+<svg aria-hidden="true" class="go" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</section>
+
+<!-- HOW TO USE EXPLORE -->
+<section id="howto" style="border: 1px solid #1f2b52; border-radius: 26px; background: #070d20; padding: 36px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.16em; color: #9fe870">HOW IT WORKS</span>
+<h2 style="margin: 0; font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; line-height: 1.1">How to use the Explore page</h2>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px">
+<div style="border: 1px solid #1f2b52; border-radius: 18px; background: #0a1228; padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: #18224a; color: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center">1</span>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: #ffffff">Choose an Earth system</h3>
+<p style="margin: 0; font-size: 0.9375rem; color: #c5cee8">Pick a category in the left panel, such as Agriculture or Water.</p>
+</div>
+</div>
+<div style="border: 1px solid #1f2b52; border-radius: 18px; background: #0a1228; padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: #18224a; color: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center">2</span>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: #ffffff">Set township, dataset, time</h3>
+<p style="margin: 0; font-size: 0.9375rem; color: #c5cee8">Use the three dropdowns: Township, Dataset (e.g. NDVI) and Time Period.</p>
+</div>
+</div>
+<div style="border: 1px solid #1f2b52; border-radius: 18px; background: #0a1228; padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: #18224a; color: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center">3</span>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: #ffffff">Read the map</h3>
+<p style="margin: 0; font-size: 0.9375rem; color: #c5cee8">Colors run from Low to High. Zoom, switch layers, or re-center on your township.</p>
+</div>
+</div>
+<div style="border: 1px solid #1f2b52; border-radius: 18px; background: #0a1228; padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: #18224a; color: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center">4</span>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: #ffffff">Switch the view</h3>
+<p style="margin: 0; font-size: 0.9375rem; color: #c5cee8">Tabs show the same data as Trend Analysis, Comparison, Map View or Data Table.</p>
+</div>
+</div>
+<div style="border: 1px solid #1f2b52; border-radius: 18px; background: #0a1228; padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: #18224a; color: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center">5</span>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: #ffffff">Check the trend</h3>
+<p style="margin: 0; font-size: 0.9375rem; color: #c5cee8">See the annual change, whether it is significant, plus temperature, rainfall and soil moisture.</p>
+</div>
+</div>
+<div style="border: 1px solid #1f2b52; border-radius: 18px; background: #0a1228; padding: 22px; display: flex; gap: 16px; align-items: flex-start">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: #18224a; color: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center">6</span>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: #ffffff">Ask for guidance</h3>
+<p style="margin: 0; font-size: 0.9375rem; color: #c5cee8">AI Decision Support gives key insights and recommended actions. Open the detailed recommendation for more.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- RECENT DISCOVERIES -->
+<section id="history" style="border: 1px solid #1f2b52; border-radius: 26px; background: #070d20; padding: 36px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px; gap: 20px">
+<h2 style="margin: 0; font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; line-height: 1.1">Recent Discoveries <span style="font-size: 1.125rem; font-weight: 600; color: #a9b6d8">(History)</span></h2>
+<a href="#history" class="lift" style="border: 1px solid #1f2b52; border-radius: 18px; background: #0a1228; padding: 20px; display: flex; gap: 16px; align-items: center; color: #e9edfa">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 12px; background: #123a26; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9fe870" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6 4-4 8 8"></path><path d="M21 11v6h-6"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 700; color: #ffffff">Vegetation is declining in Yangon</span>
+<span style="font-size: 0.875rem; color: #c5cee8">NDVI −12.5% · 2020 – 2024 · Significant (p &lt; 0.05)</span>
+</span>
+<svg aria-hidden="true" class="go" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</a>
+<a href="#history" class="lift" style="border: 1px solid #1f2b52; border-radius: 18px; background: #0a1228; padding: 20px; display: flex; gap: 16px; align-items: center; color: #e9edfa">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 12px; background: #3a1a1a; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff9b8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 700; color: #ffffff">Drier and hotter: drought stress may rise</span>
+<span style="font-size: 0.875rem; color: #c5cee8">Rainfall −12.5% · Temperature +1.2 °C · Yangon</span>
+</span>
+<svg aria-hidden="true" class="go" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</a>
+<a href="#history" class="lift" style="border: 1px solid #1f2b52; border-radius: 18px; background: #0a1228; padding: 20px; display: flex; gap: 16px; align-items: center; color: #e9edfa">
+<span style="flex: none; width: 44px; height: 44px; border-radius: 12px; background: #2a1a40; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e39bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-4 9 4-9 4z"></path><path d="M3 12l9 4 9-4M3 16l9 4 9-4"></path></svg></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-weight: 700; color: #ffffff">Soil moisture is below the last decade</span>
+<span style="font-size: 0.875rem; color: #c5cee8">−8.7% vs. 2010 – 2019 · Yangon</span>
+</span>
+<svg aria-hidden="true" class="go" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+</a>
+<div style="display: flex; justify-content: flex-end">
+<a href="#history" class="lift" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 14px; background: {{accent}}; color: #ffffff; font-weight: 700; box-sizing: border-box">View History
+<svg aria-hidden="true" class="go" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</section>
+
+<!-- JUMP TO A REGION -->
+<section id="regions" style="border: 1px solid #1f2b52; border-radius: 26px; background: #070d20; padding: 36px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h2 style="margin: 0; font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; color: #ffffff; line-height: 1.1">Jump to a region</h2>
+<p style="margin: 0; color: #c5cee8">Switch region and open its trends in Explore.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<sc-for list="{{regions}}" as="r" hint-placeholder-count="9">
+<a href="#systems" class="lift" style="display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: 999px; border: 1px solid #2a3760; background: #0f1836; color: #ffffff; font-size: 0.9375rem; font-weight: 600; box-sizing: border-box">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9fe870" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>{{r.name}}</a>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: flex-end">
+<a href="#systems" class="lift" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 14px; background: {{accent}}; color: #ffffff; font-weight: 700; box-sizing: border-box">Explore Other Regions
+<svg aria-hidden="true" class="go" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</section>
+
+</main>
+
+<footer style="margin-top: 72px; border-top: 1px solid #172142">
+<div style="max-width: 1320px; margin: 0 auto; padding: 24px 32px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.875rem; color: #a9b6d8; box-sizing: border-box">
+<span>Earth Trend Detective · Myanmar Earth Intelligence</span>
+<span>Powered by NASA Earth Observation Data</span>
+</div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#6d4aff","options":["#6d4aff","#2563eb","#0f766e"]},"$preview":{"width":1440,"height":3600}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { who: 'farmers', metric: 'ndvi' };
+}
+renderVals() {
+const data = {
+farmers: {
+label: 'Farmers',
+question: 'Based on these trends, what should farmers in Yangon consider?',
+actions: ['Consider drought-resistant crop varieties.', 'Adjust planting schedule with updated seasonal rainfall forecasts.', 'Monitor soil moisture and adopt efficient irrigation (e.g., drip irrigation).']
+},
+planners: {
+label: 'Urban planners',
+question: 'Where is urban growth replacing green cover in Yangon?',
+actions: ['Compare land use and vegetation trends township by township.', 'Flag areas where construction is expanding into farmland.', 'Plan green space and drainage before new development.']
+},
+responders: {
+label: 'Disaster teams',
+question: 'Which areas should we watch this season?',
+actions: ['Review flood, landslide and wildfire layers for your region.', 'Check rainfall and soil moisture trends for early stress signals.', 'Share the summary with local teams to prepare in advance.']
+}
+};
+const who = this.state.who;
+const tabs = Object.keys(data).map((k) => ({
+label: data[k].label,
+pressed: k === who ? 'true' : 'false',
+bg: k === who ? '#ffffff' : '#141a44',
+fg: k === who ? '#0b0f2c' : '#ffffff',
+border: k === who ? '#ffffff' : '#343b7e',
+pick: () => this.setState({ who: k })
+}));
+const xs = [40, 155, 270, 385, 500];
+const metrics = {
+ndvi: { label: 'Vegetation', title: 'Vegetation Trend (NDVI)', value: '↓ −12.5%', color: '#9fe870', note: 'Annual trend · 2020 – 2024 · Significant (p < 0.05)', ys: [37, 80, 93, 123, 106], aria: 'NDVI for Yangon fell from 0.61 in 2020 to 0.41 in 2023, then rose to 0.45 in 2024' },
+temp: { label: 'Temperature', title: 'Temperature', value: '↗ +1.2 °C', color: '#ff9b8a', note: 'vs. 2010 – 2019 · illustrative curve', ys: [118, 104, 96, 70, 44], aria: 'Temperature is 1.2 degrees Celsius above the 2010 to 2019 average; illustrative curve' },
+rain: { label: 'Rainfall', title: 'Rainfall', value: '↓ −12.5%', color: '#5cc8ff', note: 'vs. 2010 – 2019 · illustrative curve', ys: [40, 62, 58, 96, 116], aria: 'Rainfall is 12.5 percent below the 2010 to 2019 average; illustrative curve' },
+soil: { label: 'Soil Moisture', title: 'Soil Moisture', value: '↓ −8.7%', color: '#e39bff', note: 'vs. 2010 – 2019 · illustrative curve', ys: [46, 52, 78, 84, 108], aria: 'Soil moisture is 8.7 percent below the 2010 to 2019 average; illustrative curve' }
+};
+const sel = this.state.metric;
+const m = {};
+const tabsM = [];
+Object.keys(metrics).forEach((k) => {
+const on = k === sel;
+const pick = () => this.setState({ metric: k });
+m[k] = { pressed: on ? 'true' : 'false', ring: on ? metrics[k].color : '#2a3760', pick };
+tabsM.push({ label: metrics[k].label, pressed: on ? 'true' : 'false', bg: on ? '#ffffff' : '#0f1836', fg: on ? '#070d20' : '#ffffff', border: on ? '#ffffff' : '#2a3760', pick });
+});
+const c = metrics[sel];
+const line = c.ys.map((y, i) => (i ? 'L' : 'M') + xs[i] + ' ' + y).join('');
+const cur = { title: c.title, value: c.value, color: c.color, note: c.note, aria: c.aria, line, area: line + 'V150H40z' };
+return {
+accent: this.props.accent ?? '#6d4aff',
+tabs, m, tabsM, cur,
+question: data[who].question,
+actions: data[who].actions.map((t) => ({ text: t })),
+regions: ['Yangon', 'Mandalay', 'Ayeyarwady', 'Sagaing', 'Bago', 'Magway', 'Shan', 'Rakhine', 'Nay Pyi Taw'].map((n) => ({ name: n }))
+};
+}
+}
+</script>
+<script>
+document.addEventListener('click', function(event) {
+  const link = event.target.closest('a');
+  if (!link) return;
+  const label = link.textContent.trim();
+  const href = link.getAttribute('href');
+  const action = href === '#assistant' ? 'assistant' : href === '#systems' ? 'explore' : null;
+  if (!action) return;
+  event.preventDefault();
+  const topics = {'Agriculture':'agriculture','Infrastructure & Urban Change':'infrastructure-urban-change','Water':'water','Energy & Electricity':'energy','Environmental Change':'environmental-change','Disaster Intelligence':'disaster-intelligence'};
+  const topic = Object.keys(topics).find(name => label.startsWith(name));
+  const regions = {'Yangon':'yangon','Mandalay':'mandalay','Ayeyarwady':'ayeyarwady','Sagaing':'sagaing','Bago':'bago','Magway':'magway','Shan':'shan','Rakhine':'rakhine','Nay Pyi Taw':'naypyidaw'};
+  window.parent.postMessage({type:'earthlens-home-navigation', action:action, topic:topics[topic], region:regions[label]}, window.location.origin);
+});
+</script>
+</body>
+</html>
