@@ -29,6 +29,7 @@ if (liveReference.includes("function N9e(") || liveReference.includes("return N9
 }
 const html = (source.slice(0, componentStart) + earthbeatCore + "\n" + earthbeatPanel + "\n" + dashboard + "\n" + liveReference + adapter + source.slice(end))
   .replace("</head>", `<style>${dashboardCss}\n${earthbeatCss}</style></head>`)
+  .replace("minZoom:5,zoomSnap:.25", "minZoom:3.5,zoomSnap:.25")
   .replace("Myanmar EarthLens — Demo preview", "Myanmar EarthLens — NASA environmental insights")
   .replace('Naypyidaw shown as a point: bundled boundary data includes it within Mandalay. Run ', 'Naypyidaw is shown as a representative point. ')
   .replace('(0,Je.jsx)("code",{children:"npm run boundaries:fetch"})," for geoBoundaries ADM1."', '"The map boundary includes it within Mandalay."')

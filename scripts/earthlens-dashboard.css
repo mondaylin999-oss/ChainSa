@@ -32,3 +32,30 @@ html[lang=my] .terra-app{font-family:var(--font-mm);line-height:1.8}html[lang=my
 @media(max-width:700px){.terra-chat-launcher{right:16px;bottom:max(16px,env(safe-area-inset-bottom))}.terra-chat.terra-floating-chat.is-expanded{right:16px;bottom:84px;height:min(600px,calc(100dvh - 104px));max-height:calc(100dvh - 104px)}.terra-floating-chat .terra-chat-heading span{display:none}}
 
 .terra-chat-launcher:focus-visible,.terra-floating-chat button:focus-visible,.terra-floating-chat input:focus-visible,.terra-floating-chat a:focus-visible{outline:2px solid #7cc7ff;outline-offset:3px}
+
+/* Keep the dashboard frame in the viewport and give the map the remaining height. */
+.terra-app{height:100vh;height:100dvh;min-height:0;overflow:hidden}
+.terra-header{flex-shrink:0}
+.terra-workspace{height:calc(100dvh - 78px);min-height:0;overflow:hidden}
+.terra-main{display:flex;flex-direction:column;height:100%;min-height:0;overflow:hidden}
+.terra-page-heading{flex-shrink:0;margin-bottom:16px}
+.terra-content{flex:1;min-height:0;align-items:stretch;overflow:hidden}
+.terra-center{position:static;height:auto;min-height:0;gap:14px;overflow:hidden}
+.terra-map-panel{min-height:0}
+.terra-map-canvas{height:auto;min-height:0}
+.terra-inspector{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+@media(max-width:900px){.terra-workspace{height:calc(100dvh - 68px);grid-template-rows:auto minmax(0,1fr)}}
+@media(max-width:700px){
+  .terra-main{padding:12px 14px 16px}
+  .terra-page-heading{margin-bottom:8px}
+  .terra-page-heading h1{font-size:21px}
+  .terra-mobile-tabs{flex-shrink:0;margin-bottom:8px;padding:3px}
+  .terra-mobile-tabs button{padding:7px}
+  .terra-content{flex:1;min-height:0;overflow:hidden}
+  .terra-app[data-view=map] .terra-content{flex-direction:column}
+  .terra-app[data-view=map] .terra-inspector .terra-controls{display:none}
+  .terra-app[data-view=map] .terra-center{flex:1;min-height:0;gap:0;overflow:hidden}
+  .terra-app[data-view=map] .terra-map-panel{display:flex;flex:1;flex-direction:column;min-height:0}
+  .terra-app[data-view=map] .terra-map-canvas{height:auto;min-height:0;flex:1}
+  .terra-app[data-view=insights] .terra-inspector{flex:1;height:100%;overflow-y:auto}
+}
