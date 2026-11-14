@@ -12,8 +12,19 @@ those routes call NASA for real.
   Live NASA data only — there is no demo/sample-data mode.
 - **Chatbot** (`src/features/earthlens-chat`): floating chat panel connected to the site's language and selected region.
 - **API routes:** `GET /api/regions`, `GET /api/status`, `POST /api/analyze`, `POST /api/chat`
-  (same handler as `POST /api/earthlens-chat`), `GET /api/earthlens-chat/status`.
+  (same handler as `POST /api/earthlens-chat`), `GET /api/earthlens-chat/status`, and
+  `GET /api/modis/ndvi?regionId=mandalay` (or `?lat=21.4&lon=95.95`, inside Myanmar only).
 - **NASA data:** NASA POWER daily (rainfall, temperature, humidity, wind, root-zone soil wetness) and NASA FIRMS VIIRS fires (only when `NASA_FIRMS_MAP_KEY` is set)
+- **Vegetation (NDVI):** NASA MODIS Terra MOD13Q1 v061 (250 m, 16-day composites) through the free ORNL DAAC
+  MODIS/VIIRS Land Product Subsets API (https://modis.ornl.gov/data/modis_webservice.html, no key). For each point:
+  the mean of valid pixels in a ~2 × 2 km window for the latest composite and the one before, compared with the same
+  composite in the previous 10 years (mean and percentile). Fill values (−3000) and out-of-range pixels are dropped.
+  - The chatbot adds NDVI for vegetation, crop, farming and drought questions: observations go to "Current NASA Data",
+    the past-year comparison to "Historical Data Comparison", the product link to "Data Sources".
+  - ORNL answers requests for older years slowly (25–35 s each, measured 2026-11-14), so past years are fetched in the
+    background and cached for 7 days. Until then the chat shows the latest NDVI and says the comparison is being prepared;
+    `/api/modis/ndvi` waits for it (the first call can take about a minute).
+  - NDVI is vegetation greenness, not a crop-yield estimate or a forecast; clouds or flooding can lower it.
 - **AI providers:** OpenRouter **free** models first, then Groq **free-plan** models, then a template answer. There is no paid fallback.
 
 > **Status — please read.** Every test so far ran in a cloud sandbox **with no internet access to NASA,
@@ -144,7 +155,7 @@ npm run check:secrets       # after build: confirms no key is in browser files
 | `CHAT_ALLOWED_ORIGINS` | no | e.g. `https://your-site.org`; blocks other websites from calling the API |
 | `CHAT_VERIFY_MODE` | no | `strict` (default) discards AI answers with unverified numbers; `warn` keeps and logs them |
 | `AI_TIMEOUT_MS`, `NASA_TIMEOUT_MS` | no | Request timeouts |
-| `OPENROUTER_BASE_URL`, `GROQ_BASE_URL`, `NASA_POWER_BASE_URL` | testing only | Point at the mock server; leave empty in real use |
+| `OPENROUTER_BASE_URL`, `GROQ_BASE_URL`, `NASA_POWER_BASE_URL`, `NASA_MODIS_BASE_URL` | testing only | Point at the mock server; leave empty in real use |
 
 Without any AI key the chatbot still works and answers with the template. NASA POWER needs no key.
 

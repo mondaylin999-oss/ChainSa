@@ -2,9 +2,9 @@
 
 export type Lang = "en" | "my";
 
-export type ParamKey = "rainfall" | "temperature" | "humidity" | "wind" | "soilWetness" | "fires";
+export type ParamKey = "rainfall" | "temperature" | "humidity" | "wind" | "soilWetness" | "fires" | "vegetation";
 
-export type SourceId = "nasa-power-daily" | "nasa-firms-viirs";
+export type SourceId = "nasa-power-daily" | "nasa-firms-viirs" | "nasa-modis-ndvi";
 
 export interface SourceRef {
   id: SourceId;

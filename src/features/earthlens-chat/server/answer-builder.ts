@@ -76,7 +76,9 @@ function history({ lang, fmt, a }: BuildInput): string[] {
   const L = (t: T) => t[lang];
   const out: string[] = [];
   if (!a.available) {
-    out.push(L({ en: "The long-term NASA POWER record could not be retrieved, so no historical comparison is shown.", my: "ရေရှည် NASA POWER မှတ်တမ်းကို မရယူနိုင်သဖြင့် ယခင်မှတ်တမ်းနှင့် နှိုင်းယှဉ်ချက် မပြနိုင်ပါ။" }));
+    out.push(L({ en: "The long-term NASA POWER record could not be retrieved, so no rainfall, soil-wetness or heat comparison is shown.", my: "ရေရှည် NASA POWER မှတ်တမ်းကို မရယူနိုင်သဖြင့် မိုးရေချိန်၊ မြေစိုစွတ်မှု သို့မဟုတ် အပူ နှိုင်းယှဉ်ချက် မပြနိုင်ပါ။" }));
+    // Comparisons from other datasets (e.g. MODIS NDVI) are still shown.
+    for (const f of a.facts.filter((x) => x.kind === "comparison")) out.push(`• ${factText(f, lang, fmt)}`);
     return out;
   }
   if (a.baseline)
@@ -213,6 +215,8 @@ function sourcesSection({ lang, fmt, g, a, outlook }: BuildInput): string[] {
   if (g.period) out.push(L({ en: `  Recent observation window: ${g.period.start} to ${g.period.end}.`, my: `  မကြာသေးမီ တိုင်းတာကာလ - ${g.period.start} မှ ${g.period.end}။` }));
   if (a.latestDate && a.baseline)
     out.push(L({ en: `  Long-term comparison: ${a.baseline.firstYear}–${a.baseline.lastYear}, latest data day ${a.latestDate}.`, my: `  ရေရှည် နှိုင်းယှဉ်ကာလ - ${a.baseline.firstYear}–${a.baseline.lastYear}၊ နောက်ဆုံး အချက်အလက်ရက် ${a.latestDate}။` }));
+  if (sources.some((s) => s.id === "nasa-modis-ndvi"))
+    out.push(L({ en: "  MODIS NDVI accessed through the ORNL DAAC MODIS/VIIRS Land Product Subsets service: https://modis.ornl.gov/data/modis_webservice.html (16-day composites, usually published 2–3 weeks after the period ends).", my: "  MODIS NDVI ကို ORNL DAAC MODIS/VIIRS Land Product Subsets ဝန်ဆောင်မှုမှ ရယူထားသည် - https://modis.ornl.gov/data/modis_webservice.html (၁၆ ရက် ပေါင်းစပ်ပုံများ၊ ကာလပြီးဆုံးပြီး ၂–၃ ပတ်ခန့်အကြာတွင် ထုတ်ပြန်လေ့ရှိ)။" }));
   out.push(L({ en: "• NASA POWER data access and documentation: https://power.larc.nasa.gov/", my: "• NASA POWER အချက်အလက် ရယူရန်နှင့် စာတမ်းများ - https://power.larc.nasa.gov/" }));
   if (outlook?.probabilities.length) {
     for (const p of outlook.probabilities)

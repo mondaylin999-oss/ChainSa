@@ -24,6 +24,8 @@ export interface ServerConfig {
   nasaTimeoutMs: number;
   /** NASA POWER API base; only overridden for local testing. */
   powerBaseUrl: string;
+  /** NASA MODIS (ORNL DAAC) subset API base; only overridden for local testing. */
+  modisBaseUrl: string;
   rateLimit: { max: number; windowMs: number };
   trustProxy: boolean;
   allowedOrigins: string[];
@@ -99,6 +101,7 @@ export function getConfig(): ServerConfig {
     verifyMode: (e.CHAT_VERIFY_MODE ?? "").toLowerCase() === "warn" ? "warn" : "strict",
     nasaTimeoutMs: int(e.NASA_TIMEOUT_MS, 20_000, 3_000, 60_000),
     powerBaseUrl: baseUrl(e.NASA_POWER_BASE_URL, "https://power.larc.nasa.gov/api/temporal"),
+    modisBaseUrl: baseUrl(e.NASA_MODIS_BASE_URL, "https://modis.ornl.gov/rst/api/v1"),
     rateLimit: {
       max: int(e.CHAT_RATE_LIMIT_MAX, 10, 1, 1000),
       windowMs: int(e.CHAT_RATE_LIMIT_WINDOW_SECONDS, 60, 1, 86_400) * 1000,

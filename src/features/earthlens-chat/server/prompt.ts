@@ -51,6 +51,7 @@ export function buildSystemPrompt(p: PromptInput): string {
     ...(p.historical.length ? p.historical.map(factLine) : ["- none available"]),
     "",
     `EARTHLENS INDICATORS: drought=${a.drought}, wet/flood-from-rain=${a.wet}, heat=${a.heat}, coming 30 days normally dry=${a.drySeasonAhead}.`,
+    "NDVI facts (if any) come from NASA MODIS and measure vegetation greenness (about 0.2 sparse, above 0.6 dense). They are observations, not crop-yield estimates or forecasts.",
     "VALIDATED 30-DAY FORECAST: NONE. No forecast model has been validated, so there is no forecast and no probability.",
     "",
     "RECOMMENDATIONS THE APP WILL SHOW IN THE DECISION SUPPORT SECTION (do not repeat them; your impacts should be consistent with them):",

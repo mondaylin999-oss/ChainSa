@@ -38,6 +38,7 @@ export const baseConfig = (over: Partial<ServerConfig> = {}): ServerConfig => ({
   verifyMode: "strict",
   nasaTimeoutMs: 5000,
   powerBaseUrl: "https://power.larc.nasa.gov/api/temporal",
+  modisBaseUrl: "https://modis.ornl.gov/rst/api/v1",
   rateLimit: { max: 10, windowMs: 60_000 },
   trustProxy: false,
   allowedOrigins: [],

@@ -12,6 +12,7 @@ import { buildAssessment } from "./climate/assessment";
 import { buildRecommendations } from "./recommendations";
 import { getValidatedOutlook } from "./forecast/validated-outlook";
 import { buildAnswer } from "./answer-builder";
+import { buildVegetation } from "./vegetation";
 import { buildGeneralPrompt, buildMessages, buildSystemPrompt } from "./prompt";
 import { runProviderChain } from "./providers/chain";
 import { buildAllowed, forbiddenClaims, verifyAnswer, type VerifyResult } from "./verify";
@@ -36,14 +37,23 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
   const named = detectRegion(message);
   if (!isEnvironmentalQuestion(message, Boolean(named))) return answerGeneral(message, lang, req, cfg, fmt, deps);
   const region = named ?? getRegion(req.selectedRegionId) ?? getRegion(DEFAULT_REGION_ID)!;
-  const params: ParamKey[] = [...CORE_PARAMS, ...(detectParams(message).includes("fires") ? (["fires"] as ParamKey[]) : [])];
+  const detected = detectParams(message);
+  const params: ParamKey[] = [...CORE_PARAMS, ...(detected.includes("fires") ? (["fires"] as ParamKey[]) : [])];
   const topics = detectTopics(message);
+  // MODIS NDVI only for vegetation, crop, farming and drought questions (not every default topic).
+  const wantsVegetation = detected.includes("vegetation");
   const limitations = detectLimitations(message, region.id, lang);
 
-  const [g, a] = await Promise.all([
+  const [g0, a0, veg] = await Promise.all([
     buildGrounding(region, params, lang, { fetchImpl: deps.fetchImpl, firmsMapKey: cfg.firmsMapKey, nasaTimeoutMs: cfg.nasaTimeoutMs, powerBaseUrl: cfg.powerBaseUrl, today: deps.today }),
     buildAssessment(region, { fetchImpl: deps.fetchImpl, timeoutMs: Math.min(60_000, cfg.nasaTimeoutMs * 3), powerBaseUrl: cfg.powerBaseUrl, today: deps.today }),
+    wantsVegetation ? buildVegetation(region, lang, { fetchImpl: deps.fetchImpl, timeoutMs: cfg.nasaTimeoutMs, modisBaseUrl: cfg.modisBaseUrl }) : null,
   ]);
+  // NDVI observations join the current data, its past-year comparison joins the historical section.
+  const g = veg
+    ? { ...g0, facts: [...g0.facts, ...veg.facts.filter((f) => f.kind === "observation")], sources: [...g0.sources, ...veg.sources], notes: [...g0.notes, ...veg.notes], nasaDataAvailable: g0.nasaDataAvailable || veg.facts.length > 0 }
+    : g0;
+  const a = veg ? { ...a0, facts: [...a0.facts, ...veg.facts.filter((f) => f.kind === "comparison")] } : a0;
   const outlook = await getValidatedOutlook(region, a.outlookWindow);
   const recs = buildRecommendations(a, lang);
   const nasaDataAvailable = g.nasaDataAvailable || a.available;
