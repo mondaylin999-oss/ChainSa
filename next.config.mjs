@@ -2,9 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  async rewrites() {
-    return { beforeFiles: [{ source: "/", destination: "/earthlens.html" }] };
-  },
   // Server secrets are read with process.env inside server-only modules.
   // Never add API keys to `env` here or prefix them with NEXT_PUBLIC_ — that would inline them into browser code.
 };

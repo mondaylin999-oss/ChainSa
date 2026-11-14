@@ -1,18 +1,21 @@
-# Myanmar EarthLens — AI Chatbot module (prototype)
+# Myanmar EarthLens — local exploration prototype
 
-A bilingual (Myanmar / English) chatbot that answers questions with **real NASA data**.
-It is built as one self-contained feature folder, so you can copy it into the original
-Myanmar EarthLens Next.js project.
+The Next.js app now opens on a Home view with an accurate local state/region map, an evidence-grounded AI chat, and an Explore Map data workspace. The bilingual EarthLens chat and its server-side integrations remain in place.
 
-- **Frontend:** a React chat widget that copies the EarthLens demo's design (colours, fonts, panel, bubbles)
-- **Backend:** a Next.js Route Handler at `POST /api/earthlens-chat` (Node.js runtime)
-- **NASA data:** NASA POWER daily (rainfall, temperature, humidity, wind, root-zone soil wetness) and NASA FIRMS VIIRS fires (only when `FIRMS_MAP_KEY` is set)
-- **AI providers:** OpenRouter **free** models first, then Groq **free-plan** models, then a template answer. There is no paid fallback.
+## Current local interface
 
-> **Status — please read.** Every test so far ran in a cloud sandbox **with no internet access to NASA,
-> OpenRouter or Groq**. The full flow was tested with automated tests and a local mock server
-> (`scripts/mock-providers.mjs`). **Real NASA POWER/FIRMS calls and real OpenRouter/Groq calls have
-> not been tested yet.** Run the checks in "Test with real data" below on your computer.
+- **Home:** project introduction, locally bundled Myanmar admin-1 boundaries, and a wide chat panel.
+- **Explore Map:** six topic panels, a clear unavailable township selector, searchable state/region reference points, topic-filtered datasets, date controls, NASA-backed charts and source/coverage details.
+- **Boundaries:** `src/features/earthlens-chat/server/nasa/myanmar-admin1.json`, Natural Earth 1:10m Admin-1, public domain. The map includes attribution. The bundled data has 14 state/region polygons; a Naypyidaw reference point is shown, but it has no separate boundary in this asset.
+- **Townships:** no verified township records or boundaries are bundled. Do not interpret the regional reference points as townships or township averages. Add a verified township source before enabling township-level selection or claims.
+- **Live chart data:** NASA POWER daily corrected precipitation, near-surface air temperature, modelled root-zone wetness, solar radiation and wind speed at existing state/region reference coordinates. NASA FIRMS detections are optional and require `FIRMS_MAP_KEY`. Unconnected data products are shown as unavailable, not simulated.
+- **AI:** existing `POST /api/earthlens-chat` server route; provider credentials remain server-side. The chat UI reports when no OpenRouter/Groq provider is configured.
+- The previous bundled dashboard is still available at `/earthlens.html`.
+
+> **Data coverage — please read.** Township records and boundaries are not bundled. The Explore Map
+> offers existing regional reference points and clearly labels NASA observations as point samples.
+> Real external NASA/provider requests depend on your network and configuration; they are not mocked
+> into successful live results.
 
 ---
 
@@ -61,7 +64,8 @@ src/
   app/
     api/earthlens-chat/route.ts          POST endpoint (3 lines — calls the feature's handler)
     api/earthlens-chat/status/route.ts   GET: which providers are configured (never shows keys)
-    page.tsx, layout.tsx, globals.css    prototype host page only (not needed in the real site)
+    api/explore/                         catalogue and NASA POWER/FIRMS observation routes
+    page.tsx, layout.tsx, globals.css    Home, Explore Map, responsive styles and metadata
   features/earthlens-chat/               ← COPY THIS FOLDER INTO THE REAL PROJECT
     index.ts                             browser-safe exports (ChatWidget, types, regions)
     types.ts  regions.ts  params.ts  i18n.ts
@@ -85,32 +89,33 @@ src/
       prompt.ts         AI instructions built from the answer format
       verify.ts         number/date checker (handles Myanmar digits ၀-၉)
       cache.ts          in-memory cache for NASA responses
+  features/explorer/
+    catalog.ts                            topics, supported products and explicit limitations
+    client/data-service.ts                browser requests to the local observation API
+    components/MyanmarMap.tsx             SVG from the bundled admin-1 GeoJSON
+    components/ChatPanel.tsx              evidence-backed chat using the existing server API
 scripts/
   mock-providers.mjs    offline mock of NASA POWER + AI providers (synthetic numbers)
   check-secrets.mjs     scans the browser build for leaked keys
-tests/                  38 unit/integration tests (vitest, mocked network)
+tests/                  41 unit/integration tests (vitest, mocked network)
 docs/FORECAST_VALIDATION_PLAN.md   datasets, probability method and validation gate for Phase 2
 ```
 
-## 3. Run locally on Windows
+## 3. Run locally
 
-Requirements: **Node.js 20.9 or newer** (22 LTS recommended) — https://nodejs.org
+Requirements: **Node.js 20.9 or newer** (22 LTS recommended) — https://nodejs.org. Install the locked dependencies, then run:
 
-In **PowerShell**, from the project folder:
-
-```powershell
-npm install
-Copy-Item .env.example .env.local
-notepad .env.local          # paste your keys (see section 4)
+```sh
+npm ci
 npm run dev
 ```
 
-Open http://localhost:3000 and click the round chat button in the bottom-right corner.
+Open http://localhost:3000 to view Home. Use **Explore Map** to open the data workspace and **Ask AI** to focus the chat input. Copy `.env.example` to `.env.local` and add server-only keys to enable AI providers or FIRMS. All UI changes stay in this local checkout until you choose to commit and push.
 
 Other commands:
 
 ```powershell
-npm test                    # 38 automated tests (no internet needed)
+npm test                    # 41 automated tests (no internet needed)
 npm run typecheck
 npm run build               # production build
 npm run check:secrets       # after build: confirms no key is in browser files
@@ -133,7 +138,7 @@ npm run check:secrets       # after build: confirms no key is in browser files
 | `AI_TIMEOUT_MS`, `NASA_TIMEOUT_MS` | no | Request timeouts |
 | `OPENROUTER_BASE_URL`, `GROQ_BASE_URL`, `NASA_POWER_BASE_URL` | testing only | Point at the mock server; leave empty in real use |
 
-Without any AI key the chatbot still works and answers with the template. NASA POWER needs no key.
+The chat API retains its evidence-based template fallback when no model is configured; the new UI shows a clear unavailable state until an OpenRouter or Groq provider is configured. NASA POWER needs no key.
 
 **Never** prefix these with `NEXT_PUBLIC_`, and never commit `.env.local` (it is already in `.gitignore`).
 
@@ -151,12 +156,12 @@ Without any AI key the chatbot still works and answers with the template. NASA P
 
 ### In the browser
 1. `npm run dev`, then open http://localhost:3000.
-2. Click the chat button. Try a suggested question or type one:
+2. In the Home chat panel, try a suggested question or type one:
    - English: `Is there a drought risk for rice farmers in Magway in the next 30 days?`
    - Myanmar: `ဧရာဝတီတိုင်းဒေသကြီးတွင် လာမည့် တစ်လအတွင်း ရေကြီးနိုင်ခြေ မည်သို့ရှိပါသလဲ။`
    - Check: the six numbered sections appear in the same order in both languages, section 2 says no forecast is
      available, the historical block says "NOT a forecast" / "ခန့်မှန်းချက် မဟုတ်ပါ", and section 6 has the exact disclaimer.
-3. Switch EN / မြန်မာ in the page. The UI changes, and the **answer language follows the question's script**.
+3. Switch EN / မြန်မာ in the page. Myanmar script is supported, and the **answer language follows the question's script**.
 4. Under each answer, check the line showing the region, the dates, "AI-written (model)" or "template", and the
    "numbers checked against NASA data" badge.
 
