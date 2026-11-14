@@ -29,6 +29,7 @@ function Og() {
   const [refresh, setRefresh] = ft.useState(0);
   const [collapsed, setCollapsed] = ft.useState(false);
   const [mobileView, setMobileView] = ft.useState("map");
+  const [chatOpenRequest, setChatOpenRequest] = ft.useState(0);
   const [narrow, setNarrow] = ft.useState(() => window.matchMedia("(max-width: 700px)").matches);
   ft.useEffect(() => {
     const media = window.matchMedia("(max-width: 700px)");
@@ -99,6 +100,7 @@ function Og() {
         h("span", {className:"terra-brand-divider", "aria-hidden":true}, "×"),
         h("a", {className:"terra-nasa", href:"https://power.larc.nasa.gov/", target:"_blank", rel:"noreferrer", "aria-label":"NASA POWER data source"}, "NASA", h("small", null, "EARTH DATA"))),
       h("div", {className:"terra-header-actions"},
+        h("a", {className:"terra-chat-shortcut", href:"#ai-chat", onClick:()=>setChatOpenRequest(value=>value+1)}, icon(vo, 16), text("AI chat", "AI စကားပြောရန်")),
         h("div", {className:"terra-mode", role:"group", "aria-label":text("Data mode", "ဒေတာ အမျိုးအစား")},
           ["live", "demo"].map(key => h("button", {key, "aria-pressed":mode===key, onClick:()=>setMode(key)},
             h("span", {className:`terra-dot ${key}`, "aria-hidden":true}), t(key === "live" ? "modeLive" : "modeDemo")))),
@@ -130,7 +132,7 @@ function Og() {
               h("div", {className:"terra-map-canvas", id:"map"},
                 h(O9e, {regions:Tr, boundaries, selectedId:regionId, onSelect:selectRegion, fires:result?.fires, loading:busy})),
               boundaryError && h("p", {role:"alert", className:"terra-error"}, text("Map boundaries could not load. Use the location selector to continue.", "မြေပုံနယ်နိမိတ်များ မရရှိပါ။ နေရာရွေးချယ်မှုကို အသုံးပြုပါ။"))),
-            h(TerraDashboardChat, {key:`${regionId}:${mode}`, lang, t, region, param, mode})),
+            h(TerraDashboardChat, {key:`${regionId}:${mode}`, lang, t, region, param, mode, openRequest:chatOpenRequest})),
           h("aside", {className:"terra-inspector", "aria-label":text("Location and insights", "နေရာနှင့် သုံးသပ်ချက်များ")},
             h("section", {className:"terra-controls terra-panel"},
               panelTitle(text("Explore conditions", "အခြေအနေများကို လေ့လာရန်")),
@@ -181,7 +183,7 @@ function Og() {
                 h("div", {className:"terra-empty terra-empty-details"}, icon(ds, 24), h("p", null, text("Select an area on the map or use the location selector. Sources and observation dates will appear with your results.", "မြေပုံပေါ်မှ သို့မဟုတ် စာရင်းမှ နေရာရွေးပါ။ ရင်းမြစ်နှင့် ရက်စွဲများကို ရလဒ်နှင့်အတူ ပြပါမည်။"))))))))));
 }
 
-function TerraDashboardChat({lang, t, region, param, mode}) {
+function TerraDashboardChat({lang, t, region, param, mode, openRequest}) {
   const h = ft.createElement;
   const [messages, setMessages] = ft.useState([]);
   const [input, setInput] = ft.useState("");
@@ -191,6 +193,7 @@ function TerraDashboardChat({lang, t, region, param, mode}) {
   const request = ft.useRef(null);
   const thread = ft.useRef(null);
   const text = (en, my) => lang === "my" ? my : en;
+  ft.useEffect(()=>{ if (openRequest) setExpanded(true); }, [openRequest]);
   ft.useEffect(()=>()=>request.current?.abort(), []);
   ft.useEffect(()=>{ if (thread.current) thread.current.scrollTop = thread.current.scrollHeight; }, [messages, busy]);
   async function send(question) {
@@ -213,7 +216,7 @@ function TerraDashboardChat({lang, t, region, param, mode}) {
     } finally { if (!controller.signal.aborted) setBusy(false); }
   }
   const question = region ? (lang === "my" ? `${region.nameMy}၏ ${Ha[param].labelMy} အချက်အလက်များကို ရှင်းပြပါ။` : `Explain the recent ${Ha[param].label.toLowerCase()} measurements in ${region.name}.`) : "";
-  return h("section", {className:"terra-chat terra-panel", "aria-label":t("chatTitle")},
+  return h("section", {id:"ai-chat", className:`terra-chat terra-panel ${expanded ? "is-expanded" : ""}`, "aria-label":t("chatTitle")},
     h("div", {className:"terra-chat-heading"}, h("div", null, h(vo, {width:20, height:20}), h("h2", null, t("chatTitle")),
       h("span", null, region ? (lang === "my" ? region.nameMy : region.name) : text("Choose a location", "နေရာရွေးပါ"))),
       h("button", {onClick:()=>setExpanded(!expanded), "aria-expanded":expanded, "aria-controls":"terra-chat-body"}, text(expanded ? "Minimize" : "Open chat", expanded ? "ချုံ့ရန်" : "ဖွင့်ရန်"))),
