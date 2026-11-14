@@ -27,7 +27,11 @@ export function useEarthLensChat({ endpoint = "/api/earthlens-chat", lang, selec
     async (text: string) => {
       const message = text.trim();
       if (!message || busy) return;
-      const history = messages.filter((m) => !m.error).map((m) => ({ role: m.role, content: m.content })).slice(-10);
+      // Earlier answers are long (tables, cards); only their short summary is sent back as context.
+      const history = messages
+        .filter((m) => !m.error)
+        .map((m) => ({ role: m.role, content: (m.response?.summary || m.content).slice(0, 1500) }))
+        .slice(-10);
       setMessages((m) => [...m, { role: "user", content: message }]);
       setBusy(true);
       try {

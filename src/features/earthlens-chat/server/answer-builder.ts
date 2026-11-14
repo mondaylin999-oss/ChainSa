@@ -8,10 +8,11 @@ import { POWER_SOURCE } from "./nasa/power";
 import { cardsText, tableText } from "./presentation";
 
 /**
- * Builds the concise seven-section answer:
- *   1 Direct Answer (AI sentence or template) · 2 Current NASA Data (table) · 3 Historical Comparison ·
- *   4 Next 30-Day Outlook · 5 Evidence-Based Action Cards · 6 Data Sources · 7 Disclaimer (always last).
- * Only section 1 may contain AI-written text. The table and cards are built from NASA facts by the server.
+ * Builds the answer: an Executive Summary on top, then "Detailed Analysis" with six numbered sections:
+ *   1 Current NASA Data (table) · 2 Historical Comparison · 3 Next 30-Day Outlook ·
+ *   4 Evidence-Based Action Cards · 5 Data Sources · 6 Disclaimer (always last).
+ * Only the summary's first sentence may be AI-written. Every other summary sentence is taken from the table and
+ * the Action Cards, so the summary can never say something the detailed sections do not.
  */
 
 type T = Record<Lang, string>;
@@ -43,10 +44,16 @@ export interface BuildInput {
   cardNote: string | null;
 }
 
+/** The summary has no number; the detailed sections are numbered 1–6. */
+export function sectionNumber(fmt: AnswerFormat, id: SectionId): number | null {
+  if (id === "summary") return null;
+  return fmt.sections.filter((s) => s.id !== "summary").findIndex((s) => s.id === id) + 1;
+}
+
 function heading(fmt: AnswerFormat, id: SectionId, lang: Lang): string {
-  const i = fmt.sections.findIndex((s) => s.id === id);
-  const h = fmt.sections[i].heading[lang];
-  return fmt.numberHeadings ? `${i + 1}. ${h}` : h;
+  const h = fmt.sections.find((s) => s.id === id)!.heading[lang];
+  const n = sectionNumber(fmt, id);
+  return fmt.numberHeadings && n ? `${n}. ${h}` : h;
 }
 
 const PHRASE: Record<string, T> = {
@@ -207,10 +214,57 @@ function disclaimer({ lang, fmt, outlook, limitations, g }: BuildInput): string[
   return out;
 }
 
+const SUMMARY_RANK: [number, T][] = [
+  [20, { en: "well below usual", my: "ပုံမှန်ထက် အများကြီး နည်း" }],
+  [40, { en: "below usual", my: "ပုံမှန်ထက် နည်း" }],
+  [60, { en: "near usual", my: "ပုံမှန်နီးပါး" }],
+  [80, { en: "above usual", my: "ပုံမှန်ထက် များ" }],
+  [101, { en: "well above usual", my: "ပုံမှန်ထက် အများကြီး များ" }],
+];
+
+/**
+ * Executive Summary (2–4 sentences): the direct answer, up to 2 key findings from the data table, and the main
+ * impact + first option of the most relevant Action Card. No new numbers: every value comes from the table/cards.
+ */
+export function buildSummary(input: BuildInput): string {
+  const { lang, table, cards, cardNote } = input;
+  const out: string[] = [input.aiDirect ?? templateDirect(input)];
+  const end = lang === "my" ? "။" : ".";
+  const rows = (table?.rows ?? []).filter((r) => r.reference && r.rank !== null).slice(0, 2);
+  if (rows.length) {
+    const parts = rows.map((r) => {
+      const word = SUMMARY_RANK.find(([max]) => r.rank! < max)![1][lang];
+      return lang === "my"
+        ? `${r.label} ${r.latest.value} ${r.latest.unit} (${word}၊ ပုံမှန် ${r.reference!.value} ${r.reference!.unit})`
+        : `${r.label.toLowerCase()} was ${r.latest.value} ${r.latest.unit} (${word}; typical ${r.reference!.value} ${r.reference!.unit})`;
+    });
+    out.push(lang === "my" ? `အဓိက တွေ့ရှိချက် - ${parts.join("၊ ")}${end}` : `Key findings: ${parts.join("; ")}${end}`);
+  } else if (table?.rows.length) {
+    const r = table.rows[0];
+    out.push(lang === "my"
+      ? `နောက်ဆုံး တိုင်းတာချက် - ${r.label} ${r.latest.value} ${r.latest.unit} (ယခင်နှစ်များနှင့် နှိုင်းယှဉ်ချက် မရရှိပါ)${end}`
+      : `Latest measurement: ${r.label.toLowerCase()} ${r.latest.value} ${r.latest.unit} (no comparison with past years available)${end}`);
+  }
+  const card = cards[0];
+  if (card) {
+    const opt = card.suggestedOptions[0]?.replace(/[.။]$/, "");
+    const highImpact = card.decisionType === "water" || card.decisionType === "electricity" || card.decisionType === "disaster";
+    const check = highImpact ? card.evidenceNeeded.slice(0, 2).join(lang === "my" ? "၊ " : ", ") : "";
+    out.push(card.potentialImpact);
+    if (opt)
+      out.push(lang === "my"
+        ? `အဓိက အကြံပြုချက် - ${opt}${check ? ` (မလုပ်ဆောင်မီ ${check} ကို စစ်ဆေးပါ)` : ""}${end}`
+        : `Main option to consider: ${opt.charAt(0).toLowerCase()}${opt.slice(1)}${check ? ` (check ${check.toLowerCase()} first)` : ""}${end}`);
+  } else if (cardNote) {
+    out.push(cardNote);
+  }
+  return out.join(" ");
+}
+
 export function buildAnswer(input: BuildInput): { text: string; sections: Record<SectionId, string> } {
   const { lang, fmt } = input;
   const bodies: Record<SectionId, string[]> = {
-    direct: [input.aiDirect ?? templateDirect(input)],
+    summary: [buildSummary(input)],
     current: current(input),
     history: history(input),
     outlook: outlookSection(input),
@@ -224,6 +278,7 @@ export function buildAnswer(input: BuildInput): { text: string; sections: Record
     const body = bodies[s.id].join("\n");
     sections[s.id] = body;
     parts.push(`${heading(fmt, s.id, lang)}\n${body}`);
+    if (s.id === "summary") parts.push(`— ${fmt.detailedHeading[lang]} —`);
   }
   return { text: parts.join("\n\n"), sections };
 }

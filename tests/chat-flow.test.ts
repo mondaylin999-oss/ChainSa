@@ -12,8 +12,12 @@ const keys = (over = {}) =>
     groq: { name: "groq", apiKey: "gq-test", baseUrl: "https://groq.test/openai/v1", models: ["openai/gpt-oss-20b"], rejectedModels: [] },
     ...over,
   });
-const EN_HEADINGS = ["1. Direct Answer", "2. Current NASA Data", "3. Historical Comparison", "4. Next 30-Day Outlook", "5. Evidence-Based Action Cards", "6. Data Sources", "7. Disclaimer"];
-const MY_HEADINGS = answerFormat.sections.map((s, i) => `${i + 1}. ${s.heading.my}`);
+const EN_HEADINGS = ["Executive Summary", "— Detailed Analysis —", "1. Current NASA Data", "2. Historical Comparison", "3. Next 30-Day Outlook", "4. Evidence-Based Action Cards", "5. Data Sources", "6. Disclaimer"];
+const MY_HEADINGS = [
+  "အကျဉ်းချုပ်အဖြေ",
+  "— အသေးစိတ်အချက်အလက် —",
+  ...answerFormat.sections.filter((s) => s.id !== "summary").map((s, i) => `${i + 1}. ${s.heading.my}`),
+];
 const DISCLAIMER_EN = "The analysis and forecasts provided are based on NASA Earth observation data, relevant historical records, and the forecasting models used. They represent estimated future possibilities and do not guarantee actual future conditions.";
 const DISCLAIMER_MY = "ဤအဖြေတွင် ဖော်ပြထားသော ခန့်မှန်းသုံးသပ်ချက်များသည် NASA မှ ရရှိသော ကမ္ဘာမြေလေ့လာရေးအချက်အလက်များ၊ သက်ဆိုင်ရာ အတိတ်မှတ်တမ်းများနှင့် အသုံးပြုထားသော ခန့်မှန်းမော်ဒယ်များအပေါ် အခြေခံထားခြင်းဖြစ်ပါသည်။ ၎င်းတို့သည် ဖြစ်နိုင်ခြေကို ခန့်မှန်းသုံးသပ်ထားခြင်းသာဖြစ်ပြီး အမှန်တကယ် ဖြစ်ပေါ်လာမည်ဟု အာမခံခြင်း မဟုတ်ပါ။";
 
@@ -35,7 +39,8 @@ describe("seven-section concise answer format", () => {
     inOrder(r.answer, EN_HEADINGS);
     expect(r.answer).toContain(DISCLAIMER_EN);
     expect(r.answer.endsWith(DISCLAIMER_EN)).toBe(true);
-    expect(r.sections.direct).toMatch(/^For Ayeyarwady: /);
+    expect(r.answer.startsWith("Executive Summary\nFor Ayeyarwady: ")).toBe(true);
+    expect(r.summary).toBe(r.sections.summary);
     expect(r.sections.history).toMatch(/Compared with the same dates in past years \(1981–20\d\d\)/);
     expect(r.sections.current).toContain("Ayeyarwady — NASA grid point 16.75°N, 95.11°E");
     expect(r.sections.current).toContain("| Parameter | Latest value | Typical in past years | Difference |");
@@ -114,7 +119,7 @@ describe("AI provider chain (direct answer only)", () => {
     const r = await answerChat({ message: "rice farming Ayeyarwady next month" }, { config: keys(), fetchImpl: f, today: TODAY });
     expect(r.generator).toBe("llm");
     expect(r.provider).toBe("openrouter");
-    expect(r.sections.direct).toContain("In past years these 30 days");
+    expect(r.sections.summary).toContain("In past years these 30 days");
     expect(r.sections.outlook).not.toContain("In past years these 30 days");
     expect(r.sections.actions).not.toContain("In past years these 30 days");
     expect(system).toContain("VALIDATED 30-DAY FORECAST: NONE");
@@ -127,7 +132,7 @@ describe("AI provider chain (direct answer only)", () => {
       "https://openrouter.test": () => completion("Rice fields in Ayeyarwady look normal for the season.\n• Water supply matters for rice."),
     });
     const r = await answerChat({ message: "rice farming Ayeyarwady" }, { config: keys(), fetchImpl: f, today: TODAY });
-    expect(r.sections.direct).toBe("Rice fields in Ayeyarwady look normal for the season. Water supply matters for rice.");
+    expect(r.sections.summary.startsWith("Rice fields in Ayeyarwady look normal for the season. Water supply matters for rice.")).toBe(true);
     expect(r.sections.actions).not.toContain("Water supply matters for rice");
     expect(r.answer.endsWith(DISCLAIMER_EN)).toBe(true);
   });

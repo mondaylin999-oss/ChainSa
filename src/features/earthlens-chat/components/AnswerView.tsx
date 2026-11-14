@@ -1,6 +1,6 @@
 "use client";
 
-import { CloudRain, Droplets, Flame, Leaf, ShieldAlert, Sprout, Zap } from "lucide-react";
+import { CloudRain, Droplets, Flame, Leaf, ShieldAlert, Sparkles, Sprout, Zap } from "lucide-react";
 import type { ActionCard, ChatResponseBody, ConfidenceLevel, DataTable, DecisionType, Lang } from "../types";
 import { answerFormat } from "../config/answer-format";
 import { UI_STRINGS } from "../i18n";
@@ -118,10 +118,13 @@ export function ActionCardView({ card, lang }: { card: ActionCard; lang: Lang })
   );
 }
 
+/** Detailed sections are numbered 1–6; the Executive Summary above them has no number. */
+const DETAILED = answerFormat.sections.filter((s) => s.id !== "summary");
+
 function Heading({ id, lang, first }: { id: string; lang: Lang; first?: boolean }) {
-  const i = answerFormat.sections.findIndex((s) => s.id === id);
+  const i = DETAILED.findIndex((s) => s.id === id);
   if (i < 0) return null;
-  return <h3 className={`font-display text-[13px] font-semibold text-ocean-300 ${first ? "" : "mt-3"}`}>{`${i + 1}. ${answerFormat.sections[i].heading[lang]}`}</h3>;
+  return <h3 className={`font-display text-[13px] font-semibold text-ocean-300 ${first ? "" : "mt-3"}`}>{`${i + 1}. ${DETAILED[i].heading[lang]}`}</h3>;
 }
 
 const Lines = ({ text, className = "" }: { text: string; className?: string }) => (
@@ -131,15 +134,26 @@ const Lines = ({ text, className = "" }: { text: string; className?: string }) =
 /** Rich view for environmental answers. Returns null when the response has no structured data (older messages). */
 export function StructuredAnswer({ r, lang }: { r: ChatResponseBody; lang: Lang }) {
   const t = UI_STRINGS[lang];
-  if (r.kind !== "environmental" || !r.sections || !("actions" in r.sections)) return null;
+  if (r.kind !== "environmental" || !r.sections || !("summary" in r.sections)) return null;
   const s = r.sections;
   const [locationLine] = s.current.split("\n");
   return (
     <div className="space-y-1 text-[13px] leading-relaxed">
-      <Heading id="direct" lang={lang} first />
-      <Lines text={s.direct} className="text-slate-100" />
+      <section aria-label={answerFormat.sections[0].heading[lang]} className="rounded-xl border border-ocean-400/30 bg-ocean-500/10 p-3">
+        <h3 className="mb-1 flex items-center gap-1.5 font-display text-[13px] font-semibold text-white">
+          <Sparkles className="h-3.5 w-3.5 text-ocean-300" />
+          {answerFormat.sections.find((x) => x.id === "summary")!.heading[lang]}
+        </h3>
+        <p className="text-[13px] leading-relaxed text-slate-100">{s.summary}</p>
+      </section>
 
-      <Heading id="current" lang={lang} />
+      <div className="flex items-center gap-2 pt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+        <span className="h-px flex-1 bg-white/10" />
+        {answerFormat.detailedHeading[lang]}
+        <span className="h-px flex-1 bg-white/10" />
+      </div>
+
+      <Heading id="current" lang={lang} first />
       {r.dataTable ? (
         <>
           <p className="text-[11px] text-slate-400">{locationLine}</p>

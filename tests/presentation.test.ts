@@ -145,3 +145,62 @@ describe("shorter answers", () => {
     expect(r.answer.endsWith(answerFormat.disclaimer.en)).toBe(true);
   });
 });
+
+describe("Executive Summary", () => {
+  it("English: summary first, then the six numbered detailed sections, disclaimer last", async () => {
+    const r = await ask("Is there drought risk for rice farmers in Magway?", DRY);
+    expect(r.answer.startsWith("Executive Summary\n")).toBe(true);
+    const order = ["Executive Summary", "— Detailed Analysis —", "1. Current NASA Data", "2. Historical Comparison", "3. Next 30-Day Outlook", "4. Evidence-Based Action Cards", "5. Data Sources", "6. Disclaimer"];
+    let pos = -1;
+    for (const h of order) {
+      const i = r.answer.indexOf(h);
+      expect(i, h).toBeGreaterThan(pos);
+      pos = i;
+    }
+    expect(r.answer.endsWith(answerFormat.disclaimer.en)).toBe(true);
+  });
+
+  it("summary is 2–4 sentences and only uses values shown in the table and cards", async () => {
+    const r = await ask("Is there drought risk for rice farmers in Magway?", DRY);
+    const sentences = r.summary.split(/(?<=[.။])\s+/).filter(Boolean);
+    expect(sentences.length).toBeGreaterThanOrEqual(2);
+    expect(sentences.length).toBeLessThanOrEqual(4);
+    // every number in the summary appears in the data table or the action cards
+    const allowed = JSON.stringify({ t: r.dataTable, c: r.actionCards });
+    for (const n of r.summary.match(/\d+(?:\.\d+)?/g) ?? []) expect(allowed, n).toContain(n);
+    // key finding and main option come from the detailed sections
+    expect(r.summary).toContain(r.dataTable!.rows[0].latest.value.toString());
+    expect(r.summary).toContain(r.actionCards[0].potentialImpact);
+  });
+
+  it("high-impact summary names the local data to check first", async () => {
+    const r = await ask("Should we change irrigation water distribution from the reservoir in Magway?", DRY);
+    const first = r.actionCards[0];
+    expect(first.decisionType).toBe("water");
+    expect(r.summary).toMatch(/check reservoir storage levels, river water levels first/);
+  });
+
+  it("Myanmar: Myanmar summary on top", async () => {
+    const r = await ask("မကွေးတိုင်းဒေသကြီးရှိ စပါးတောင်သူများအတွက် မိုးခေါင်နိုင်ခြေ ရှိပါသလား", DRY);
+    expect(r.answer.startsWith("အကျဉ်းချုပ်အဖြေ\n")).toBe(true);
+    expect(r.summary).toContain("အဓိက တွေ့ရှိချက်");
+    expect(r.answer).toContain("— အသေးစိတ်အချက်အလက် —");
+    expect(r.answer.endsWith(answerFormat.disclaimer.my)).toBe(true);
+  });
+
+  it("says evidence is insufficient in the summary when no card can be made", async () => {
+    const r = await ask("wind speed in Yangon");
+    expect(r.summary).toContain("Insufficient evidence to generate a reliable action recommendation.");
+  });
+});
+
+describe("follow-up questions", () => {
+  it("accepts a long earlier answer in history (trimmed, not rejected)", async () => {
+    const { handleChatPost, resetRateLimiterForTests } = await import("@/features/earthlens-chat/server/handler");
+    resetRateLimiterForTests();
+    const { f } = mockFetch({ "https://power.larc.nasa.gov": nasa(), "https://modis.ornl.gov": () => new Response("down", { status: 503 }) });
+    const body = { message: "and what about soil?", selectedRegionId: "magway", history: [{ role: "user", content: "drought Magway?" }, { role: "assistant", content: "x".repeat(6000) }] };
+    const res = await handleChatPost(new Request("http://localhost/api/chat", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }), { config: baseConfig(), fetchImpl: f, today: TODAY });
+    expect(res.status).toBe(200);
+  });
+});

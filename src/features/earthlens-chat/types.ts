@@ -97,6 +97,8 @@ export interface ChatResponseBody {
   recommendations: { id: string; text: string; reason: string; uncertainty: string }[];
   /** The answer sections as separate strings (same text as `answer`). Empty for general questions, except direct + disclaimer. */
   sections: Record<SectionKey, string>;
+  /** Executive Summary shown at the top (same text as sections.summary). */
+  summary: string;
   /** Compact table of the most relevant NASA measurements (null for general questions or without data). */
   dataTable: DataTable | null;
   /** Evidence-based Action Cards built by the server from NASA facts (never by the AI). */
@@ -110,7 +112,7 @@ export interface ChatErrorBody {
   code: "invalid_request" | "rate_limited" | "server_error" | "forbidden_origin";
 }
 
-export type SectionKey = "direct" | "current" | "history" | "outlook" | "actions" | "sources" | "disclaimer";
+export type SectionKey = "summary" | "current" | "history" | "outlook" | "actions" | "sources" | "disclaimer";
 
 export interface TableValue {
   value: number;

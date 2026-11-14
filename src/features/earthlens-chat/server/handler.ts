@@ -145,6 +145,7 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
     outlook: { window: a.outlookWindow, forecastAvailable: !!outlook?.probabilities.length, historical: a.facts.filter((f) => f.kind === "historical") },
     recommendations: recs,
     sections: built.sections,
+    summary: built.sections.summary,
     dataTable,
     actionCards,
     actionNote: actionCards.length ? null : actionNote,
@@ -176,7 +177,7 @@ async function answerGeneral(message: string, lang: Lang, req: ValidChatRequest,
   const body = chain.text?.trim() || GENERAL_TEMPLATE[lang];
   const disclaimer = fmt.generalDisclaimer[lang];
   const region = getRegion(req.selectedRegionId) ?? getRegion(DEFAULT_REGION_ID)!;
-  const empty = { direct: body, current: "", history: "", outlook: "", actions: "", sources: "", disclaimer };
+  const empty = { summary: body, current: "", history: "", outlook: "", actions: "", sources: "", disclaimer };
   return {
     answer: `${body}\n\n${disclaimer}`,
     lang,
@@ -199,6 +200,7 @@ async function answerGeneral(message: string, lang: Lang, req: ValidChatRequest,
     outlook: { window: { start: "", end: "" }, forecastAvailable: false, historical: [] },
     recommendations: [],
     sections: empty,
+    summary: body,
     dataTable: null,
     actionCards: [],
     actionNote: null,

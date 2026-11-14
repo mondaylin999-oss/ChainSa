@@ -1,22 +1,24 @@
 /**
  * ANSWER FORMAT — edit this file to change how the chatbot answers.
  *
- * Every environmental answer has the same seven concise sections in English and Myanmar:
- *   1 Direct Answer                — 1–3 sentences written by the AI (numbers checked), or a rule-based template
- *   2 Current NASA Data            — compact table: latest value · typical past value · calculated difference
- *   3 Historical Comparison        — one or two sentences: how the latest values rank against past years
- *   4 Next 30-Day Outlook          — validated forecast (none yet) + one clearly labelled historical-pattern sentence
- *   5 Evidence-Based Action Cards  — rule-based cards built from NASA facts, each with a confidence level
- *   6 Data Sources                 — datasets, observation dates, links, forecast model
- *   7 Disclaimer                   — the fixed disclaimer text below, always the last text, added by the server
+ * Every environmental answer starts with an Executive Summary, followed by six numbered detailed sections:
+ *   Executive Summary              — 2–4 sentences: direct answer (AI, numbers checked, or template) + key findings,
+ *                                    main impact and main option, all taken from the sections below
+ *   Detailed Analysis
+ *   1 Current NASA Data            — compact table: latest value · typical past value · calculated difference
+ *   2 Historical Comparison        — one or two sentences: how the latest values rank against past years
+ *   3 Next 30-Day Outlook          — validated forecast (none yet) + one clearly labelled historical-pattern sentence
+ *   4 Evidence-Based Action Cards  — rule-based cards built from NASA facts, each with a confidence level
+ *   5 Data Sources                 — datasets, observation dates, links, forecast model
+ *   6 Disclaimer                   — the fixed disclaimer text below, always the last text, added by the server
  *
- * Only section 1 is written by the AI, so it cannot invent evidence, cards, forecasts or percentages.
+ * Only the first sentence of the summary is written by the AI, so it cannot invent evidence, cards, forecasts or percentages.
  * Questions that are not about the environment get a short answer plus `generalDisclaimer`.
  */
 
 import type { Lang } from "../types";
 
-export type SectionId = "direct" | "current" | "history" | "outlook" | "actions" | "sources" | "disclaimer";
+export type SectionId = "summary" | "current" | "history" | "outlook" | "actions" | "sources" | "disclaimer";
 
 export interface AnswerFormat {
   /** Section order and headings. Numbers are added automatically when `numberHeadings` is true. */
@@ -27,6 +29,8 @@ export interface AnswerFormat {
   showUnits: boolean;
   showDates: boolean;
   showSourceLinks: boolean;
+  /** Heading shown between the Executive Summary and the numbered detailed sections. */
+  detailedHeading: Record<Lang, string>;
   /** Exact disclaimer text (required wording — do not shorten). */
   disclaimer: Record<Lang, string>;
   /** Disclaimer for questions that are not about the environment (no NASA data used). */
@@ -43,7 +47,7 @@ export interface AnswerFormat {
 // The two NASA disclaimer texts are exactly as specified in the project brief (Nov 2026).
 export const answerFormat: AnswerFormat = {
   sections: [
-    { id: "direct", heading: { en: "Direct Answer", my: "တိုက်ရိုက် အဖြေ" } },
+    { id: "summary", heading: { en: "Executive Summary", my: "အကျဉ်းချုပ်အဖြေ" } },
     { id: "current", heading: { en: "Current NASA Data", my: "လက်ရှိ NASA အချက်အလက်" } },
     { id: "history", heading: { en: "Historical Comparison", my: "ယခင်မှတ်တမ်းများနှင့် နှိုင်းယှဉ်ချက်" } },
     { id: "outlook", heading: { en: "Next 30-Day Outlook", my: "လာမည့် ရက် ၃၀ အလားအလာ" } },
@@ -52,6 +56,7 @@ export const answerFormat: AnswerFormat = {
     { id: "disclaimer", heading: { en: "Disclaimer", my: "သတိပေးချက်" } },
   ],
   numberHeadings: true,
+  detailedHeading: { en: "Detailed Analysis", my: "အသေးစိတ်အချက်အလက်" },
   aiMaxWords: 60,
   showUnits: true,
   showDates: true,

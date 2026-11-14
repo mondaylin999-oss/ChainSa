@@ -36,12 +36,14 @@ those routes call NASA for real.
 
 ## 0. What's new: 30-day drought / flood / agriculture decision support (Phase 1)
 
-Every environmental answer has the same seven concise sections in English and Myanmar:
-**1 Direct Answer · 2 Current NASA Data · 3 Historical Comparison · 4 Next 30-Day Outlook · 5 Evidence-Based Action Cards ·
-6 Data Sources · 7 Disclaimer.**
+Every environmental answer starts with an **Executive Summary** (`summary` in the response), followed by
+**Detailed Analysis** with six numbered sections, in English and Myanmar:
+**1 Current NASA Data · 2 Historical Comparison · 3 Next 30-Day Outlook · 4 Evidence-Based Action Cards · 5 Data Sources · 6 Disclaimer.**
 
-- **Only the Direct Answer is written by the AI** (1–3 sentences, numbers checked against the NASA facts; template without AI).
-  Everything else is built by the server.
+- **Executive Summary (2–4 sentences):** a direct answer (the only AI-written text, 1–2 sentences, numbers checked; template
+  without AI), up to two key findings from the data table, and the main impact and option of the most relevant Action Card.
+  For water, electricity and emergency questions it also names the local data to check first. It contains no value that is
+  not in the detailed sections; when evidence is insufficient it says so.
 - **Current NASA Data is a table** (`server/presentation.ts` → `dataTable` in the response, rendered by
   `components/AnswerView.tsx`): at most 4 rows chosen for the question, each with the latest value and date, the typical value
   for the same dates in past years (median since 1981, or the 10-year NDVI mean), and the difference calculated by the server
