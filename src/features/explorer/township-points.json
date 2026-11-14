@@ -1,0 +1,2646 @@
+{
+  "source": "MIMU PCode 9.4 township polygons; names from MIMU 9.7 directory",
+  "method": "Interior point: midpoint of the widest polygon scanline interval sampled at 25%, 50% and 75% of polygon latitude extent. Not a centroid or area average.",
+  "townships": [
+    {
+      "id": "MMR017008",
+      "regionId": "ayeyarwady",
+      "name": "Hinthada",
+      "nameMy": "ဟင်္သာတ",
+      "lat": 17.620609,
+      "lon": 95.391166
+    },
+    {
+      "id": "MMR017013",
+      "regionId": "ayeyarwady",
+      "name": "Ingapu",
+      "nameMy": "အင်္ဂပူ",
+      "lat": 17.838488,
+      "lon": 95.180959
+    },
+    {
+      "id": "MMR017012",
+      "regionId": "ayeyarwady",
+      "name": "Kyangin",
+      "nameMy": "ကြံခင်း",
+      "lat": 18.316657,
+      "lon": 95.056271
+    },
+    {
+      "id": "MMR017010",
+      "regionId": "ayeyarwady",
+      "name": "Lemyethna",
+      "nameMy": "လေးမျက်နှာ",
+      "lat": 17.603262,
+      "lon": 94.999642
+    },
+    {
+      "id": "MMR017011",
+      "regionId": "ayeyarwady",
+      "name": "Myanaung",
+      "nameMy": "မြန်အောင်",
+      "lat": 18.111046,
+      "lon": 95.142587
+    },
+    {
+      "id": "MMR017009",
+      "regionId": "ayeyarwady",
+      "name": "Zalun",
+      "nameMy": "ဇလွန်",
+      "lat": 17.408671,
+      "lon": 95.555778
+    },
+    {
+      "id": "MMR017016",
+      "regionId": "ayeyarwady",
+      "name": "Labutta",
+      "nameMy": "လပွတ္တာ",
+      "lat": 15.962443,
+      "lon": 94.950068
+    },
+    {
+      "id": "MMR017018",
+      "regionId": "ayeyarwady",
+      "name": "Mawlamyinegyun",
+      "nameMy": "မော်လမြိုင်ကျွန်း",
+      "lat": 16.473156,
+      "lon": 95.334498
+    },
+    {
+      "id": "MMR017022",
+      "regionId": "ayeyarwady",
+      "name": "Danubyu",
+      "nameMy": "ဓနုဖြူ",
+      "lat": 17.327039,
+      "lon": 95.551621
+    },
+    {
+      "id": "MMR017019",
+      "regionId": "ayeyarwady",
+      "name": "Maubin",
+      "nameMy": "မအူပင်",
+      "lat": 16.715127,
+      "lon": 95.645016
+    },
+    {
+      "id": "MMR017021",
+      "regionId": "ayeyarwady",
+      "name": "Nyaungdon",
+      "nameMy": "ညောင်တုန်း",
+      "lat": 16.94466,
+      "lon": 95.70988
+    },
+    {
+      "id": "MMR017020",
+      "regionId": "ayeyarwady",
+      "name": "Pantanaw",
+      "nameMy": "ပန်းတနော်",
+      "lat": 16.870157,
+      "lon": 95.422453
+    },
+    {
+      "id": "MMR017015",
+      "regionId": "ayeyarwady",
+      "name": "Einme",
+      "nameMy": "အိမ်မဲ",
+      "lat": 16.765469,
+      "lon": 95.08149
+    },
+    {
+      "id": "MMR017014",
+      "regionId": "ayeyarwady",
+      "name": "Myaungmya",
+      "nameMy": "မြောင်းမြ",
+      "lat": 16.532442,
+      "lon": 94.914165
+    },
+    {
+      "id": "MMR017017",
+      "regionId": "ayeyarwady",
+      "name": "Wakema",
+      "nameMy": "ဝါးခယ်မ",
+      "lat": 16.552055,
+      "lon": 95.223852
+    },
+    {
+      "id": "MMR017002",
+      "regionId": "ayeyarwady",
+      "name": "Kangyidaunt",
+      "nameMy": "ကန်ကြီးထောင့်",
+      "lat": 16.891651,
+      "lon": 94.91598
+    },
+    {
+      "id": "MMR017006",
+      "regionId": "ayeyarwady",
+      "name": "Yegyi",
+      "nameMy": "ရေကြည်",
+      "lat": 17.349678,
+      "lon": 94.956307
+    },
+    {
+      "id": "MMR017024",
+      "regionId": "ayeyarwady",
+      "name": "Bogale",
+      "nameMy": "ဘိုကလေး",
+      "lat": 16.129032,
+      "lon": 95.450347
+    },
+    {
+      "id": "MMR017026",
+      "regionId": "ayeyarwady",
+      "name": "Dedaye",
+      "nameMy": "ဒေးဒရဲ",
+      "lat": 16.303016,
+      "lon": 95.79706
+    },
+    {
+      "id": "MMR017025",
+      "regionId": "ayeyarwady",
+      "name": "Kyaiklat",
+      "nameMy": "ကျိုက်လတ်",
+      "lat": 16.513928,
+      "lon": 95.648243
+    },
+    {
+      "id": "MMR017023",
+      "regionId": "ayeyarwady",
+      "name": "Pyapon",
+      "nameMy": "ဖျာပုံ",
+      "lat": 15.883941,
+      "lon": 95.502184
+    },
+    {
+      "id": "MMR007001",
+      "regionId": "bago",
+      "name": "Bago",
+      "nameMy": "ပဲခူး",
+      "lat": 17.526439,
+      "lon": 96.400462
+    },
+    {
+      "id": "MMR007007",
+      "regionId": "bago",
+      "name": "Daik-U",
+      "nameMy": "ဒိုက်ဦး",
+      "lat": 17.680082,
+      "lon": 96.630795
+    },
+    {
+      "id": "MMR007003",
+      "regionId": "bago",
+      "name": "Kawa",
+      "nameMy": "ကဝ",
+      "lat": 17.010237,
+      "lon": 96.594338
+    },
+    {
+      "id": "MMR007006",
+      "regionId": "bago",
+      "name": "Kyauktaga",
+      "nameMy": "ကျောက်တံခါး",
+      "lat": 18.195175,
+      "lon": 96.390547
+    },
+    {
+      "id": "MMR007014",
+      "regionId": "bago",
+      "name": "Htantabin",
+      "nameMy": "ထန်းတပင်",
+      "lat": 18.828279,
+      "lon": 96.536145
+    },
+    {
+      "id": "MMR007011",
+      "regionId": "bago",
+      "name": "Kyaukkyi",
+      "nameMy": "ကျောက်ကြီး",
+      "lat": 18.257563,
+      "lon": 96.907018
+    },
+    {
+      "id": "MMR007013",
+      "regionId": "bago",
+      "name": "Oktwin",
+      "nameMy": "အုတ်တွင်း",
+      "lat": 18.767739,
+      "lon": 96.195295
+    },
+    {
+      "id": "MMR007012",
+      "regionId": "bago",
+      "name": "Phyu",
+      "nameMy": "ဖြူး",
+      "lat": 18.531361,
+      "lon": 96.266332
+    },
+    {
+      "id": "MMR007009",
+      "regionId": "bago",
+      "name": "Taungoo",
+      "nameMy": "တောင်ငူ",
+      "lat": 19.008219,
+      "lon": 96.208057
+    },
+    {
+      "id": "MMR007010",
+      "regionId": "bago",
+      "name": "Yedashe",
+      "nameMy": "ရေတာရှည်",
+      "lat": 19.169752,
+      "lon": 96.185362
+    },
+    {
+      "id": "MMR008003",
+      "regionId": "bago",
+      "name": "Padaung",
+      "nameMy": "ပန်းတောင်း",
+      "lat": 18.82556,
+      "lon": 94.969218
+    },
+    {
+      "id": "MMR017007",
+      "regionId": "ayeyarwady",
+      "name": "Kyaunggon",
+      "nameMy": "ကျောင်းကုန်း",
+      "lat": 17.055501,
+      "lon": 95.186803
+    },
+    {
+      "id": "MMR017005",
+      "regionId": "ayeyarwady",
+      "name": "Kyonpyaw",
+      "nameMy": "ကျုံပျော်",
+      "lat": 17.228171,
+      "lon": 95.275892
+    },
+    {
+      "id": "MMR017004",
+      "regionId": "ayeyarwady",
+      "name": "Ngapudaw",
+      "nameMy": "ငပုတော",
+      "lat": 16.344165,
+      "lon": 94.421578
+    },
+    {
+      "id": "MMR017001",
+      "regionId": "ayeyarwady",
+      "name": "Pathein",
+      "nameMy": "ပုသိမ်",
+      "lat": 16.834287,
+      "lon": 94.602668
+    },
+    {
+      "id": "MMR017003",
+      "regionId": "ayeyarwady",
+      "name": "Thabaung",
+      "nameMy": "သာပေါင်း",
+      "lat": 17.149303,
+      "lon": 94.782141
+    },
+    {
+      "id": "MMR007005",
+      "regionId": "bago",
+      "name": "Nyaunglebin",
+      "nameMy": "ညောင်လေးပင်",
+      "lat": 17.911685,
+      "lon": 96.747288
+    },
+    {
+      "id": "MMR007008",
+      "regionId": "bago",
+      "name": "Shwegyin",
+      "nameMy": "ရွှေကျင်",
+      "lat": 18.041535,
+      "lon": 96.973168
+    },
+    {
+      "id": "MMR007002",
+      "regionId": "bago",
+      "name": "Thanatpin",
+      "nameMy": "သနပ်ပင်",
+      "lat": 17.19203,
+      "lon": 96.688575
+    },
+    {
+      "id": "MMR008002",
+      "regionId": "bago",
+      "name": "Paukkhaung",
+      "nameMy": "ပေါက်ခေါင်း",
+      "lat": 19.077968,
+      "lon": 95.614169
+    },
+    {
+      "id": "MMR008004",
+      "regionId": "bago",
+      "name": "Paungde",
+      "nameMy": "ပေါင်းတည်",
+      "lat": 18.744658,
+      "lon": 95.683532
+    },
+    {
+      "id": "MMR007004",
+      "regionId": "bago",
+      "name": "Waw",
+      "nameMy": "ဝေါ",
+      "lat": 17.449031,
+      "lon": 96.724157
+    },
+    {
+      "id": "MMR004002",
+      "regionId": "chin",
+      "name": "Hakha",
+      "nameMy": "ဟားခါး",
+      "lat": 22.622357,
+      "lon": 93.756198
+    },
+    {
+      "id": "MMR004003",
+      "regionId": "chin",
+      "name": "Thantlang",
+      "nameMy": "ထန်တလန်",
+      "lat": 22.82603,
+      "lon": 93.289101
+    },
+    {
+      "id": "MMR004007",
+      "regionId": "chin",
+      "name": "Matupi",
+      "nameMy": "မတူပီ",
+      "lat": 21.980927,
+      "lon": 93.523403
+    },
+    {
+      "id": "MMR004009",
+      "regionId": "chin",
+      "name": "Paletwa",
+      "nameMy": "ပလက်ဝ",
+      "lat": 21.431221,
+      "lon": 92.959129
+    },
+    {
+      "id": "MMR004008",
+      "regionId": "chin",
+      "name": "Kanpetlet",
+      "nameMy": "ကန်ပက်လက်",
+      "lat": 21.136643,
+      "lon": 93.91934
+    },
+    {
+      "id": "MMR004006",
+      "regionId": "chin",
+      "name": "Mindat",
+      "nameMy": "မင်းတပ်",
+      "lat": 21.44157,
+      "lon": 93.790687
+    },
+    {
+      "id": "MMR001010",
+      "regionId": "kachin",
+      "name": "Bhamo",
+      "nameMy": "ဗန်းမော်",
+      "lat": 24.210961,
+      "lon": 97.176101
+    },
+    {
+      "id": "MMR001013",
+      "regionId": "kachin",
+      "name": "Mansi",
+      "nameMy": "မံစီ",
+      "lat": 23.918613,
+      "lon": 97.295719
+    },
+    {
+      "id": "MMR001012",
+      "regionId": "kachin",
+      "name": "Momauk",
+      "nameMy": "မိုးမောက်",
+      "lat": 24.719254,
+      "lon": 97.372792
+    },
+    {
+      "id": "MMR001011",
+      "regionId": "kachin",
+      "name": "Shwegu",
+      "nameMy": "ရွှေကူ",
+      "lat": 24.384617,
+      "lon": 96.836098
+    },
+    {
+      "id": "MMR001009",
+      "regionId": "kachin",
+      "name": "Hpakant",
+      "nameMy": "ဖားကန့်",
+      "lat": 25.468995,
+      "lon": 96.360821
+    },
+    {
+      "id": "MMR001008",
+      "regionId": "kachin",
+      "name": "Mogaung",
+      "nameMy": "မိုးကောင်း",
+      "lat": 25.161931,
+      "lon": 96.851731
+    },
+    {
+      "id": "MMR001007",
+      "regionId": "kachin",
+      "name": "Mohnyin",
+      "nameMy": "မိုးညှင်း",
+      "lat": 24.955112,
+      "lon": 96.422501
+    },
+    {
+      "id": "MMR001005",
+      "regionId": "kachin",
+      "name": "Chipwi",
+      "nameMy": "ချီဖွေ",
+      "lat": 25.788431,
+      "lon": 98.260604
+    },
+    {
+      "id": "MMR001003",
+      "regionId": "kachin",
+      "name": "Injangyang",
+      "nameMy": "အင်ဂျန်းယန်",
+      "lat": 25.888156,
+      "lon": 97.776996
+    },
+    {
+      "id": "MMR001001",
+      "regionId": "kachin",
+      "name": "Myitkyina",
+      "nameMy": "မြစ်ကြီးနား",
+      "lat": 24.957926,
+      "lon": 97.109614
+    },
+    {
+      "id": "MMR008001",
+      "regionId": "bago",
+      "name": "Pyay",
+      "nameMy": "ပြည်",
+      "lat": 18.913838,
+      "lon": 95.274681
+    },
+    {
+      "id": "MMR001004",
+      "regionId": "kachin",
+      "name": "Tanai",
+      "nameMy": "တနိုင်း",
+      "lat": 26.403454,
+      "lon": 96.60272
+    },
+    {
+      "id": "MMR008006",
+      "regionId": "bago",
+      "name": "Shwedaung",
+      "nameMy": "ရွှေတောင်",
+      "lat": 18.564183,
+      "lon": 95.17342
+    },
+    {
+      "id": "MMR001016",
+      "regionId": "kachin",
+      "name": "Machanbaw",
+      "nameMy": "မချမ်းဘော",
+      "lat": 27.24505,
+      "lon": 97.865603
+    },
+    {
+      "id": "MMR001017",
+      "regionId": "kachin",
+      "name": "Nawngmun",
+      "nameMy": "နောင်မွန်း",
+      "lat": 27.927955,
+      "lon": 97.80851
+    },
+    {
+      "id": "MMR001014",
+      "regionId": "kachin",
+      "name": "Puta-O",
+      "nameMy": "ပူတာအို",
+      "lat": 27.345751,
+      "lon": 97.275471
+    },
+    {
+      "id": "MMR001015",
+      "regionId": "kachin",
+      "name": "Sumprabum",
+      "nameMy": "ဆွမ်ပရာဘွမ်",
+      "lat": 26.59926,
+      "lon": 97.645523
+    },
+    {
+      "id": "MMR010004",
+      "regionId": "mandalay",
+      "name": "Chanmyathazi",
+      "nameMy": "ချမ်းမြသာစည်",
+      "lat": 21.943322,
+      "lon": 96.094361
+    },
+    {
+      "id": "MMR008005",
+      "regionId": "bago",
+      "name": "Thegon",
+      "nameMy": "သဲကုန်း",
+      "lat": 18.606227,
+      "lon": 95.426262
+    },
+    {
+      "id": "MMR008014",
+      "regionId": "bago",
+      "name": "Gyobingauk",
+      "nameMy": "ကြို့ပင်ကောက်",
+      "lat": 18.360041,
+      "lon": 95.887341
+    },
+    {
+      "id": "MMR008008",
+      "regionId": "bago",
+      "name": "Letpadan",
+      "nameMy": "လက်ပံတန်း",
+      "lat": 18.002283,
+      "lon": 95.984106
+    },
+    {
+      "id": "MMR002001",
+      "regionId": "kayah",
+      "name": "Loikaw",
+      "nameMy": "လွိုင်ကော်",
+      "lat": 19.807511,
+      "lon": 97.298152
+    },
+    {
+      "id": "MMR002004",
+      "regionId": "kayah",
+      "name": "Shadaw",
+      "nameMy": "ရှားတော",
+      "lat": 19.530174,
+      "lon": 97.630108
+    },
+    {
+      "id": "MMR003002",
+      "regionId": "kayin",
+      "name": "Hlaingbwe",
+      "nameMy": "လှိုင်းဘွဲ့",
+      "lat": 17.261735,
+      "lon": 97.90439
+    },
+    {
+      "id": "MMR003001",
+      "regionId": "kayin",
+      "name": "Hpa-An",
+      "nameMy": "ဘားအံ",
+      "lat": 16.812392,
+      "lon": 97.733295
+    },
+    {
+      "id": "MMR003004",
+      "regionId": "kayin",
+      "name": "Thandaunggyi",
+      "nameMy": "သံတောင်ကြီး",
+      "lat": 18.826195,
+      "lon": 96.834512
+    },
+    {
+      "id": "MMR003003",
+      "regionId": "kayin",
+      "name": "Hpapun",
+      "nameMy": "ဖာပွန်",
+      "lat": 18.06918,
+      "lon": 97.425375
+    },
+    {
+      "id": "MMR003006",
+      "regionId": "kayin",
+      "name": "Kawkareik",
+      "nameMy": "ကော့ကရိတ်",
+      "lat": 16.527124,
+      "lon": 98.144046
+    },
+    {
+      "id": "MMR003007",
+      "regionId": "kayin",
+      "name": "Kyainseikgyi",
+      "nameMy": "ကြာအင်းဆိပ်ကြီး",
+      "lat": 15.839543,
+      "lon": 98.222571
+    },
+    {
+      "id": "MMR003005",
+      "regionId": "kayin",
+      "name": "Myawaddy",
+      "nameMy": "မြဝတီ",
+      "lat": 16.829057,
+      "lon": 98.401324
+    },
+    {
+      "id": "MMR009023",
+      "regionId": "magway",
+      "name": "Gangaw",
+      "nameMy": "ဂန့်ဂေါ",
+      "lat": 22.038633,
+      "lon": 94.223403
+    },
+    {
+      "id": "MMR009025",
+      "regionId": "magway",
+      "name": "Saw",
+      "nameMy": "ဆော",
+      "lat": 21.014179,
+      "lon": 94.182945
+    },
+    {
+      "id": "MMR008009",
+      "regionId": "bago",
+      "name": "Minhla",
+      "nameMy": "မင်းလှ",
+      "lat": 17.91231,
+      "lon": 95.703912
+    },
+    {
+      "id": "MMR009006",
+      "regionId": "magway",
+      "name": "Natmauk",
+      "nameMy": "နတ်မောက်",
+      "lat": 20.401167,
+      "lon": 95.473191
+    },
+    {
+      "id": "MMR008013",
+      "regionId": "bago",
+      "name": "Monyo",
+      "nameMy": "မိုးညို",
+      "lat": 18.088837,
+      "lon": 95.494966
+    },
+    {
+      "id": "MMR008012",
+      "regionId": "bago",
+      "name": "Nattalin",
+      "nameMy": "နတ်တလင်း",
+      "lat": 18.517786,
+      "lon": 95.793229
+    },
+    {
+      "id": "MMR008010",
+      "regionId": "bago",
+      "name": "Okpho",
+      "nameMy": "အုတ်ဖို",
+      "lat": 18.177734,
+      "lon": 95.879741
+    },
+    {
+      "id": "MMR008007",
+      "regionId": "bago",
+      "name": "Thayarwady",
+      "nameMy": "သာယာဝတီ",
+      "lat": 17.691858,
+      "lon": 95.787123
+    },
+    {
+      "id": "MMR009004",
+      "regionId": "magway",
+      "name": "Taungdwingyi",
+      "nameMy": "တောင်တွင်းကြီး",
+      "lat": 19.877595,
+      "lon": 95.568064
+    },
+    {
+      "id": "MMR008011",
+      "regionId": "bago",
+      "name": "Zigon",
+      "nameMy": "ဇီးကုန်း",
+      "lat": 18.345356,
+      "lon": 95.669014
+    },
+    {
+      "id": "MMR004001",
+      "regionId": "chin",
+      "name": "Falam",
+      "nameMy": "ဖလမ်း",
+      "lat": 23.077614,
+      "lon": 93.669395
+    },
+    {
+      "id": "MMR004004",
+      "regionId": "chin",
+      "name": "Tedim",
+      "nameMy": "တီးတိန်",
+      "lat": 23.372814,
+      "lon": 93.695094
+    },
+    {
+      "id": "MMR010001",
+      "regionId": "mandalay",
+      "name": "Aungmyaythazan",
+      "nameMy": "အောင်မြေသာစံ",
+      "lat": 21.992535,
+      "lon": 96.093731
+    },
+    {
+      "id": "MMR004005",
+      "regionId": "chin",
+      "name": "Tonzang",
+      "nameMy": "တွန်းဇန်",
+      "lat": 23.796605,
+      "lon": 93.770099
+    },
+    {
+      "id": "MMR001006",
+      "regionId": "kachin",
+      "name": "Tsawlaw",
+      "nameMy": "ဆော့လော်",
+      "lat": 26.644796,
+      "lon": 98.516302
+    },
+    {
+      "id": "MMR001002",
+      "regionId": "kachin",
+      "name": "Waingmaw",
+      "nameMy": "ဝိုင်းမော်",
+      "lat": 25.475531,
+      "lon": 97.80483
+    },
+    {
+      "id": "MMR001018",
+      "regionId": "kachin",
+      "name": "Khaunglanhpu",
+      "nameMy": "ခေါင်လန်ဖူး",
+      "lat": 26.94693,
+      "lon": 98.398376
+    },
+    {
+      "id": "MMR002005",
+      "regionId": "kayah",
+      "name": "Bawlake",
+      "nameMy": "ဘောလခဲ",
+      "lat": 19.090191,
+      "lon": 97.521927
+    },
+    {
+      "id": "MMR002006",
+      "regionId": "kayah",
+      "name": "Hpasawng",
+      "nameMy": "ဖားဆောင်း",
+      "lat": 18.853703,
+      "lon": 97.218353
+    },
+    {
+      "id": "MMR002007",
+      "regionId": "kayah",
+      "name": "Mese",
+      "nameMy": "မယ်စဲ့",
+      "lat": 18.745765,
+      "lon": 97.54336
+    },
+    {
+      "id": "MMR010002",
+      "regionId": "mandalay",
+      "name": "Chanayethazan",
+      "nameMy": "ချမ်းအေးသာစံ",
+      "lat": 21.975639,
+      "lon": 96.094968
+    },
+    {
+      "id": "MMR002002",
+      "regionId": "kayah",
+      "name": "Demoso",
+      "nameMy": "ဒီးမော့ဆို",
+      "lat": 19.586303,
+      "lon": 97.09841
+    },
+    {
+      "id": "MMR002003",
+      "regionId": "kayah",
+      "name": "Hpruso",
+      "nameMy": "ဖရူဆို",
+      "lat": 19.275133,
+      "lon": 97.028705
+    },
+    {
+      "id": "MMR009024",
+      "regionId": "magway",
+      "name": "Tilin",
+      "nameMy": "ထီးလင်း",
+      "lat": 21.730052,
+      "lon": 94.173897
+    },
+    {
+      "id": "MMR009003",
+      "regionId": "magway",
+      "name": "Chauk",
+      "nameMy": "ချောက်",
+      "lat": 20.837067,
+      "lon": 94.87436
+    },
+    {
+      "id": "MMR010003",
+      "regionId": "mandalay",
+      "name": "Mahaaungmyay",
+      "nameMy": "မဟာအောင်မြေ",
+      "lat": 21.959766,
+      "lon": 96.091402
+    },
+    {
+      "id": "MMR010007",
+      "regionId": "mandalay",
+      "name": "Patheingyi",
+      "nameMy": "ပုသိမ်ကြီး",
+      "lat": 21.988942,
+      "lon": 96.213744
+    },
+    {
+      "id": "MMR009001",
+      "regionId": "magway",
+      "name": "Magway",
+      "nameMy": "မကွေး",
+      "lat": 19.924794,
+      "lon": 95.223248
+    },
+    {
+      "id": "MMR009005",
+      "regionId": "magway",
+      "name": "Myothit",
+      "nameMy": "မြို့သစ်",
+      "lat": 20.177093,
+      "lon": 95.493312
+    },
+    {
+      "id": "MMR009002",
+      "regionId": "magway",
+      "name": "Yenangyaung",
+      "nameMy": "ရေနံချောင်း",
+      "lat": 20.462661,
+      "lon": 95.00144
+    },
+    {
+      "id": "MMR009007",
+      "regionId": "magway",
+      "name": "Minbu",
+      "nameMy": "မင်းဘူး",
+      "lat": 20.096455,
+      "lon": 94.73273
+    },
+    {
+      "id": "MMR010023",
+      "regionId": "mandalay",
+      "name": "Yamethin",
+      "nameMy": "ရမည်းသင်း",
+      "lat": 20.393452,
+      "lon": 96.109759
+    },
+    {
+      "id": "MMR009009",
+      "regionId": "magway",
+      "name": "Ngape",
+      "nameMy": "ငဖဲ",
+      "lat": 19.954065,
+      "lon": 94.4394
+    },
+    {
+      "id": "MMR011002",
+      "regionId": "mon",
+      "name": "Kyaikmaraw",
+      "nameMy": "ကျိုက်မရော",
+      "lat": 16.231217,
+      "lon": 97.933422
+    },
+    {
+      "id": "MMR011001",
+      "regionId": "mon",
+      "name": "Mawlamyine",
+      "nameMy": "မော်လမြိုင်",
+      "lat": 16.486819,
+      "lon": 97.655169
+    },
+    {
+      "id": "MMR011005",
+      "regionId": "mon",
+      "name": "Mudon",
+      "nameMy": "မုဒုံ",
+      "lat": 16.071714,
+      "lon": 97.729088
+    },
+    {
+      "id": "MMR011004",
+      "regionId": "mon",
+      "name": "Thanbyuzayat",
+      "nameMy": "သံဖြူဇရပ်",
+      "lat": 15.731681,
+      "lon": 97.794626
+    },
+    {
+      "id": "MMR011006",
+      "regionId": "mon",
+      "name": "Ye",
+      "nameMy": "ရေး",
+      "lat": 15.279506,
+      "lon": 97.964545
+    },
+    {
+      "id": "MMR009008",
+      "regionId": "magway",
+      "name": "Pwintbyu",
+      "nameMy": "ပွင့်ဖြူ",
+      "lat": 20.410107,
+      "lon": 94.630705
+    },
+    {
+      "id": "MMR011010",
+      "regionId": "mon",
+      "name": "Bilin",
+      "nameMy": "ဘီးလင်း",
+      "lat": 17.169894,
+      "lon": 97.177774
+    },
+    {
+      "id": "MMR009010",
+      "regionId": "magway",
+      "name": "Salin",
+      "nameMy": "စလင်း",
+      "lat": 20.699574,
+      "lon": 94.519252
+    },
+    {
+      "id": "MMR009011",
+      "regionId": "magway",
+      "name": "Sidoktaya",
+      "nameMy": "စေတုတ္ထရာ",
+      "lat": 20.533388,
+      "lon": 94.16378
+    },
+    {
+      "id": "MMR009020",
+      "regionId": "magway",
+      "name": "Myaing",
+      "nameMy": "မြိုင်",
+      "lat": 21.750212,
+      "lon": 94.85192
+    },
+    {
+      "id": "MMR018003",
+      "regionId": "naypyidaw",
+      "name": "Tatkon",
+      "nameMy": "တပ်ကုန်း",
+      "lat": 20.172286,
+      "lon": 96.141464
+    },
+    {
+      "id": "MMR018001",
+      "regionId": "naypyidaw",
+      "name": "Zay Yar Thi Ri",
+      "nameMy": "ဇေယျာသီရိ",
+      "lat": 19.866205,
+      "lon": 96.338709
+    },
+    {
+      "id": "MMR009018",
+      "regionId": "magway",
+      "name": "Pakokku",
+      "nameMy": "ပခုက္ကူ",
+      "lat": 21.342573,
+      "lon": 94.937647
+    },
+    {
+      "id": "MMR012014",
+      "regionId": "rakhine",
+      "name": "Ann",
+      "nameMy": "အမ်း",
+      "lat": 19.599537,
+      "lon": 94.081874
+    },
+    {
+      "id": "MMR012011",
+      "regionId": "rakhine",
+      "name": "Kyaukpyu",
+      "nameMy": "ကျောက်ဖြူ",
+      "lat": 19.432295,
+      "lon": 93.761931
+    },
+    {
+      "id": "MMR012012",
+      "regionId": "rakhine",
+      "name": "Munaung",
+      "nameMy": "မာန်အောင်",
+      "lat": 18.857692,
+      "lon": 93.613911
+    },
+    {
+      "id": "MMR012013",
+      "regionId": "rakhine",
+      "name": "Ramree",
+      "nameMy": "ရမ်းဗြဲ",
+      "lat": 18.985444,
+      "lon": 93.849113
+    },
+    {
+      "id": "MMR012010",
+      "regionId": "rakhine",
+      "name": "Buthidaung",
+      "nameMy": "ဘူးသီးတောင်",
+      "lat": 21.182602,
+      "lon": 92.540259
+    },
+    {
+      "id": "MMR012009",
+      "regionId": "rakhine",
+      "name": "Maungdaw",
+      "nameMy": "မောင်တော",
+      "lat": 20.705668,
+      "lon": 92.450927
+    },
+    {
+      "id": "MMR012004",
+      "regionId": "rakhine",
+      "name": "Kyauktaw",
+      "nameMy": "ကျောက်တော်",
+      "lat": 21.056319,
+      "lon": 92.930629
+    },
+    {
+      "id": "MMR012005",
+      "regionId": "rakhine",
+      "name": "Minbya",
+      "nameMy": "မင်းပြား",
+      "lat": 20.547069,
+      "lon": 93.520053
+    },
+    {
+      "id": "MMR012003",
+      "regionId": "rakhine",
+      "name": "Mrauk-U",
+      "nameMy": "မြောက်ဦး",
+      "lat": 20.735999,
+      "lon": 93.222487
+    },
+    {
+      "id": "MMR012006",
+      "regionId": "rakhine",
+      "name": "Myebon",
+      "nameMy": "မြေပုံ",
+      "lat": 20.063055,
+      "lon": 93.537678
+    },
+    {
+      "id": "MMR012007",
+      "regionId": "rakhine",
+      "name": "Pauktaw",
+      "nameMy": "ပေါက်တော",
+      "lat": 20.328728,
+      "lon": 93.120599
+    },
+    {
+      "id": "MMR012002",
+      "regionId": "rakhine",
+      "name": "Ponnagyun",
+      "nameMy": "ပုဏ္ဏားကျွန်း",
+      "lat": 20.60624,
+      "lon": 92.917326
+    },
+    {
+      "id": "MMR012008",
+      "regionId": "rakhine",
+      "name": "Rathedaung",
+      "nameMy": "ရသေ့တောင်",
+      "lat": 20.635285,
+      "lon": 92.740094
+    },
+    {
+      "id": "MMR009021",
+      "regionId": "magway",
+      "name": "Pauk",
+      "nameMy": "ပေါက်",
+      "lat": 21.504207,
+      "lon": 94.509861
+    },
+    {
+      "id": "MMR009022",
+      "regionId": "magway",
+      "name": "Seikphyu",
+      "nameMy": "ဆိပ်ဖြူ",
+      "lat": 21.051924,
+      "lon": 94.539
+    },
+    {
+      "id": "MMR009019",
+      "regionId": "magway",
+      "name": "Yesagyo",
+      "nameMy": "ရေစကြို",
+      "lat": 21.618894,
+      "lon": 95.179092
+    },
+    {
+      "id": "MMR009016",
+      "regionId": "magway",
+      "name": "Aunglan",
+      "nameMy": "အောင်လံ",
+      "lat": 19.206617,
+      "lon": 95.502094
+    },
+    {
+      "id": "MMR009015",
+      "regionId": "magway",
+      "name": "Kamma",
+      "nameMy": "ကံမ",
+      "lat": 19.015086,
+      "lon": 94.891883
+    },
+    {
+      "id": "MMR009014",
+      "regionId": "magway",
+      "name": "Mindon",
+      "nameMy": "မင်းတုန်း",
+      "lat": 19.489046,
+      "lon": 94.652536
+    },
+    {
+      "id": "MMR009013",
+      "regionId": "magway",
+      "name": "Minhla",
+      "nameMy": "မင်းလှ",
+      "lat": 19.648878,
+      "lon": 94.68931
+    },
+    {
+      "id": "MMR009017",
+      "regionId": "magway",
+      "name": "Sinbaungwe",
+      "nameMy": "ဆင်ပေါင်ဝဲ",
+      "lat": 19.655856,
+      "lon": 95.346023
+    },
+    {
+      "id": "MMR009012",
+      "regionId": "magway",
+      "name": "Thayet",
+      "nameMy": "သရက်",
+      "lat": 19.4776,
+      "lon": 95.024562
+    },
+    {
+      "id": "MMR010013",
+      "regionId": "mandalay",
+      "name": "Kyaukse",
+      "nameMy": "ကျောက်ဆည်",
+      "lat": 21.575966,
+      "lon": 96.271171
+    },
+    {
+      "id": "MMR010015",
+      "regionId": "mandalay",
+      "name": "Myittha",
+      "nameMy": "မြစ်သား",
+      "lat": 21.445798,
+      "lon": 96.067336
+    },
+    {
+      "id": "MMR010014",
+      "regionId": "mandalay",
+      "name": "Sintgaing",
+      "nameMy": "စဉ့်ကိုင်",
+      "lat": 21.749029,
+      "lon": 96.139462
+    },
+    {
+      "id": "MMR010016",
+      "regionId": "mandalay",
+      "name": "Tada-U",
+      "nameMy": "တံတားဦး",
+      "lat": 21.584345,
+      "lon": 95.903506
+    },
+    {
+      "id": "MMR010006",
+      "regionId": "mandalay",
+      "name": "Amarapura",
+      "nameMy": "အမရပူရ",
+      "lat": 21.862889,
+      "lon": 96.103241
+    },
+    {
+      "id": "MMR010005",
+      "regionId": "mandalay",
+      "name": "Pyigyitagon",
+      "nameMy": "ပြည်ကြီးတံခွန်",
+      "lat": 21.901178,
+      "lon": 96.106931
+    },
+    {
+      "id": "MMR005013",
+      "regionId": "sagaing",
+      "name": "Budalin",
+      "nameMy": "ဘုတလင်",
+      "lat": 22.438766,
+      "lon": 95.096716
+    },
+    {
+      "id": "MMR010029",
+      "regionId": "mandalay",
+      "name": "Mahlaing",
+      "nameMy": "မလှိုင်",
+      "lat": 20.999475,
+      "lon": 95.636327
+    },
+    {
+      "id": "MMR016005",
+      "regionId": "shan",
+      "name": "Mongla",
+      "nameMy": "မိုင်းလား",
+      "lat": 21.511759,
+      "lon": 99.895108
+    },
+    {
+      "id": "MMR016007",
+      "regionId": "shan",
+      "name": "Mongping",
+      "nameMy": "မိုင်းပျဉ်း",
+      "lat": 21.388831,
+      "lon": 98.966934
+    },
+    {
+      "id": "MMR016003",
+      "regionId": "shan",
+      "name": "Mongyang",
+      "nameMy": "မိုင်းယန်း",
+      "lat": 21.917405,
+      "lon": 99.516302
+    },
+    {
+      "id": "MMR016006",
+      "regionId": "shan",
+      "name": "Monghsat",
+      "nameMy": "မိုင်းဆတ်",
+      "lat": 20.530854,
+      "lon": 99.333518
+    },
+    {
+      "id": "MMR016008",
+      "regionId": "shan",
+      "name": "Mongton",
+      "nameMy": "မိုင်းတုံ",
+      "lat": 19.952064,
+      "lon": 98.637431
+    },
+    {
+      "id": "MMR016010",
+      "regionId": "shan",
+      "name": "Monghpyak",
+      "nameMy": "မိုင်းဖြတ်",
+      "lat": 20.841052,
+      "lon": 99.772618
+    },
+    {
+      "id": "MMR016011",
+      "regionId": "shan",
+      "name": "Mongyawng",
+      "nameMy": "မိုင်းယောင်း",
+      "lat": 21.369941,
+      "lon": 100.562109
+    },
+    {
+      "id": "MMR016009",
+      "regionId": "shan",
+      "name": "Tachileik",
+      "nameMy": "တာချီလိတ်",
+      "lat": 20.682278,
+      "lon": 99.928666
+    },
+    {
+      "id": "MMR015021",
+      "regionId": "shan",
+      "name": "Hopang",
+      "nameMy": "ဟိုပန်",
+      "lat": 23.087169,
+      "lon": 98.679497
+    },
+    {
+      "id": "MMR015008",
+      "regionId": "shan",
+      "name": "Mongmao",
+      "nameMy": "မိုင်းမော",
+      "lat": 22.949286,
+      "lon": 98.825973
+    },
+    {
+      "id": "MMR010028",
+      "regionId": "mandalay",
+      "name": "Meiktila",
+      "nameMy": "မိတ္ထီလာ",
+      "lat": 20.82711,
+      "lon": 95.748963
+    },
+    {
+      "id": "MMR010030",
+      "regionId": "mandalay",
+      "name": "Thazi",
+      "nameMy": "သာစည်",
+      "lat": 20.919205,
+      "lon": 96.182075
+    },
+    {
+      "id": "MMR010031",
+      "regionId": "mandalay",
+      "name": "Wundwin",
+      "nameMy": "ဝမ်းတွင်း",
+      "lat": 21.199726,
+      "lon": 95.999381
+    },
+    {
+      "id": "MMR015004",
+      "regionId": "shan",
+      "name": "Tangyan",
+      "nameMy": "တန့်ယန်း",
+      "lat": 22.698472,
+      "lon": 98.298647
+    },
+    {
+      "id": "MMR015024",
+      "regionId": "shan",
+      "name": "Matman",
+      "nameMy": "မက်မန်း",
+      "lat": 21.870784,
+      "lon": 98.794536
+    },
+    {
+      "id": "MMR010017",
+      "regionId": "mandalay",
+      "name": "Myingyan",
+      "nameMy": "မြင်းခြံ",
+      "lat": 21.554358,
+      "lon": 95.473406
+    },
+    {
+      "id": "MMR010019",
+      "regionId": "mandalay",
+      "name": "Natogyi",
+      "nameMy": "နွားထိုးကြီး",
+      "lat": 21.370582,
+      "lon": 95.70764
+    },
+    {
+      "id": "MMR006008",
+      "regionId": "tanintharyi",
+      "name": "Tanintharyi",
+      "nameMy": "တနင်္သာရီ",
+      "lat": 11.850671,
+      "lon": 99.306593
+    },
+    {
+      "id": "MMR010021",
+      "regionId": "mandalay",
+      "name": "Ngazun",
+      "nameMy": "ငါန်းဇွန်",
+      "lat": 21.849367,
+      "lon": 95.635405
+    },
+    {
+      "id": "MMR010018",
+      "regionId": "mandalay",
+      "name": "Taungtha",
+      "nameMy": "တောင်သာ",
+      "lat": 21.302665,
+      "lon": 95.377646
+    },
+    {
+      "id": "MMR010020",
+      "regionId": "mandalay",
+      "name": "Kyaukpadaung",
+      "nameMy": "ကျောက်ပန်းတောင်း",
+      "lat": 20.828426,
+      "lon": 95.279942
+    },
+    {
+      "id": "MMR010022",
+      "regionId": "mandalay",
+      "name": "Nyaung-U",
+      "nameMy": "ညောင်ဦး",
+      "lat": 21.086061,
+      "lon": 95.019786
+    },
+    {
+      "id": "MMR010009",
+      "regionId": "mandalay",
+      "name": "Madaya",
+      "nameMy": "မတ္တရာ",
+      "lat": 22.205129,
+      "lon": 96.178935
+    },
+    {
+      "id": "MMR010011",
+      "regionId": "mandalay",
+      "name": "Mogoke",
+      "nameMy": "မိုးကုတ်",
+      "lat": 22.908182,
+      "lon": 96.439552
+    },
+    {
+      "id": "MMR010008",
+      "regionId": "mandalay",
+      "name": "Pyinoolwin",
+      "nameMy": "ပြင်ဦးလွင်",
+      "lat": 22.020171,
+      "lon": 96.541672
+    },
+    {
+      "id": "MMR013017",
+      "regionId": "yangon",
+      "name": "Botahtaung",
+      "nameMy": "ဗိုလ်တထောင်",
+      "lat": 16.76931,
+      "lon": 96.179644
+    },
+    {
+      "id": "MMR013020",
+      "regionId": "yangon",
+      "name": "Dagon Myothit (East)",
+      "nameMy": "ဒဂုံမြို့သစ် (အရှေ့ပိုင်း)",
+      "lat": 16.945118,
+      "lon": 96.250678
+    },
+    {
+      "id": "MMR010010",
+      "regionId": "mandalay",
+      "name": "Singu",
+      "nameMy": "စဉ့်ကူး",
+      "lat": 22.422735,
+      "lon": 96.141181
+    },
+    {
+      "id": "MMR010012",
+      "regionId": "mandalay",
+      "name": "Thabeikkyin",
+      "nameMy": "သပိတ်ကျင်း",
+      "lat": 23.437531,
+      "lon": 96.114785
+    },
+    {
+      "id": "MMR010024",
+      "regionId": "mandalay",
+      "name": "Pyawbwe",
+      "nameMy": "ပျော်ဘွယ်",
+      "lat": 20.585819,
+      "lon": 95.953739
+    },
+    {
+      "id": "MMR011003",
+      "regionId": "mon",
+      "name": "Chaungzon",
+      "nameMy": "ချောင်းဆုံ",
+      "lat": 16.431774,
+      "lon": 97.520727
+    },
+    {
+      "id": "MMR011009",
+      "regionId": "mon",
+      "name": "Kyaikto",
+      "nameMy": "ကျိုက်ထို",
+      "lat": 17.430362,
+      "lon": 97.025152
+    },
+    {
+      "id": "MMR011008",
+      "regionId": "mon",
+      "name": "Paung",
+      "nameMy": "ပေါင်",
+      "lat": 16.739108,
+      "lon": 97.396066
+    },
+    {
+      "id": "MMR011007",
+      "regionId": "mon",
+      "name": "Thaton",
+      "nameMy": "သထုံ",
+      "lat": 16.865427,
+      "lon": 97.328739
+    },
+    {
+      "id": "MMR018004",
+      "regionId": "naypyidaw",
+      "name": "Det Khi Na Thi Ri",
+      "nameMy": "ဒက္ခိဏသီရိ",
+      "lat": 19.700857,
+      "lon": 96.0872
+    },
+    {
+      "id": "MMR018007",
+      "regionId": "naypyidaw",
+      "name": "Lewe",
+      "nameMy": "လယ်ဝေး",
+      "lat": 19.547881,
+      "lon": 96.107134
+    },
+    {
+      "id": "MMR018006",
+      "regionId": "naypyidaw",
+      "name": "Pyinmana",
+      "nameMy": "ပျဉ်းမနား",
+      "lat": 19.7518,
+      "lon": 96.453568
+    },
+    {
+      "id": "MMR018002",
+      "regionId": "naypyidaw",
+      "name": "Za Bu Thi Ri",
+      "nameMy": "ဇမ္ဗူသီရိ",
+      "lat": 19.746288,
+      "lon": 96.091239
+    },
+    {
+      "id": "MMR018008",
+      "regionId": "naypyidaw",
+      "name": "Oke Ta Ra Thi Ri",
+      "nameMy": "ဥတ္တရသီရိ",
+      "lat": 19.984592,
+      "lon": 95.960581
+    },
+    {
+      "id": "MMR018005",
+      "regionId": "naypyidaw",
+      "name": "Poke Ba Thi Ri",
+      "nameMy": "ပုဗ္ဗသီရိ",
+      "lat": 19.959474,
+      "lon": 96.194628
+    },
+    {
+      "id": "MMR012001",
+      "regionId": "rakhine",
+      "name": "Sittwe",
+      "nameMy": "စစ်တွေ",
+      "lat": 20.206832,
+      "lon": 92.838286
+    },
+    {
+      "id": "MMR012017",
+      "regionId": "rakhine",
+      "name": "Gwa",
+      "nameMy": "ဂွ",
+      "lat": 17.939294,
+      "lon": 94.65076
+    },
+    {
+      "id": "MMR012015",
+      "regionId": "rakhine",
+      "name": "Thandwe",
+      "nameMy": "သံတွဲ",
+      "lat": 18.544426,
+      "lon": 94.508741
+    },
+    {
+      "id": "MMR012016",
+      "regionId": "rakhine",
+      "name": "Toungup",
+      "nameMy": "တောင်ကုတ်",
+      "lat": 18.850973,
+      "lon": 94.454135
+    },
+    {
+      "id": "MMR005033",
+      "regionId": "sagaing",
+      "name": "Hkamti",
+      "nameMy": "ခန္တီး",
+      "lat": 25.907482,
+      "lon": 95.63576
+    },
+    {
+      "id": "MMR005034",
+      "regionId": "sagaing",
+      "name": "Homalin",
+      "nameMy": "ဟုမ္မလင်း",
+      "lat": 25.227016,
+      "lon": 95.490215
+    },
+    {
+      "id": "MMR005027",
+      "regionId": "sagaing",
+      "name": "Kale",
+      "nameMy": "ကလေး",
+      "lat": 23.119541,
+      "lon": 94.092533
+    },
+    {
+      "id": "MMR005028",
+      "regionId": "sagaing",
+      "name": "Kalewa",
+      "nameMy": "ကလေးဝ",
+      "lat": 23.281948,
+      "lon": 94.51941
+    },
+    {
+      "id": "MMR005029",
+      "regionId": "sagaing",
+      "name": "Mingin",
+      "nameMy": "မင်းကင်း",
+      "lat": 23.061946,
+      "lon": 94.608834
+    },
+    {
+      "id": "MMR005007",
+      "regionId": "sagaing",
+      "name": "Kanbalu",
+      "nameMy": "ကန့်ဘလူ",
+      "lat": 23.063713,
+      "lon": 95.713863
+    },
+    {
+      "id": "MMR005008",
+      "regionId": "sagaing",
+      "name": "Kyunhla",
+      "nameMy": "ကျွန်းလှ",
+      "lat": 23.399339,
+      "lon": 95.238517
+    },
+    {
+      "id": "MMR005023",
+      "regionId": "sagaing",
+      "name": "Banmauk",
+      "nameMy": "ဗန်းမောက်",
+      "lat": 24.551937,
+      "lon": 95.738461
+    },
+    {
+      "id": "MMR005021",
+      "regionId": "sagaing",
+      "name": "Indaw",
+      "nameMy": "အင်းတော်",
+      "lat": 24.297148,
+      "lon": 96.105012
+    },
+    {
+      "id": "MMR005020",
+      "regionId": "sagaing",
+      "name": "Katha",
+      "nameMy": "ကသာ",
+      "lat": 23.934385,
+      "lon": 96.340589
+    },
+    {
+      "id": "MMR005022",
+      "regionId": "sagaing",
+      "name": "Tigyaing",
+      "nameMy": "ထီးချိုင့်",
+      "lat": 23.796895,
+      "lon": 96.24344
+    },
+    {
+      "id": "MMR005024",
+      "regionId": "sagaing",
+      "name": "Kawlin",
+      "nameMy": "ကောလင်း",
+      "lat": 23.802194,
+      "lon": 95.762959
+    },
+    {
+      "id": "MMR005026",
+      "regionId": "sagaing",
+      "name": "Pinlebu",
+      "nameMy": "ပင်လည်ဘူး",
+      "lat": 24.20381,
+      "lon": 95.446733
+    },
+    {
+      "id": "MMR005025",
+      "regionId": "sagaing",
+      "name": "Wuntho",
+      "nameMy": "ဝန်းသို",
+      "lat": 24.002981,
+      "lon": 95.79649
+    },
+    {
+      "id": "MMR005031",
+      "regionId": "sagaing",
+      "name": "Mawlaik",
+      "nameMy": "မော်လိုက်",
+      "lat": 23.661993,
+      "lon": 94.593056
+    },
+    {
+      "id": "MMR005032",
+      "regionId": "sagaing",
+      "name": "Paungbyin",
+      "nameMy": "ဖောင်းပြင်",
+      "lat": 24.168504,
+      "lon": 94.829711
+    },
+    {
+      "id": "MMR005014",
+      "regionId": "sagaing",
+      "name": "Ayadaw",
+      "nameMy": "အရာတော်",
+      "lat": 22.193102,
+      "lon": 95.465578
+    },
+    {
+      "id": "MMR005015",
+      "regionId": "sagaing",
+      "name": "Chaung-U",
+      "nameMy": "ချောင်းဦး",
+      "lat": 21.921865,
+      "lon": 95.279635
+    },
+    {
+      "id": "MMR013014",
+      "regionId": "yangon",
+      "name": "Dawbon",
+      "nameMy": "ဒေါပုံ",
+      "lat": 16.780532,
+      "lon": 96.18422
+    },
+    {
+      "id": "MMR005012",
+      "regionId": "sagaing",
+      "name": "Monywa",
+      "nameMy": "မုံရွာ",
+      "lat": 22.118185,
+      "lon": 95.232251
+    },
+    {
+      "id": "MMR005036",
+      "regionId": "sagaing",
+      "name": "Lahe",
+      "nameMy": "လဟယ်",
+      "lat": 26.22982,
+      "lon": 95.388079
+    },
+    {
+      "id": "MMR005035",
+      "regionId": "sagaing",
+      "name": "Layshi",
+      "nameMy": "လေရှီး",
+      "lat": 25.307188,
+      "lon": 94.821462
+    },
+    {
+      "id": "MMR005037",
+      "regionId": "sagaing",
+      "name": "Nanyun",
+      "nameMy": "နန်းယွန်း",
+      "lat": 27.144461,
+      "lon": 96.49943
+    },
+    {
+      "id": "MMR013035",
+      "regionId": "yangon",
+      "name": "Lanmadaw",
+      "nameMy": "လမ်းမတော်",
+      "lat": 16.776905,
+      "lon": 96.142006
+    },
+    {
+      "id": "MMR005003",
+      "regionId": "sagaing",
+      "name": "Myaung",
+      "nameMy": "မြောင်",
+      "lat": 21.79428,
+      "lon": 95.294469
+    },
+    {
+      "id": "MMR013036",
+      "regionId": "yangon",
+      "name": "Latha",
+      "nameMy": "လသာ",
+      "lat": 16.774243,
+      "lon": 96.150476
+    },
+    {
+      "id": "MMR013042",
+      "regionId": "yangon",
+      "name": "Mayangone",
+      "nameMy": "မရမ်းကုန်း",
+      "lat": 16.859321,
+      "lon": 96.153443
+    },
+    {
+      "id": "MMR013034",
+      "regionId": "yangon",
+      "name": "Pabedan",
+      "nameMy": "ပန်းဘဲတန်း",
+      "lat": 16.773352,
+      "lon": 96.155713
+    },
+    {
+      "id": "MMR005002",
+      "regionId": "sagaing",
+      "name": "Myinmu",
+      "nameMy": "မြင်းမူ",
+      "lat": 22.001,
+      "lon": 95.51602
+    },
+    {
+      "id": "MMR005001",
+      "regionId": "sagaing",
+      "name": "Sagaing",
+      "nameMy": "စစ်ကိုင်း",
+      "lat": 21.951279,
+      "lon": 95.821318
+    },
+    {
+      "id": "MMR005005",
+      "regionId": "sagaing",
+      "name": "Khin-U",
+      "nameMy": "ခင်ဦး",
+      "lat": 22.78185,
+      "lon": 95.704192
+    },
+    {
+      "id": "MMR005004",
+      "regionId": "sagaing",
+      "name": "Shwebo",
+      "nameMy": "ရွှေဘို",
+      "lat": 22.578104,
+      "lon": 95.71843
+    },
+    {
+      "id": "MMR005010",
+      "regionId": "sagaing",
+      "name": "Tabayin",
+      "nameMy": "ဒီပဲယင်း",
+      "lat": 22.635067,
+      "lon": 95.202692
+    },
+    {
+      "id": "MMR005011",
+      "regionId": "sagaing",
+      "name": "Taze",
+      "nameMy": "တန့်ဆည်",
+      "lat": 23.077742,
+      "lon": 95.158903
+    },
+    {
+      "id": "MMR005006",
+      "regionId": "sagaing",
+      "name": "Wetlet",
+      "nameMy": "ဝက်လက်",
+      "lat": 22.349272,
+      "lon": 95.772783
+    },
+    {
+      "id": "MMR005009",
+      "regionId": "sagaing",
+      "name": "Ye-U",
+      "nameMy": "ရေဦး",
+      "lat": 22.857394,
+      "lon": 95.02981
+    },
+    {
+      "id": "MMR005030",
+      "regionId": "sagaing",
+      "name": "Tamu",
+      "nameMy": "တမူး",
+      "lat": 24.187626,
+      "lon": 94.392444
+    },
+    {
+      "id": "MMR005017",
+      "regionId": "sagaing",
+      "name": "Kani",
+      "nameMy": "ကနီ",
+      "lat": 22.475719,
+      "lon": 94.677387
+    },
+    {
+      "id": "MMR005019",
+      "regionId": "sagaing",
+      "name": "Pale",
+      "nameMy": "ပုလဲ",
+      "lat": 21.899989,
+      "lon": 94.652176
+    },
+    {
+      "id": "MMR005018",
+      "regionId": "sagaing",
+      "name": "Salingyi",
+      "nameMy": "ဆားလင်းကြီး",
+      "lat": 21.906451,
+      "lon": 95.014427
+    },
+    {
+      "id": "MMR005016",
+      "regionId": "sagaing",
+      "name": "Yinmarbin",
+      "nameMy": "ယင်းမာပင်",
+      "lat": 22.155038,
+      "lon": 94.872952
+    },
+    {
+      "id": "MMR016001",
+      "regionId": "shan",
+      "name": "Kengtung",
+      "nameMy": "ကျိုင်းတုံ",
+      "lat": 21.241817,
+      "lon": 99.762565
+    },
+    {
+      "id": "MMR016002",
+      "regionId": "shan",
+      "name": "Mongkhet",
+      "nameMy": "မိုင်းခတ်",
+      "lat": 21.697174,
+      "lon": 99.317129
+    },
+    {
+      "id": "MMR015007",
+      "regionId": "shan",
+      "name": "Pangwaun",
+      "nameMy": "ပန်ဝိုင်",
+      "lat": 22.838668,
+      "lon": 99.232614
+    },
+    {
+      "id": "MMR015023",
+      "regionId": "shan",
+      "name": "Konkyan",
+      "nameMy": "ကုန်းကြမ်း",
+      "lat": 24.054262,
+      "lon": 98.689779
+    },
+    {
+      "id": "MMR015022",
+      "regionId": "shan",
+      "name": "Laukkaing",
+      "nameMy": "လောက်ကိုင်",
+      "lat": 23.742474,
+      "lon": 98.694319
+    },
+    {
+      "id": "MMR015014",
+      "regionId": "shan",
+      "name": "Hsipaw",
+      "nameMy": "သီပေါ",
+      "lat": 22.175109,
+      "lon": 97.610899
+    },
+    {
+      "id": "MMR015012",
+      "regionId": "shan",
+      "name": "Kyaukme",
+      "nameMy": "ကျောက်မဲ",
+      "lat": 22.760845,
+      "lon": 96.723488
+    },
+    {
+      "id": "MMR015015",
+      "regionId": "shan",
+      "name": "Namtu",
+      "nameMy": "နမ္မတူ",
+      "lat": 23.152979,
+      "lon": 97.406004
+    },
+    {
+      "id": "MMR015013",
+      "regionId": "shan",
+      "name": "Nawnghkio",
+      "nameMy": "နောင်ချို",
+      "lat": 22.152845,
+      "lon": 96.729039
+    },
+    {
+      "id": "MMR015002",
+      "regionId": "shan",
+      "name": "Hseni",
+      "nameMy": "သိန္နီ",
+      "lat": 23.257564,
+      "lon": 98.085439
+    },
+    {
+      "id": "MMR015020",
+      "regionId": "shan",
+      "name": "Kunlong",
+      "nameMy": "ကွမ်းလုံ",
+      "lat": 23.308272,
+      "lon": 98.566898
+    },
+    {
+      "id": "MMR015001",
+      "regionId": "shan",
+      "name": "Lashio",
+      "nameMy": "လားရှိုး",
+      "lat": 23.084698,
+      "lon": 98.075952
+    },
+    {
+      "id": "MMR015003",
+      "regionId": "shan",
+      "name": "Mongyai",
+      "nameMy": "မိုင်းရယ်",
+      "lat": 22.448197,
+      "lon": 97.996734
+    },
+    {
+      "id": "MMR015006",
+      "regionId": "shan",
+      "name": "Narphan",
+      "nameMy": "နားဖန်း",
+      "lat": 22.565981,
+      "lon": 99.16534
+    },
+    {
+      "id": "MMR015005",
+      "regionId": "shan",
+      "name": "Pangsang (Panghkam)",
+      "nameMy": "ပန်ဆန်း (ပန်ခမ်း)",
+      "lat": 22.327,
+      "lon": 98.916736
+    },
+    {
+      "id": "MMR015018",
+      "regionId": "shan",
+      "name": "Mabein",
+      "nameMy": "မဘိမ်း",
+      "lat": 23.472516,
+      "lon": 96.69299
+    },
+    {
+      "id": "MMR015017",
+      "regionId": "shan",
+      "name": "Mongmit",
+      "nameMy": "မိုးမိတ်",
+      "lat": 23.162536,
+      "lon": 96.544758
+    },
+    {
+      "id": "MMR015011",
+      "regionId": "shan",
+      "name": "Kutkai",
+      "nameMy": "ကွတ်ခိုင်",
+      "lat": 23.627032,
+      "lon": 98.136725
+    },
+    {
+      "id": "MMR015009",
+      "regionId": "shan",
+      "name": "Muse",
+      "nameMy": "မူဆယ်",
+      "lat": 23.900541,
+      "lon": 97.99536
+    },
+    {
+      "id": "MMR015010",
+      "regionId": "shan",
+      "name": "Namhkan",
+      "nameMy": "နမ့်ခမ်း",
+      "lat": 23.78856,
+      "lon": 97.651159
+    },
+    {
+      "id": "MMR015019",
+      "regionId": "shan",
+      "name": "Manton",
+      "nameMy": "မန်တုံ",
+      "lat": 23.395546,
+      "lon": 97.343292
+    },
+    {
+      "id": "MMR015016",
+      "regionId": "shan",
+      "name": "Namhsan",
+      "nameMy": "နမ့်ဆန်",
+      "lat": 22.945432,
+      "lon": 97.161997
+    },
+    {
+      "id": "MMR014006",
+      "regionId": "shan",
+      "name": "Pindaya",
+      "nameMy": "ပင်းတယ",
+      "lat": 20.818159,
+      "lon": 96.65843
+    },
+    {
+      "id": "MMR014007",
+      "regionId": "shan",
+      "name": "Ywangan",
+      "nameMy": "ရွာငံ",
+      "lat": 21.509197,
+      "lon": 96.558571
+    },
+    {
+      "id": "MMR014018",
+      "regionId": "shan",
+      "name": "Langkho",
+      "nameMy": "လင်းခေး",
+      "lat": 20.085142,
+      "lon": 97.959644
+    },
+    {
+      "id": "MMR014020",
+      "regionId": "shan",
+      "name": "Mawkmai",
+      "nameMy": "မောက်မယ်",
+      "lat": 20.306567,
+      "lon": 97.628542
+    },
+    {
+      "id": "MMR014019",
+      "regionId": "shan",
+      "name": "Mongnai",
+      "nameMy": "မိုးနဲ",
+      "lat": 20.691752,
+      "lon": 98.194071
+    },
+    {
+      "id": "MMR014021",
+      "regionId": "shan",
+      "name": "Mongpan",
+      "nameMy": "မိုင်းပန်",
+      "lat": 20.258524,
+      "lon": 98.363895
+    },
+    {
+      "id": "MMR014014",
+      "regionId": "shan",
+      "name": "Kunhing",
+      "nameMy": "ကွန်ဟိန်း",
+      "lat": 21.078628,
+      "lon": 98.553784
+    },
+    {
+      "id": "MMR014015",
+      "regionId": "shan",
+      "name": "Kyethi",
+      "nameMy": "ကျေးသီး",
+      "lat": 21.909112,
+      "lon": 97.945391
+    },
+    {
+      "id": "MMR014012",
+      "regionId": "shan",
+      "name": "Laihka",
+      "nameMy": "လဲချား",
+      "lat": 21.298576,
+      "lon": 97.762115
+    },
+    {
+      "id": "MMR014011",
+      "regionId": "shan",
+      "name": "Loilen",
+      "nameMy": "လွိုင်လင်",
+      "lat": 21.069508,
+      "lon": 97.502937
+    },
+    {
+      "id": "MMR014017",
+      "regionId": "shan",
+      "name": "Monghsu",
+      "nameMy": "မိုင်းရှူး",
+      "lat": 21.665514,
+      "lon": 98.422665
+    },
+    {
+      "id": "MMR014016",
+      "regionId": "shan",
+      "name": "Mongkaing",
+      "nameMy": "မိုင်းကိုင်",
+      "lat": 21.74655,
+      "lon": 97.503364
+    },
+    {
+      "id": "MMR014013",
+      "regionId": "shan",
+      "name": "Nansang",
+      "nameMy": "နမ့်စန်",
+      "lat": 20.83216,
+      "lon": 97.851041
+    },
+    {
+      "id": "MMR014003",
+      "regionId": "shan",
+      "name": "Hopong",
+      "nameMy": "ဟိုပုံး",
+      "lat": 21.231539,
+      "lon": 97.237541
+    },
+    {
+      "id": "MMR014004",
+      "regionId": "shan",
+      "name": "Hsihseng",
+      "nameMy": "ဆီဆိုင်",
+      "lat": 20.066974,
+      "lon": 97.275967
+    },
+    {
+      "id": "MMR014009",
+      "regionId": "shan",
+      "name": "Pinlaung",
+      "nameMy": "ပင်လောင်း",
+      "lat": 19.939977,
+      "lon": 96.693253
+    },
+    {
+      "id": "MMR014005",
+      "regionId": "shan",
+      "name": "Kalaw",
+      "nameMy": "ကလော",
+      "lat": 20.57736,
+      "lon": 96.679383
+    },
+    {
+      "id": "MMR014008",
+      "regionId": "shan",
+      "name": "Lawksawk",
+      "nameMy": "ရပ်စောက်",
+      "lat": 21.318708,
+      "lon": 96.858509
+    },
+    {
+      "id": "MMR014002",
+      "regionId": "shan",
+      "name": "Nyaungshwe",
+      "nameMy": "ညောင်ရွှေ",
+      "lat": 20.166652,
+      "lon": 97.007164
+    },
+    {
+      "id": "MMR014010",
+      "regionId": "shan",
+      "name": "Pekon",
+      "nameMy": "ဖယ်ခုံ",
+      "lat": 19.643175,
+      "lon": 96.794049
+    },
+    {
+      "id": "MMR014001",
+      "regionId": "shan",
+      "name": "Taunggyi",
+      "nameMy": "တောင်ကြီး",
+      "lat": 20.849504,
+      "lon": 96.988695
+    },
+    {
+      "id": "MMR006001",
+      "regionId": "tanintharyi",
+      "name": "Dawei",
+      "nameMy": "ထားဝယ်",
+      "lat": 13.947425,
+      "lon": 98.743207
+    },
+    {
+      "id": "MMR006002",
+      "regionId": "tanintharyi",
+      "name": "Launglon",
+      "nameMy": "လောင်းလုံး",
+      "lat": 13.87797,
+      "lon": 98.152795
+    },
+    {
+      "id": "MMR006003",
+      "regionId": "tanintharyi",
+      "name": "Thayetchaung",
+      "nameMy": "သရက်ချောင်း",
+      "lat": 13.659607,
+      "lon": 98.458583
+    },
+    {
+      "id": "MMR006004",
+      "regionId": "tanintharyi",
+      "name": "Yebyu",
+      "nameMy": "ရေဖြူ",
+      "lat": 14.637158,
+      "lon": 98.149607
+    },
+    {
+      "id": "MMR006010",
+      "regionId": "tanintharyi",
+      "name": "Bokpyin",
+      "nameMy": "ဘုတ်ပြင်း",
+      "lat": 11.222937,
+      "lon": 99.005212
+    },
+    {
+      "id": "MMR006009",
+      "regionId": "tanintharyi",
+      "name": "Kawthoung",
+      "nameMy": "ကော့သောင်း",
+      "lat": 10.452168,
+      "lon": 98.64473
+    },
+    {
+      "id": "MMR006006",
+      "regionId": "tanintharyi",
+      "name": "Kyunsu",
+      "nameMy": "ကျွန်းစု",
+      "lat": 11.860771,
+      "lon": 98.796139
+    },
+    {
+      "id": "MMR006005",
+      "regionId": "tanintharyi",
+      "name": "Myeik",
+      "nameMy": "မြိတ်",
+      "lat": 12.481602,
+      "lon": 98.751698
+    },
+    {
+      "id": "MMR006007",
+      "regionId": "tanintharyi",
+      "name": "Palaw",
+      "nameMy": "ပုလော",
+      "lat": 13.114657,
+      "lon": 98.7138
+    },
+    {
+      "id": "MMR013019",
+      "regionId": "yangon",
+      "name": "Dagon Myothit (North)",
+      "nameMy": "ဒဂုံမြို့သစ် (မြောက်ပိုင်း)",
+      "lat": 16.86792,
+      "lon": 96.198937
+    },
+    {
+      "id": "MMR013021",
+      "regionId": "yangon",
+      "name": "Dagon Myothit (Seikkan)",
+      "nameMy": "ဒဂုံမြို့သစ် (ဆိပ်ကမ်း)",
+      "lat": 16.840589,
+      "lon": 96.273501
+    },
+    {
+      "id": "MMR013018",
+      "regionId": "yangon",
+      "name": "Dagon Myothit (South)",
+      "nameMy": "ဒဂုံမြို့သစ် (တောင်ပိုင်း)",
+      "lat": 16.862864,
+      "lon": 96.240353
+    },
+    {
+      "id": "MMR013022",
+      "regionId": "yangon",
+      "name": "Mingalartaungnyunt",
+      "nameMy": "မင်္ဂလာတောင်ညွန့်",
+      "lat": 16.786507,
+      "lon": 96.168655
+    },
+    {
+      "id": "MMR013012",
+      "regionId": "yangon",
+      "name": "North Okkalapa",
+      "nameMy": "မြောက်ဥက္ကလာပ",
+      "lat": 16.939159,
+      "lon": 96.192173
+    },
+    {
+      "id": "MMR013016",
+      "regionId": "yangon",
+      "name": "Pazundaung",
+      "nameMy": "ပုဇွန်တောင်",
+      "lat": 16.775435,
+      "lon": 96.177371
+    },
+    {
+      "id": "MMR013011",
+      "regionId": "yangon",
+      "name": "South Okkalapa",
+      "nameMy": "တောင်ဥက္ကလာပ",
+      "lat": 16.849338,
+      "lon": 96.183171
+    },
+    {
+      "id": "MMR013010",
+      "regionId": "yangon",
+      "name": "Yankin",
+      "nameMy": "ရန်ကင်း",
+      "lat": 16.829528,
+      "lon": 96.165467
+    },
+    {
+      "id": "MMR013015",
+      "regionId": "yangon",
+      "name": "Tamwe",
+      "nameMy": "တာမွေ",
+      "lat": 16.817892,
+      "lon": 96.175042
+    },
+    {
+      "id": "MMR013002",
+      "regionId": "yangon",
+      "name": "Mingaladon",
+      "nameMy": "မင်္ဂလာဒုံ",
+      "lat": 17.040236,
+      "lon": 96.13142
+    },
+    {
+      "id": "MMR013007",
+      "regionId": "yangon",
+      "name": "Shwepyithar",
+      "nameMy": "ရွှေပြည်သာ",
+      "lat": 16.977887,
+      "lon": 96.072703
+    },
+    {
+      "id": "MMR013005",
+      "regionId": "yangon",
+      "name": "Taikkyi",
+      "nameMy": "တိုက်ကြီး",
+      "lat": 17.325172,
+      "lon": 95.892284
+    },
+    {
+      "id": "MMR013013",
+      "regionId": "yangon",
+      "name": "Thaketa",
+      "nameMy": "သာကေတ",
+      "lat": 16.806859,
+      "lon": 96.213779
+    },
+    {
+      "id": "MMR013031",
+      "regionId": "yangon",
+      "name": "Seikgyikanaungto",
+      "nameMy": "ဆိပ်ကြီး/ခနောင်တို",
+      "lat": 16.757292,
+      "lon": 96.100337
+    },
+    {
+      "id": "MMR013009",
+      "regionId": "yangon",
+      "name": "Thingangyun",
+      "nameMy": "သင်္ဃန်းကျွန်း",
+      "lat": 16.82974,
+      "lon": 96.195344
+    },
+    {
+      "id": "MMR013023",
+      "regionId": "yangon",
+      "name": "Thanlyin",
+      "nameMy": "သန်လျင်",
+      "lat": 16.747792,
+      "lon": 96.312752
+    },
+    {
+      "id": "MMR013025",
+      "regionId": "yangon",
+      "name": "Thongwa",
+      "nameMy": "သုံးခွ",
+      "lat": 16.790012,
+      "lon": 96.594954
+    },
+    {
+      "id": "MMR013027",
+      "regionId": "yangon",
+      "name": "Twantay",
+      "nameMy": "တွံတေး",
+      "lat": 16.828163,
+      "lon": 95.974814
+    },
+    {
+      "id": "MMR013046",
+      "regionId": "yangon",
+      "name": "Hlaingtharya (East)",
+      "nameMy": "လှိုင်သာယာ (အရှေ့ပိုင်း)",
+      "lat": 16.869006,
+      "lon": 96.064784
+    },
+    {
+      "id": "MMR013047",
+      "regionId": "yangon",
+      "name": "Hlaingtharya (West)",
+      "nameMy": "လှိုင်သာယာ (အနောက်ပိုင်း)",
+      "lat": 16.891384,
+      "lon": 96.034955
+    },
+    {
+      "id": "MMR013004",
+      "regionId": "yangon",
+      "name": "Hlegu",
+      "nameMy": "လှည်းကူး",
+      "lat": 17.116392,
+      "lon": 96.272331
+    },
+    {
+      "id": "MMR013003",
+      "regionId": "yangon",
+      "name": "Hmawbi",
+      "nameMy": "မှော်ဘီ",
+      "lat": 17.204747,
+      "lon": 96.004619
+    },
+    {
+      "id": "MMR013006",
+      "regionId": "yangon",
+      "name": "Htantabin",
+      "nameMy": "ထန်းတပင်",
+      "lat": 16.961264,
+      "lon": 95.959682
+    },
+    {
+      "id": "MMR013001",
+      "regionId": "yangon",
+      "name": "Insein",
+      "nameMy": "အင်းစိန်",
+      "lat": 16.882321,
+      "lon": 96.10974
+    },
+    {
+      "id": "MMR013032",
+      "regionId": "yangon",
+      "name": "Cocokyun",
+      "nameMy": "ကိုကိုးကျွန်း",
+      "lat": 14.073679,
+      "lon": 93.361588
+    },
+    {
+      "id": "MMR013037",
+      "regionId": "yangon",
+      "name": "Ahlone",
+      "nameMy": "အလုံ",
+      "lat": 16.78555,
+      "lon": 96.126982
+    },
+    {
+      "id": "MMR013030",
+      "regionId": "yangon",
+      "name": "Dala",
+      "nameMy": "ဒလ",
+      "lat": 16.63601,
+      "lon": 96.173575
+    },
+    {
+      "id": "MMR013028",
+      "regionId": "yangon",
+      "name": "Kawhmu",
+      "nameMy": "ကော့မှူး",
+      "lat": 16.543104,
+      "lon": 96.10889
+    },
+    {
+      "id": "MMR013026",
+      "regionId": "yangon",
+      "name": "Kayan",
+      "nameMy": "ခရမ်း",
+      "lat": 16.88594,
+      "lon": 96.581956
+    },
+    {
+      "id": "MMR013033",
+      "regionId": "yangon",
+      "name": "Kyauktada",
+      "nameMy": "ကျောက်တံတား",
+      "lat": 16.776821,
+      "lon": 96.161372
+    },
+    {
+      "id": "MMR013029",
+      "regionId": "yangon",
+      "name": "Kungyangon",
+      "nameMy": "ကွမ်းခြံကုန်း",
+      "lat": 16.433649,
+      "lon": 96.110675
+    },
+    {
+      "id": "MMR013024",
+      "regionId": "yangon",
+      "name": "Kyauktan",
+      "nameMy": "ကျောက်တန်း",
+      "lat": 16.602674,
+      "lon": 96.470146
+    },
+    {
+      "id": "MMR013044",
+      "regionId": "yangon",
+      "name": "Bahan",
+      "nameMy": "ဗဟန်း",
+      "lat": 16.811002,
+      "lon": 96.157011
+    },
+    {
+      "id": "MMR013043",
+      "regionId": "yangon",
+      "name": "Dagon",
+      "nameMy": "ဒဂုံ",
+      "lat": 16.792863,
+      "lon": 96.144568
+    },
+    {
+      "id": "MMR013038",
+      "regionId": "yangon",
+      "name": "Kyeemyindaing",
+      "nameMy": "ကြည့်မြင်တိုင်",
+      "lat": 16.818596,
+      "lon": 96.09907
+    },
+    {
+      "id": "MMR013040",
+      "regionId": "yangon",
+      "name": "Hlaing",
+      "nameMy": "လှိုင်",
+      "lat": 16.846912,
+      "lon": 96.120896
+    },
+    {
+      "id": "MMR013041",
+      "regionId": "yangon",
+      "name": "Kamaryut",
+      "nameMy": "ကမာရွတ်",
+      "lat": 16.82333,
+      "lon": 96.13152
+    },
+    {
+      "id": "MMR013039",
+      "regionId": "yangon",
+      "name": "Sanchaung",
+      "nameMy": "စမ်းချောင်း",
+      "lat": 16.806987,
+      "lon": 96.133534
+    }
+  ]
+}

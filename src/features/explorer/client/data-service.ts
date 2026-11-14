@@ -21,6 +21,7 @@ export interface ObservationResponse {
   summary: { count: number; mean: number | null; min: number | null; max: number | null; latest: number | null };
   dataset: DatasetDefinition;
   region: { id: string; name: string; nameMy: string; lat: number; lon: number };
+  location?: { id: string; name: string; nameMy: string; lat: number; lon: number; type: "township" | "region" };
   period: { start: string; end: string };
   source: DatasetDefinition["source"];
   geographicCoverage: string;
@@ -35,7 +36,7 @@ export async function fetchExploreCatalog(signal?: AbortSignal): Promise<Explore
 }
 
 export async function fetchObservations(
-  selection: { topicId: TopicId; regionId: string; datasetId: string; start: string; end: string },
+  selection: { topicId: TopicId; regionId: string; datasetId: string; start: string; end: string; townshipId?: string },
   signal?: AbortSignal,
 ): Promise<ObservationResponse> {
   const response = await fetch("/api/explore/observations", {

@@ -176,7 +176,7 @@ export default function Page() {
       setChartError("");
       setResult(null);
       try {
-        const data = await fetchObservations({ topicId: activeTopic, regionId, datasetId, start, end }, controller.signal);
+        const data = await fetchObservations({ topicId: activeTopic, regionId, datasetId, start, end, townshipId:townshipId || undefined }, controller.signal);
         if (controller.signal.aborted) return;
         setResult(data);
         setChartState(data.summary.count === 0 ? "empty" : "ready");
@@ -190,7 +190,7 @@ export default function Page() {
     };
     void run();
     return () => controller.abort();
-  }, [activeTopic, catalog, catalogError, datasetId, datasets, end, regionId, selectedDataset, start, reloadToken, view]);
+  }, [activeTopic, catalog, catalogError, datasetId, datasets, end, regionId, selectedDataset, start, reloadToken, view, townshipId]);
 
   function chooseTopic(topicId: TopicId) {
     // Pressing the open category again collapses it.
@@ -238,6 +238,7 @@ export default function Page() {
 
   const activeTopicData = TOPICS.find((item) => item.id === activeTopic);
   const selectedRegion = REGIONS.find((item) => item.id === regionId);
+  const selectedTownship = catalog?.townships.find(item=>item.id===townshipId);
   const dateError = Boolean(start && end && start > end);
 
   return (
@@ -296,7 +297,7 @@ export default function Page() {
 
           <section className="home-data-note" aria-label="Geographic coverage notice">
             <div className="note-icon"><MapPin size={18} /></div>
-            <p><strong>Township boundaries are available in Explore Map.</strong> Select a region to reveal its townships. NASA chart data is sampled at regional reference points, not township averages.</p>
+            <p><strong>Township boundaries are available in Explore Map.</strong> Select a region to reveal its townships. NASA chart data uses a representative point for the selected region or township, not an area average.</p>
             <button className="text-button" onClick={() => setView("explore")}>View data coverage <ArrowRight size={14} /></button>
           </section>
 
@@ -379,7 +380,7 @@ export default function Page() {
                 </div>
                 <p className="map-stage-note">
                   {selectedRegion
-                    ? `Active area: ${selectedRegion.name} — ${selectedRegion.type}. Observations use its regional reference point.`
+                    ? `Active area: ${selectedTownship?.name ?? selectedRegion.name} — ${selectedTownship ? "Township" : selectedRegion.type}. Observations use a representative point, not an area average.`
                     : "Select a mapped state or region to set the regional reference point. Select a region to reveal its township boundaries."}
                 </p>
               </section>
@@ -392,7 +393,7 @@ export default function Page() {
                   <div className="field-control">
                     <label htmlFor="township-select">Select Township</label>
                     <select id="township-select" value={townshipId} disabled={!regionId || !catalog?.townships.length} onChange={event=>{setTownshipId(event.target.value);setMapFocused(true);}} aria-describedby="township-help"><option value="">All townships in this region</option>{catalog?.townships.filter(item=>item.regionId===regionId).map(item=><option key={item.id} value={item.id}>{lang==="my"?item.nameMy:item.name}</option>)}</select>
-                    <p className="field-hint" id="township-help">MIMU township map selection. Measurements still use the regional reference point.</p>
+                    <p className="field-hint" id="township-help">Selecting a township reloads NASA POWER at a point inside its boundary. Nearby townships may share the same NASA grid cell.</p>
                   </div>
                   <div className="field-control">
                     <label htmlFor="regional-reference">Regional reference point <span className="field-meta">(not a township)</span></label>
@@ -452,7 +453,7 @@ export default function Page() {
 
               <section className="chart-card panel" aria-labelledby="chart-title">
                 <div className="panel-title-row chart-heading">
-                  <div><p className="eyebrow">Observation series</p><h2 id="chart-title">{selectedDataset?.label ?? "Dataset chart"}</h2><p>{selectedRegion?.name ?? "Select a regional reference point"} · {start} — {end}</p></div>
+                  <div><p className="eyebrow">Observation series</p><h2 id="chart-title">{selectedDataset?.label ?? "Dataset chart"}</h2><p>{selectedTownship?.name ?? selectedRegion?.name ?? "Select a location"} · {start} — {end}</p></div>
                   <ChartNoAxesCombined className="chart-heading-icon" size={21} />
                 </div>
                 <DataChart state={chartState} result={result} error={chartError} onRetry={() => setReloadToken((token) => token + 1)} />
@@ -494,7 +495,7 @@ export default function Page() {
                   </div>
                 ) : result ? (
                   <dl className="detail-grid">
-                    <div><dt>Area</dt><dd>{result.region.name}, {REGIONS.find((item) => item.id === result.region.id)?.type ?? "region"}</dd></div>
+                    <div><dt>Area</dt><dd>{result.location?.name ?? result.region.name}, {result.location?.type ?? "region"}</dd></div>
                     <div><dt>Topic</dt><dd>{activeTopicData?.label}</dd></div>
                     <div><dt>Dataset</dt><dd>{result.dataset.label}</dd></div>
                     <div><dt>Observation period</dt><dd>{result.period.start} — {result.period.end}</dd></div>
@@ -513,8 +514,8 @@ export default function Page() {
 
               <div className="coverage-card">
                 <div className="coverage-heading"><MapPin size={16} /><strong>Coverage note</strong></div>
-                <p>{catalog?.townshipCoverage.reason ?? "Township boundaries are available for selection. Observations use regional reference locations."}</p>
-                <span>Township map coverage: available · Measurements: regional reference point</span>
+                <p>{catalog?.townshipCoverage.reason ?? "Township boundaries support selection. NASA POWER uses the selected township or regional representative point."}</p>
+                <span>Township map coverage: available · Measurements: selected representative point</span>
               </div>
             </aside>
           </div>

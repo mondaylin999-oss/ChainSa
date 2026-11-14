@@ -9,6 +9,7 @@ import type { DataSeries } from "@/features/environmental/types/environmental";
 import type { ObservationResponse } from "../client/data-service";
 
 export function EarthbeatExperience({ result }: { result: ObservationResponse }) {
+  const location=result.location ?? result.region;
   const points = useMemo(() => result.observations.map(point => ({...point,time:Date.parse(point.date)})),[result]);
   const valid = useMemo(() => points.filter(point => point.value !== null),[points]);
   const [active,setActive] = useState(-1);
@@ -32,9 +33,9 @@ export function EarthbeatExperience({ result }: { result: ObservationResponse })
     dataset:result.dataset.label,datasetId:result.dataset.id === "fire-detections" ? "NASA_FIRMS" : "NASA_POWER",provider:result.source.name,
     spatialResolution:result.geographicCoverage,temporalResolution:"Daily",spatialSelection:result.dataset.id === "fire-detections" ? undefined : "representative-point",
     observations:valid.map(point=>({date:point.date,value:point.value!,unit:result.dataset.unit,source:result.source.name})),
-    requestedStartDate:result.period.start,requestedEndDate:result.period.end,validObservationCount:valid.length,missingObservationCount:result.missingCount,
+    requestedStartDate:result.period.start,requestedEndDate:result.period.end,validObservationCount:valid.length,missingObservationCount:result.missingCount,expectedObservationCount:points.length,coverageFraction:points.length?valid.length/points.length:0,actualStartDate:valid[0]?.date,actualEndDate:valid.at(-1)?.date,
     limitations:[result.dataset.limitations,result.geographicCoverage],processing:["Missing observations are excluded from statistics and remain silent during playback.","Dates retain their elapsed-time spacing. Descriptive calculations are not forecasts."]
-  }),[result,valid]);
+  }),[result,valid,points]);
   const analysis=useMemo(()=>analyzeSeries(series),[series]);
   function run(action:()=>Promise<void>|undefined){setError("");try{void action()?.catch(()=>setError("Audio could not start. Check your browser sound settings and try Play again."));}catch{setError("Sound is unavailable in this browser.");}}
   function select(index:number){if(index<0||points[index]?.value==null)return;setActive(index);run(()=>engine.current?.seek(index));}
@@ -53,7 +54,7 @@ export function EarthbeatExperience({ result }: { result: ObservationResponse })
   }
   const current=points[active];
   return <div className="earthbeat-experience">
-    <EnvironmentalChart series={series} locationName={result.region.name} startDate={result.period.start} endDate={result.period.end} activeDate={current?.date} interactions={{role:"slider",tabIndex:0,"aria-label":"Interactive observation graph","aria-valuemin":0,"aria-valuemax":Math.max(0,points.length-1),"aria-valuenow":Math.max(0,active),"aria-valuetext":current?`${current.date}: ${current.value} ${result.dataset.unit}`:"No observation selected",onKeyDown:keyboard,onPointerDown:(event:PointerEvent<SVGSVGElement>)=>{if(event.pointerType==="mouse"&&event.button!==0)return;event.preventDefault();dragging.current=true;event.currentTarget.setPointerCapture(event.pointerId);event.currentTarget.focus();lastIndex.current=pointer(event);select(lastIndex.current);},onPointerMove:(event:PointerEvent<SVGSVGElement>)=>{const index=pointer(event);if(dragging.current&&index!==lastIndex.current){lastIndex.current=index;select(index);}},onPointerUp:()=>{dragging.current=false;},onPointerCancel:()=>{dragging.current=false;},onLostPointerCapture:()=>{dragging.current=false;}}}/>
+    <EnvironmentalChart series={series} locationName={location.name} startDate={result.period.start} endDate={result.period.end} activeDate={current?.date} interactions={{role:"slider",tabIndex:0,"aria-label":"Interactive observation graph","aria-valuemin":0,"aria-valuemax":Math.max(0,points.length-1),"aria-valuenow":Math.max(0,active),"aria-valuetext":current?`${current.date}: ${current.value} ${result.dataset.unit}`:"No observation selected",onKeyDown:keyboard,onPointerDown:(event:PointerEvent<SVGSVGElement>)=>{if(event.pointerType==="mouse"&&event.button!==0)return;event.preventDefault();dragging.current=true;event.currentTarget.setPointerCapture(event.pointerId);event.currentTarget.focus();lastIndex.current=pointer(event);select(lastIndex.current);},onPointerMove:(event:PointerEvent<SVGSVGElement>)=>{const index=pointer(event);if(dragging.current&&index!==lastIndex.current){lastIndex.current=index;select(index);}},onPointerUp:()=>{dragging.current=false;},onPointerCancel:()=>{dragging.current=false;},onLostPointerCapture:()=>{dragging.current=false;}}}/>
     <div className="earthbeat-controls" aria-label="EARTHBEAT sound controls">
       <strong>EARTHBEAT · Graph ↔ sound</strong>
       <p aria-live={state==="playing"?"off":"polite"}>{current?`${current.date} · ${current.value} ${result.dataset.unit}`:"Touch the graph to hear a measurement."}</p>
@@ -62,6 +63,6 @@ export function EarthbeatExperience({ result }: { result: ObservationResponse })
       <p>Touch or drag the graph to audition a point. Arrow keys select points. Play repeats until Stop. Higher values have higher pitch (220–880 Hz); missing data is silent. Synthesized tones represent observations.</p>
       {error&&<p role="alert">{error}</p>}
     </div>
-    <DataTrendInsight series={series} analysis={analysis} locationName={result.region.name} latitude={result.region.lat} longitude={result.region.lon}/>
+    <DataTrendInsight series={series} analysis={analysis} locationName={location.name} latitude={location.lat} longitude={location.lon}/>
   </div>;
 }

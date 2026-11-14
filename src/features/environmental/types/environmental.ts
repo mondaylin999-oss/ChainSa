@@ -36,6 +36,8 @@ export interface DataSeries {
   processing?: string[];
   validObservationCount?: number;
   missingObservationCount?: number;
+  expectedObservationCount?: number;
+  coverageFraction?: number;
   scaleFactor?: number;
   qaPolicy?: string;
   spatialSelection?: "polygon-mean" | "representative-point";

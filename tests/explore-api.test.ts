@@ -17,7 +17,7 @@ describe("explore catalogue API", () => {
     const catalog = await response.json();
     expect(response.status).toBe(200);
     expect(catalog.townshipCoverage.available).toBe(true);
-    expect(catalog.townshipCoverage.observationsAvailable).toBe(false);
+    expect(catalog.townshipCoverage.observationsAvailable).toBe(true);
     expect(catalog.townships).toHaveLength(330);
     expect(catalog.regions).toHaveLength(15);
     expect(catalog.datasets.find((dataset: { id: string }) => dataset.id === "rainfall")).toMatchObject({

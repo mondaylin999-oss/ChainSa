@@ -20,8 +20,8 @@ export async function GET() {
     townships: townshipDirectory.townships,
     townshipCoverage: {
       available: true,
-      observationsAvailable: false,
-      reason: "MIMU township names and boundaries are available for map selection. NASA observations still use regional reference points, not township averages.",
+      observationsAvailable: true,
+      reason: "MIMU township boundaries support selection. NASA POWER uses a point inside the selected township, or the regional reference point when no township is selected. Values are not area averages; nearby selections may share a NASA grid cell.",
     },
   }, { headers: { "cache-control": "no-store" } });
 }

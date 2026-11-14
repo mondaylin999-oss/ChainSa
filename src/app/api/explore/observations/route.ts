@@ -2,6 +2,7 @@ import { getConfig } from "@/features/earthlens-chat/server/env";
 import { fetchFires } from "@/features/earthlens-chat/server/nasa/firms";
 import { getRegion } from "@/features/earthlens-chat/regions";
 import { addDays, fetchPowerDaily } from "@/features/earthlens-chat/server/nasa/power";
+import { getTownshipPoint } from "@/features/explorer/township-location";
 import { DATASETS } from "@/features/explorer/catalog";
 
 export const runtime = "nodejs";
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     return error("Request body must be a JSON object.", 400);
   }
 
-  const { topicId, regionId, datasetId, start, end } = body as Record<string, unknown>;
+  const { topicId, regionId, datasetId, start, end, townshipId } = body as Record<string, unknown>;
   if (typeof topicId !== "string" || typeof regionId !== "string" || typeof datasetId !== "string" ||
       !isValidDate(start) || !isValidDate(end)) {
     return error("Choose a topic, regional reference point, dataset, and valid date range.", 400);
@@ -43,6 +44,11 @@ export async function POST(request: Request) {
   const region = getRegion(regionId);
   if (!region) return error("Choose a valid regional reference point.", 400);
 
+  if (townshipId !== undefined && typeof townshipId !== "string") return error("Choose a valid township.", 400);
+  const township = townshipId ? getTownshipPoint(townshipId, region.id) : undefined;
+  if (townshipId && !township) return error("That township does not belong to the selected region.", 400);
+  const location = { ...(township ?? region), type: township ? "township" : "region" };
+
   const days = Math.floor((Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) / 86_400_000) + 1;
   if (days > MAX_RANGE_DAYS || start < "1981-01-01") {
     return error(`Choose a date range from 1981-01-01 onward, no longer than ${MAX_RANGE_DAYS} days.`, 400);
@@ -52,6 +58,7 @@ export async function POST(request: Request) {
 
   const config = getConfig();
   if (dataset.id === "fire-detections") {
+    if (township) return error("Township fire detections are not connected. Select all townships to view regional fire data.", 503);
     if (!config.firmsMapKey) return error("NASA FIRMS is unavailable. Configure FIRMS_MAP_KEY on the server.", 503);
     if (days > 10 || end !== today) return error("NASA FIRMS supports only the most recent 10 days ending today. Select an available recent date range.", 400);
     try {
@@ -67,6 +74,7 @@ export async function POST(request: Request) {
         summary: summarize(observations.map((observation) => observation.value)),
         dataset,
         region: { id: region.id, name: region.name, nameMy: region.nameMy, lat: region.lat, lon: region.lon },
+        location,
         period: { start, end },
         source: dataset.source,
         geographicCoverage: "Detections inside the state/region boundary; representative-point fallback where no boundary is bundled.",
@@ -82,8 +90,8 @@ export async function POST(request: Request) {
   if (!dataset.parameter) return error("This dataset is not connected to a live observation service.", 503);
   try {
     const result = await fetchPowerDaily(
-      region.lat,
-      region.lon,
+      location.lat,
+      location.lon,
       [dataset.parameter],
       start,
       end,
@@ -103,9 +111,10 @@ export async function POST(request: Request) {
       summary: summarize(values),
       dataset: { ...dataset, unit: result.units[dataset.parameter] || dataset.unit },
       region: { id: region.id, name: region.name, nameMy: region.nameMy, lat: region.lat, lon: region.lon },
+      location,
       period: { start, end },
       source: dataset.source,
-      geographicCoverage: "One NASA POWER grid point at the regional reference coordinates; not a state/region-wide or township-wide average.",
+      geographicCoverage: township ? "One NASA POWER grid point at a representative point inside the selected township boundary; not a township-wide average or local sensor measurement." : "One NASA POWER grid point at the regional reference coordinates; not a state/region-wide or township-wide average.",
       observedAt: new Date().toISOString(),
       missingCount: values.filter((value) => value === null).length,
     }, { headers: { "cache-control": "no-store" } });

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import townshipPoints from "../township-points.json";
 import type { Township } from "../client/data-service";
 import boundaries from "../../earthlens-chat/server/nasa/myanmar-admin1.json";
 import { REGIONS } from "../../earthlens-chat/regions";
@@ -142,7 +143,7 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en", 
       <g aria-label="Township boundaries">
         {visibleTownships.map(feature=>{
           const township=townships.find(item=>item.id===feature.properties.TS_PCODE);if(!township)return null;
-          const selected=township.id===selectedTownshipId;const bounds=boundsFor(feature.geometry);const x=(bounds.minX+bounds.maxX)/2,y=(bounds.minY+bounds.maxY)/2;
+          const selected=township.id===selectedTownshipId;const bounds=boundsFor(feature.geometry);const sample=townshipPoints.townships.find(item=>item.id===township.id);const anchor=sample?project([sample.lon,sample.lat]):{x:(bounds.minX+bounds.maxX)/2,y:(bounds.minY+bounds.maxY)/2};const x=anchor.x,y=anchor.y;
           return <g key={township.id}><path d={geometryPolygons(feature.geometry).map(polygonPath).join(" ")} fill={selected?"#8fd7a7":"transparent"} stroke="#596b5d" strokeWidth={selected?1.5:.6} vectorEffect="non-scaling-stroke" role="button" tabIndex={0} aria-label={language==="my"?township.nameMy:township.name} onClick={()=>onSelectTownship?.(township.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();onSelectTownship?.(township.id);}}}><title>{language==="my"?township.nameMy:township.name}</title></path><circle cx={x} cy={y} r={selected?markerRadius*1.5:markerRadius} fill="#176b4b" pointerEvents="none"/></g>;
         })}
       </g>
