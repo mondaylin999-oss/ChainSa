@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base look copied from the Myanmar EarthLens demo */
+:root {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mm: "Padauk", "Myanmar Text", "Noto Sans Myanmar", sans-serif;
+}
+html { scroll-behavior: smooth; }
+body {
+  @apply bg-abyss-950 text-slate-200 antialiased;
+  font-family: var(--font-sans);
+  background-image: radial-gradient(1200px 600px at 85% -10%, rgba(43, 143, 232, 0.16), transparent 60%),
+    radial-gradient(900px 500px at -10% 30%, rgba(47, 176, 112, 0.1), transparent 60%);
+  background-attachment: fixed;
+}
+html[lang="my"] body { font-family: var(--font-mm), var(--font-sans); line-height: 1.75; }
+.card { @apply rounded-2xl border border-white/[0.07] bg-abyss-900/70 backdrop-blur; box-shadow: 0 0 0 1px rgba(124,199,255,.12), 0 12px 40px -12px rgba(0,0,0,.6); }
+.scrollbar-thin::-webkit-scrollbar { width: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #22395f; border-radius: 3px; }
