@@ -82,4 +82,10 @@ describe("explore observations API", () => {
     expect(data.geographicCoverage).toContain("not a state/region-wide or township-wide average");
     expect(fetch).toHaveBeenCalledTimes(1);
   });
+  it("accepts a multi-decade NASA POWER range and preserves missing days",async()=>{
+    vi.stubGlobal("fetch",vi.fn(async()=>Response.json({properties:{parameter:{PRECTOTCORR:{19890101:2,20261114:3}}},parameters:{PRECTOTCORR:{units:"mm/day"}}})));
+    const response=await getObservations(request({topicId:"agriculture",regionId:"yangon",datasetId:"rainfall",start:"1989-01-01",end:"2026-11-14"}));
+    const data=await response.json();expect(response.status).toBe(200);expect(data.observations.length).toBeGreaterThan(13000);expect(data.summary.count).toBe(2);expect(data.observations[0]).toEqual({date:"1989-01-01",value:2});expect(data.observations.at(-1)).toEqual({date:"2026-11-14",value:3});
+  });
+
 });

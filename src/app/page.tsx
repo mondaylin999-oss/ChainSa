@@ -19,6 +19,7 @@ import {
   TriangleAlert,
   Zap,
 } from "lucide-react";
+import { observationDateError } from "@/features/explorer/dates";
 import { REGIONS } from "@/features/earthlens-chat/regions";
 import { EarthbeatExperience } from "@/features/explorer/components/EarthbeatExperience";
 import { ChatPanel } from "@/features/explorer/components/ChatPanel";
@@ -92,6 +93,8 @@ export default function Page() {
   const [datasetId, setDatasetId] = useState("");
   const [start, setStart] = useState(questionDate(36));
   const [end, setEnd] = useState(questionDate(7));
+  const [draftStart,setDraftStart] = useState(questionDate(36));
+  const [draftEnd,setDraftEnd] = useState(questionDate(7));
   const [chartState, setChartState] = useState<ChartState>("initial");
   const [result, setResult] = useState<ObservationResponse | null>(null);
   const [chartError, setChartError] = useState("");
@@ -218,6 +221,8 @@ export default function Page() {
     if (nextId === "fire-detections") {
       setStart(questionDate(9));
       setEnd(questionDate(0));
+      setDraftStart(questionDate(9));
+      setDraftEnd(questionDate(0));
     }
   }
 
@@ -239,7 +244,7 @@ export default function Page() {
   const activeTopicData = TOPICS.find((item) => item.id === activeTopic);
   const selectedRegion = REGIONS.find((item) => item.id === regionId);
   const selectedTownship = catalog?.townships.find(item=>item.id===townshipId);
-  const dateError = Boolean(start && end && start > end);
+  const dateError = observationDateError(draftStart,draftEnd);
 
   return (
     <main className={`earthlens-app${view === "explore" ? " is-exploring" : ""}`} lang={lang}>
@@ -440,11 +445,12 @@ export default function Page() {
                   <div className="field-control">
                     <label>Date range <span className="field-meta">(UTC)</span></label>
                     <div className="date-range">
-                      <div><label className="sr-only" htmlFor="start-date">Start date</label><input id="start-date" type="date" min="1981-01-01" max={questionDate(0)} value={start} onChange={(event) => setStart(event.target.value)} /></div>
+                      <div><label className="sr-only" htmlFor="start-date">Start date</label><input id="start-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftStart} onChange={(event) => setDraftStart(event.target.value)} /></div>
                       <span aria-hidden="true">to</span>
-                      <div><label className="sr-only" htmlFor="end-date">End date</label><input id="end-date" type="date" min="1981-01-01" max={questionDate(0)} value={end} onChange={(event) => setEnd(event.target.value)} /></div>
+                      <div><label className="sr-only" htmlFor="end-date">End date</label><input id="end-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftEnd} onChange={(event) => setDraftEnd(event.target.value)} /></div>
                     </div>
-                    {dateError && <p className="field-error" role="alert">Start date must be on or before end date.</p>}
+                    <div className="date-actions"><button type="button" className="button-primary" disabled={Boolean(dateError)} onClick={()=>{if(!dateError){setStart(draftStart);setEnd(draftEnd);setReloadToken(token=>token+1);}}}>Apply dates</button>{datasetId !== "fire-detections" && <button type="button" className="text-button" onClick={()=>{setDraftStart("1989-01-01");setDraftEnd(questionDate(0));}}>1989–today</button>}</div>
+                    {dateError ? <p className="field-error" role="status">{dateError}</p> : <p className="field-hint">Apply your dates to update the graph. Recent days may not have published observations yet.</p>}
                     {datasetId === "fire-detections" && <p className="field-hint">NASA FIRMS supports up to 10 recent days ending today.</p>}
                   </div>
                 </div>

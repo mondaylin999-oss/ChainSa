@@ -10,6 +10,7 @@ The Next.js app now opens on a Home view with an accurate local state/region map
 - **Townships:** 330 MIMU township records and PCode 9.4 boundary features are bundled. Select a region to reveal its township boundaries and markers; other regions blur. Township selection changes map focus and fetches NASA POWER observations at a representative point inside that township. The graph, sound and statistics share those observations.
 - **Live chart data:** NASA POWER daily corrected precipitation, near-surface air temperature, modelled root-zone wetness, solar radiation and wind speed at the selected township point or existing state/region reference coordinates. NASA FIRMS detections are optional and require `FIRMS_MAP_KEY`. Unconnected data products are shown as unavailable, not simulated.
 - **AI:** existing `POST /api/earthlens-chat` server route; provider credentials remain server-side. The chat UI reports when no OpenRouter/Groq provider is configured.
+- **Date ranges:** edit both dates, then select Apply dates. The 1989–today shortcut fills a full historical range. NASA POWER supports multi-decade requests from 1981 onward; recent unpublished days remain missing. Fire detections retain their separate 10-day limit.
 - **EARTHBEAT:** the handover chart, descriptive statistics, graph-to-sound selection and looping playback are integrated into the redesigned explorer. AI chat opens from a floating launcher in Explore Map.
 - The previous bundled dashboard is still available at `/earthlens.html`.
 

@@ -9,7 +9,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const MAX_RANGE_DAYS = 400;
 
 function isValidDate(value: unknown): value is string {
   if (typeof value !== "string" || !DATE_PATTERN.test(value)) return false;
@@ -50,8 +49,8 @@ export async function POST(request: Request) {
   const location = { ...(township ?? region), type: township ? "township" : "region" };
 
   const days = Math.floor((Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) / 86_400_000) + 1;
-  if (days > MAX_RANGE_DAYS || start < "1981-01-01") {
-    return error(`Choose a date range from 1981-01-01 onward, no longer than ${MAX_RANGE_DAYS} days.`, 400);
+  if (start < "1981-01-01") {
+    return error("Choose a date range from 1981-01-01 onward.", 400);
   }
   const today = new Date().toISOString().slice(0, 10);
   if (end > today) return error("Future observation dates are not available.", 400);
