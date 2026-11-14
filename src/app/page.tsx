@@ -86,7 +86,7 @@ export default function Page() {
   const [catalog, setCatalog] = useState<ExploreCatalog | null>(null);
   const [catalogError, setCatalogError] = useState("");
   const [activeTopic, setActiveTopic] = useState<TopicId>("agriculture");
-  const [openTopic, setOpenTopic] = useState<TopicId | null>("agriculture");
+  const [openTopic, setOpenTopic] = useState<TopicId | null>(null);
   const [indicatorLabel, setIndicatorLabel] = useState("");
   const [detailIndicator, setDetailIndicator] = useState<TopicIndicator | null>(null);
   const [datasetId, setDatasetId] = useState("");
