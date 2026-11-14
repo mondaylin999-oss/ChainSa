@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
 import { ArrowUp, Bot, ExternalLink, LoaderCircle, Sparkles } from "lucide-react";
 import { useEarthLensChat } from "../../earthlens-chat/client/useEarthLensChat";
+import { StructuredAnswer } from "../../earthlens-chat/components/AnswerView";
 import { REGIONS } from "../../earthlens-chat/regions";
 
 const questions = [
@@ -18,7 +19,7 @@ interface ChatPanelProps {
 }
 
 export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) {
-  const [provider, setProvider] = useState<"checking" | "available" | "unavailable" | "error">("checking");
+  const [provider] = useState<"checking" | "available" | "unavailable" | "error">("available");
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const { messages, busy, send } = useEarthLensChat({
@@ -27,23 +28,6 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
     rateLimitedText: lang === "my" ? "တောင်းဆိုမှုများလွန်းပါသည်။ ခဏစောင့်ပြီး ထပ်ကြိုးစားပါ။" : "Too many requests. Please wait a moment and try again.",
   });
   const region = REGIONS.find((item) => item.id === selectedRegionId);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch("/api/earthlens-chat/status", { signal: controller.signal, cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`Provider status returned HTTP ${response.status}.`);
-        return response.json();
-      })
-      .then((status: { openrouter?: { configured?: boolean; models?: string[] }; groq?: { configured?: boolean; models?: string[] } }) => {
-        const hasProvider = [status.openrouter, status.groq].some((item) => item?.configured && item.models?.length);
-        setProvider(hasProvider ? "available" : "unavailable");
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setProvider("error");
-      });
-    return () => controller.abort();
-  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -68,7 +52,7 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
         </div>
         <span className={`service-pill ${enabled ? "service-ready" : "service-muted"}`}>
           <span className="status-dot" />
-          {provider === "checking" ? "Checking AI" : provider === "available" ? "AI ready" : provider === "error" ? "Status unavailable" : "AI unavailable"}
+          {provider === "checking" ? "Checking AI" : provider === "available" ? "Evidence ready" : provider === "error" ? "Status unavailable" : "AI unavailable"}
         </span>
       </div>
 
@@ -103,11 +87,11 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
             const response = message.response;
             return (
               <article key={`${index}-${message.role}`} className={`message message-${message.role}${message.error ? " message-error" : ""}`}>
-                <p className="message-content">{message.content}</p>
+                {response && (response.kind === "environmental" || response.kind === "needs_region") ? <div className="structured-answer-host"><StructuredAnswer r={response} lang={lang}/></div> : <p className="message-content">{message.content}</p>}
                 {response && (
                   <div className="message-evidence">
                     <p>
-                      {response.region.name} · {response.period ? `${response.period.start} — ${response.period.end}` : "No observation period"}
+                      {response.region?.name ?? "General question"} · {response.period ? `${response.period.start} — ${response.period.end}` : "No observation period"}
                       {response.generator === "template" ? " · Evidence-based template" : response.model ? ` · ${response.model}` : " · AI-assisted"}
                     </p>
                     {response.sources.map((source) => (

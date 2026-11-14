@@ -18,7 +18,8 @@ export const chatRequestSchema = z
       .array(
         z.object({
           role: z.enum(["user", "assistant"]),
-          content: z.string().max(MAX_HISTORY_CHARS),
+          // Long earlier answers are trimmed instead of rejected (only a short excerpt is used anyway).
+          content: z.string().transform((s) => s.slice(0, MAX_HISTORY_CHARS)),
         }),
       )
       .max(20)

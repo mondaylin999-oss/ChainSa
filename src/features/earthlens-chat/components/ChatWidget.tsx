@@ -6,6 +6,7 @@ import type { Lang } from "../types";
 import { UI_STRINGS } from "../i18n";
 import { getRegion } from "../regions";
 import { useEarthLensChat, type UiMessage } from "../client/useEarthLensChat";
+import { StructuredAnswer } from "./AnswerView";
 
 export interface ChatWidgetProps {
   /** Controlled UI language. If omitted, the widget shows its own EN / မြန်မာ switch. */
@@ -150,13 +151,15 @@ function MessageBubble({ m, lang }: { m: UiMessage; lang: Lang }) {
       : m.error
         ? "rounded-tl-sm bg-ember-500/15 text-ember-400"
         : "rounded-tl-sm bg-white/[0.05] text-slate-200";
+  // Environmental answers with structured data get the table + Action Card view; others (and older messages) plain text.
+  const rich = m.role === "assistant" && !m.error && r ? <StructuredAnswer r={r} lang={r.lang ?? lang} /> : null;
   return (
     <div className={m.role === "user" ? "flex justify-end" : ""}>
-      <div className={`max-w-[92%] whitespace-pre-wrap [overflow-wrap:anywhere] rounded-2xl px-3 py-2 text-sm ${cls}`}>
-        {m.error ? `${t.errorPrefix} ${m.content}` : m.role === "assistant" ? <AnswerText text={m.content} /> : m.content}
+      <div className={`${rich ? "w-full" : "max-w-[92%] whitespace-pre-wrap"} [overflow-wrap:anywhere] rounded-2xl px-3 py-2 text-sm ${cls}`}>
+        {m.error ? `${t.errorPrefix} ${m.content}` : m.role === "assistant" ? (rich ?? <AnswerText text={m.content} />) : m.content}
         {r && (
           <div className="mt-2 text-[10px] text-slate-500">
-            {lang === "my" ? r.region.nameMy : r.region.name}
+            {r.region ? (lang === "my" ? r.region.nameMy : r.region.name) : t.noRegion}
             {r.period ? ` · ${r.period.start} → ${r.period.end}` : ` · ${t.noData}`}
             {" · "}
             {r.generator === "llm" ? `${t.aiWritten}${r.model ? ` (${r.model})` : ""}` : t.template}
@@ -183,12 +186,12 @@ function MessageBubble({ m, lang }: { m: UiMessage; lang: Lang }) {
   );
 }
 
-/** Shows "1. Current Conditions" … "6. Important Disclaimer" lines as section headings. */
+/** Plain-text fallback: shows numbered section lines ("1. Direct Answer" …) as headings. */
 function AnswerText({ text }: { text: string }) {
   return (
     <>
       {text.split("\n").map((line, i) =>
-        /^[1-6]\. \S/.test(line) ? (
+        /^[1-9]\. \S/.test(line) ? (
           <div key={i} className={`font-display font-semibold text-ocean-300 ${i ? "mt-2" : ""}`}>
             {line}
           </div>

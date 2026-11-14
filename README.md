@@ -22,11 +22,11 @@ The Next.js app now opens on a Home view with an accurate local state/region map
 
 ## 0. What's new: 30-day drought / flood / agriculture decision support (Phase 1)
 
-Every answer now has the same six sections in English and Myanmar:
-**1 Current Conditions · 2 30-Day Future Outlook · 3 Potential Impacts · 4 Decision Support · 5 Data Sources · 6 Important Disclaimer.**
+Environmental answers now start with a three-part Executive Summary, followed by six collapsible detailed sections in English and Myanmar:
+**1 Current NASA Data · 2 Historical Comparison · 3 Next 30-Day Outlook · 4 Evidence-Based Action Cards · 5 Data Sources · 6 Disclaimer.**
 
-- **Sections 1, 2, 4, 5 and 6 are built by the server**; the AI writes only section 3, so it cannot present history as a forecast, invent probabilities or add sources.
-- **No forecast yet.** Section 2 says a reliable 30-day forecast cannot be calculated yet. It then shows a **historical pattern**
+- **Evidence tables, comparisons, action cards and disclaimers are built by the server.** Answers work without an AI provider through deterministic templates. If a provider is configured, its optional direct-answer text is verified against the retrieved facts.
+- **No forecast yet.** The outlook section says a reliable 30-day forecast cannot be calculated yet. It then shows a **historical pattern**
   (what happened on the same calendar dates in 1981–last year, from NASA POWER), clearly marked "NOT a forecast".
   The validation plan for adding a real forecast is in `docs/FORECAST_VALIDATION_PLAN.md`.
 - **Current conditions** compare the last 30/90 days of rain, soil wetness and recent heat with the same dates in past years (percentiles).

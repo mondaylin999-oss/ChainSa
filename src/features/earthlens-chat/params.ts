@@ -16,6 +16,7 @@ export const PARAMS: Record<ParamKey, ParamInfo> = {
   wind: { key: "wind", label: "Wind conditions", labelMy: "လေတိုက်နှုန်း", powerCodes: ["WS10M", "WS10M_MAX"] },
   soilWetness: { key: "soilWetness", label: "Root-zone soil wetness", labelMy: "မြေဆီလွှာ စိုစွတ်မှု", powerCodes: ["GWETROOT"] },
   fires: { key: "fires", label: "Satellite-detected fires", labelMy: "ဂြိုဟ်တုမှ တွေ့ရှိသော မီးလောင်မှု", powerCodes: [] },
+  vegetation: { key: "vegetation", label: "Vegetation greenness (MODIS NDVI)", labelMy: "အပင် စိမ်းလန်းမှု (MODIS NDVI)", powerCodes: [] },
 };
 
 const FARM = /farm|crop|rice|paddy|လယ်|စပါး/;
@@ -32,6 +33,7 @@ export function detectParams(text: string): ParamKey[] {
   if (/wind|gust|storm|လေတိုက်|လေပြင်း|လေနှုန်း|မုန်တိုင်း/.test(t)) s.add("wind");
   if (/soil|drought|dry|မြေ/.test(t)) s.add("soilWetness");
   if (/fire|burn|smoke|hotspot|မီး/.test(t)) s.add("fires");
+  if (/vegetation|ndvi|green|crop|plant|forest|harvest|paddy|rice|farm|agri|seed|drought|လယ်|စိုက်|အပင်|သစ်ပင်|စိမ်း|သီးနှံ|စပါး|သစ်တော|မိုးခေါင်/.test(t)) s.add("vegetation");
   if (!s.size) {
     if (COAST.test(t)) { s.add("rainfall"); s.add("wind"); }
     else { s.add("rainfall"); s.add("temperature"); s.add("humidity"); }
@@ -88,4 +90,13 @@ export function detectTopics(text: string): Topic[] {
   if (/flood|inundat|heavy rain|waterlog|ရေကြီး|ရေလျှံ|ရေဝပ်|မိုးသည်း/.test(t)) out.push("flood");
   if (/farm|crop|rice|paddy|plant|harvest|seed|agri|လယ်|စပါး|သီးနှံ|စိုက်|ရိတ်/.test(t)) out.push("agriculture");
   return out.length ? out : ["agriculture", "drought", "flood"];
+}
+
+// Earth/environment vocabulary (English + Myanmar). Used to decide between the eight-section
+// NASA answer and a short general answer that must not invent environmental analysis.
+const ENV_WORDS =
+  /vegetation|ndvi|greenness|weather|climate|rain|precip|monsoon|temperat|heat|hot|cold|humid|wind|storm|cyclone|drought|dry|flood|water|river|irrigat|soil|crop|farm|rice|paddy|plant|harvest|seed|agri|fish|fire|smoke|burn|forest|environment|pollut|air quality|nasa|satellite|season|forecast|outlook|risk|မိုး|ရာသီ|အပူ|အအေး|စိုထိုင်း|လေတိုက်|မုန်တိုင်း|ခြောက်သွေ့|ရေကြီး|ရေလျှံ|ရေ|မြစ်|ဆည်|မြေ|သီးနှံ|လယ်|စပါး|စိုက်|ရိတ်|ငါး|မီး|သစ်တော|ပတ်ဝန်းကျင်/;
+
+export function isEnvironmentalQuestion(text: string, regionMentioned: boolean): boolean {
+  return regionMentioned || ENV_WORDS.test(text.toLowerCase());
 }
