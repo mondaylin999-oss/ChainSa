@@ -139,7 +139,7 @@ function Og() {
                 h("span", null, region ? label(param) : text("Select a state or region", "ပြည်နယ် သို့မဟုတ် တိုင်းဒေသကြီး ရွေးရန်"))),
               h("div", {className:"terra-map-canvas", id:"map"},
                 h(O9e, {regions:Tr, boundaries, selectedId:regionId, onSelect:selectRegion, fires:result?.fires, loading:busy,
-                  townships, townshipBoundaries:townships.length ? townshipBoundaries : null, selectedTownshipId:townshipId, onSelectTownship:selectTownship})),
+                  townships, townshipBoundaries:regionId && townshipBoundaries ? {...townshipBoundaries, features:townshipBoundaries.features.filter(feature=>townships.some(item=>item.id===feature.properties.TS_PCODE && item.regionId===regionId))} : null, selectedTownshipId:townshipId, onSelectTownship:selectTownship})),
               boundaryError && h("p", {role:"alert", className:"terra-error"}, text("Map boundaries could not load. Use the location selector to continue.", "မြေပုံနယ်နိမိတ်များ မရရှိပါ။ နေရာရွေးချယ်မှုကို အသုံးပြုပါ။"))),
             null),
           h("aside", {className:"terra-inspector", "aria-label":text("Location and insights", "နေရာနှင့် သုံးသပ်ချက်များ")},

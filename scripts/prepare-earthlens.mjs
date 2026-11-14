@@ -13,7 +13,7 @@ source = replaceOnce(source,
   "township map layer arguments");
 source = replaceOnce(source,
   "},`${t.source}-${u}-${c}`),e.map(g=>",
-  "},`${t.source}-${u}-${c}`),V&&Y?.length&&(0,Je.jsx)(Lg,{data:V,style:townshipStyle,onEachFeature:(feature,layer)=>{let township=Y.find(item=>item.id===feature.properties.TS_PCODE);if(!township)return;layer.bindTooltip(u===\"my\"?township.nameMy:township.name,{sticky:!0,className:\"region-tip\",direction:\"top\"}),layer.on({mouseover:x=>x.target.setStyle({...townshipStyle(feature),color:\"#8ae6b0\",weight:1.5,fillOpacity:.14}),mouseout:x=>x.target.setStyle(townshipStyle(feature)),click:()=>X?.(township.id)})},attribution:\"Township boundaries: MIMU PCode v9.4\"},`townships-${u}-${Y.length}`),e.map(g=>",
+  "},`${t.source}-${u}-${c}`),V&&Y?.length&&(0,Je.jsx)(Lg,{data:V,style:townshipStyle,onEachFeature:(feature,layer)=>{let township=Y.find(item=>item.id===feature.properties.TS_PCODE);if(!township)return;layer.bindTooltip(u===\"my\"?township.nameMy:township.name,{sticky:!0,className:\"region-tip\",direction:\"top\"}),layer.on({mouseover:x=>x.target.setStyle({...townshipStyle(feature),color:\"#8ae6b0\",weight:1.5,fillOpacity:.14}),mouseout:x=>x.target.setStyle(townshipStyle(feature)),click:()=>X?.(township.id)})},attribution:\"Township boundaries: MIMU PCode v9.4\"},`townships-${u}-${a}-${Y.length}`),e.map(g=>",
   "township GeoJSON layer");
 source = replaceOnce(source,
   "(0,Je.jsx)(C9e,{regions:e,boundaries:t,selectedId:a})",
@@ -21,7 +21,7 @@ source = replaceOnce(source,
   "township map camera props");
 source = replaceOnce(source,
   's("legendSelected")]}),(0,Je.jsxs)("div",{className:"flex items-center gap-2",children:',
-  's("legendSelected")]}),(0,Je.jsxs)("div",{className:"flex items-center gap-2",children:[(0,Je.jsx)("span",{className:"h-px w-4 bg-slate-300"}),"Township boundary"]}),(0,Je.jsxs)("div",{className:"flex items-center gap-2",children:',
+  's("legendSelected")]}),(0,Je.jsxs)("div",{className:"flex items-center gap-2",children:V?[(0,Je.jsx)("span",{className:"h-px w-4 bg-slate-300"}),"Township boundary"]:null}),(0,Je.jsxs)("div",{className:"flex items-center gap-2",children:',
   "township legend row");
 source = replaceOnce(source,
   "function C9e({regions:e,boundaries:t,selectedId:a}){let r=Sg(),n=(0,Ii.useRef)(()=>{});return n.current=()=>{let i=e.find(u=>u.id===a);",
@@ -31,6 +31,10 @@ source = replaceOnce(source,
   "},[a,t,e,r]),(0,Ii.useEffect)(()=>{let i=r.getContainer()",
   "},[a,t,e,r,c,f]),(0,Ii.useEffect)(()=>{let i=r.getContainer()",
   "township map camera dependencies");
+source = replaceOnce(source,
+  "e.map(g=>(0,Je.jsx)(rm,{center:[g.lat,g.lon]",
+  "V?.features.map(feature=>{let township=Y.find(item=>item.id===feature.properties.TS_PCODE);if(!township)return null;let center=pj.default.geoJSON(feature).getBounds().getCenter();return(0,Je.jsx)(rm,{center,radius:township.id===W?7:4,pathOptions:{color:township.id===W?\"#ffffff\":\"#7cc7ff\",weight:1,fillColor:township.id===W?\"#4fd18b\":\"#2b8fe8\",fillOpacity:.95},eventHandlers:{click:()=>X?.(township.id)},children:(0,Je.jsx)(nm,{className:\"region-tip\",children:u===\"my\"?township.nameMy:township.name})},township.id)}),!a&&e.map(g=>(0,Je.jsx)(rm,{center:[g.lat,g.lon]",
+  "region and township marker drilldown");
 const adapter = await readFile(new URL("./earthlens-adapter.js", import.meta.url), "utf8");
 const dashboard = await readFile(new URL("./earthlens-dashboard.js", import.meta.url), "utf8");
 const dashboardCss = await readFile(new URL("./earthlens-dashboard.css", import.meta.url), "utf8");
