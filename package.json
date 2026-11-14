@@ -4,6 +4,8 @@
   "private": true,
   "description": "Bilingual (Myanmar/English) NASA-grounded AI chatbot module for Myanmar EarthLens",
   "scripts": {
+    "predev": "node scripts/prepare-earthlens.mjs",
+    "prebuild": "node scripts/prepare-earthlens.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
