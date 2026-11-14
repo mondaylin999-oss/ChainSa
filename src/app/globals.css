@@ -457,6 +457,7 @@ a { color: inherit; }
  .is-exploring .explore-grid{flex:1;min-height:0;align-items:stretch;overflow:hidden}
  .is-exploring .topic-rail,.is-exploring .data-column{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
  .is-exploring .topic-rail{position:static}
+ .is-exploring .data-column{display:flex;flex-direction:column}
  .is-exploring .data-column>*{flex-shrink:0}
  .is-exploring .map-column{min-height:0}
  .is-exploring .map-stage{height:100%;display:flex;flex-direction:column;min-height:0}
