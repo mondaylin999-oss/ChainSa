@@ -9,8 +9,10 @@ afterEach(() => vi.unstubAllEnvs());
 describe("satellite data coverage", () => {
   it("assigns an actual dataset to every visible indicator", () => {
     for (const topic of TOPICS) for (const indicator of topic.indicators) {
-      expect(DATASETS.some(dataset => dataset.id === indicator.datasetId && dataset.topicId === topic.id)).toBe(true);
+      const matches = DATASETS.filter(dataset => dataset.id === indicator.datasetId && dataset.topicId === topic.id);
+      expect(matches, `${topic.id}: ${indicator.label} (${indicator.datasetId})`).toHaveLength(1);
     }
+    expect(new Set(DATASETS.map(dataset => dataset.id)).size).toBe(DATASETS.length);
   });
   it("gives each satellite dataset an applicable historical default period", () => {
     for (const product of Object.values(SATELLITE_PRODUCTS)) {

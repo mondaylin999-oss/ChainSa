@@ -57,7 +57,7 @@ function DataChart({ state, result, error, onRetry }: { state: ChartState; resul
     return <div className="chart-state" role="status"><LoaderCircle className="spin" size={24} /> Retrieving observations from the configured data service…</div>;
   }
   if (state === "initial") {
-    return <div className="chart-state"><ChartNoAxesCombined size={25} /> Select a connected dataset and date range to view observations.</div>;
+    return <div className="chart-state"><ChartNoAxesCombined size={25} /> Select an area on the map, then a connected dataset and date range, to view observations.</div>;
   }
   if (state === "unavailable") {
     return <div className="chart-state chart-unavailable"><Radio size={24} /> {error || "No observation data is available for this selection. The home preview contains illustrative figures, not measured data."}</div>;
@@ -84,8 +84,8 @@ export default function Page() {
   const [chatOpen,setChatOpen] = useState(false);
   const [view, setView] = useState<View>("home");
   const [lang, setLang] = useState<Lang>("en");
-  const [regionId, setRegionId] = useState("ayeyarwady");
-  const [regionSearch, setRegionSearch] = useState("Ayeyarwady — Region");
+  const [regionId, setRegionId] = useState("");
+  const [regionSearch, setRegionSearch] = useState("");
   const [catalog, setCatalog] = useState<ExploreCatalog | null>(null);
   const [catalogError, setCatalogError] = useState("");
   const [activeTopic, setActiveTopic] = useState<TopicId>("agriculture");
@@ -170,7 +170,8 @@ export default function Page() {
       }
       if (!catalog || !datasetId || !regionId || !selectedDataset) {
         setResult(null);
-        setChartState(datasetId ? "unavailable" : "initial");
+        setChartState(!datasetId || !regionId ? "initial" : "unavailable");
+        if (!regionId) setChartError("");
         return;
       }
       if (!selectedDataset.available) {
@@ -243,11 +244,22 @@ export default function Page() {
     }
   }
 
-  function chooseRegion(regionId: string) {
-    const region = REGIONS.find((item) => item.id === regionId);
+  function chooseRegion(nextRegionId: string) {
+    const region = REGIONS.find((item) => item.id === nextRegionId);
     setTownshipId("");
-    setMapFocused(Boolean(region));
-    if (!region) {setRegionId("");setRegionSearch("");return;}
+    if (!region) {
+      setRegionId("");
+      setRegionSearch("");
+      setMapFocused(false);
+      return;
+    }
+    if (region.id === regionId) {
+      setRegionId("");
+      setRegionSearch("");
+      setMapFocused(false);
+      return;
+    }
+    setMapFocused(true);
     setRegionId(region.id);
     setRegionSearch(`${region.name} — ${region.type}`);
   }
@@ -355,8 +367,7 @@ export default function Page() {
             </aside>
 
             <section className="map-column" aria-label="Map">
-              <section className="map-stage panel" aria-labelledby="map-stage-title">
-                <div className="panel-title-row"><div><p className="eyebrow">Myanmar</p><h2 id="map-stage-title">Select an area on the map</h2></div><MapPin size={17} /></div>
+              <section className="map-stage panel" aria-label="Select an area on the map">
                 <div className="map-stage-figure">
                   <MyanmarMap selectedRegionId={regionId} onSelectRegion={chooseRegion} language={lang} focusRegion={mapFocused} townships={catalog?.townships} selectedTownshipId={townshipId} onSelectTownship={id=>{setTownshipId(id);setMapFocused(true);}} />
                 </div>
@@ -394,7 +405,7 @@ export default function Page() {
                         const match = REGIONS.find((region) => `${region.name} — ${region.type}` === regionSearch || `${region.nameMy} — ${region.type}` === regionSearch);
                         if (!match) {
                           const fallback = REGIONS.find((region) => region.id === regionId);
-                          if (fallback) setRegionSearch(`${fallback.name} — ${fallback.type}`);
+                          setRegionSearch(fallback ? `${fallback.name} — ${fallback.type}` : "");
                         }
                       }}
                       placeholder="Search a state or region"
