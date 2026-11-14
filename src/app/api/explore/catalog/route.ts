@@ -1,6 +1,8 @@
-import { getConfig } from "@/features/earthlens-chat/server/env";
 import { REGIONS } from "@/features/earthlens-chat/regions";
 import { DATASETS, TOPICS } from "@/features/explorer/catalog";
+import { earthEngineConfigured } from "@/features/explorer/server/earth-engine";
+import { EARTH_ENGINE_SETUP_MESSAGE } from "@/features/explorer/satellite-products";
+import { PUBLIC_MODIS_DATASETS } from "@/features/explorer/server/modis-products";
 
 import townshipDirectory from "../../../../../public/townships.json";
 
@@ -8,10 +10,11 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const config = getConfig();
   const datasets = DATASETS.map((dataset) => ({
     ...dataset,
-    available: dataset.id === "fire-detections" ? Boolean(config.firmsMapKey) : dataset.available,
+    available: dataset.engine === "earth-engine" ? earthEngineConfigured() || PUBLIC_MODIS_DATASETS.has(dataset.id) : dataset.available,
+    setupRequired: dataset.engine === "earth-engine" && !earthEngineConfigured() && !PUBLIC_MODIS_DATASETS.has(dataset.id),
+    reason: dataset.engine === "earth-engine" && !earthEngineConfigured() && !PUBLIC_MODIS_DATASETS.has(dataset.id) ? EARTH_ENGINE_SETUP_MESSAGE : dataset.reason,
   }));
   return Response.json({
     topics: TOPICS,

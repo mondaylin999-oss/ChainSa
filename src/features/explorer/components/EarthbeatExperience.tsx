@@ -30,8 +30,8 @@ export function EarthbeatExperience({ result }: { result: ObservationResponse })
   useEffect(() => {engine.current?.setVolume(volume);engine.current?.setSpeed(speed);},[volume,speed,points]);
   const series: DataSeries = useMemo(() => ({
     indicator:result.dataset.parameter === "T2M" ? "temperature" : result.dataset.parameter === "PRECTOTCORR" ? "precipitation" : "environmental",
-    dataset:result.dataset.label,datasetId:result.dataset.id === "fire-detections" ? "NASA_FIRMS" : result.dataset.temporalResolution ? "NASA_MODIS" : "NASA_POWER",provider:result.source.name,
-    spatialResolution:result.geographicCoverage,temporalResolution:result.dataset.temporalResolution ?? "Daily",spatialSelection:result.dataset.id === "fire-detections" ? undefined : "representative-point",
+    dataset:result.dataset.label,datasetId:result.dataset.engine === "earth-engine" ? result.source.name.split(" via ")[0] : result.dataset.id === "fire-detections" ? "NASA_FIRMS" : result.dataset.temporalResolution ? "NASA_MODIS" : "NASA_POWER",provider:result.source.name,
+    spatialResolution:result.geographicCoverage,temporalResolution:result.dataset.temporalResolution ?? "Daily",spatialSelection:result.spatialSelection ?? (result.dataset.id === "fire-detections" ? undefined : "representative-point"),qaPolicy:result.qaPolicy,
     observations:valid.map(point=>({date:point.date,value:point.value!,unit:result.dataset.unit,source:result.source.name})),
     requestedStartDate:result.period.start,requestedEndDate:result.period.end,validObservationCount:valid.length,missingObservationCount:result.missingCount,expectedObservationCount:points.length,coverageFraction:points.length?valid.length/points.length:0,actualStartDate:valid[0]?.date,actualEndDate:valid.at(-1)?.date,
     limitations:[result.dataset.limitations,result.geographicCoverage],processing:["Missing observations are excluded from statistics and remain silent during playback.","Dates retain their elapsed-time spacing. Descriptive calculations are not forecasts."]

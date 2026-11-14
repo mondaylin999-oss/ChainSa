@@ -138,7 +138,14 @@ export default function Page() {
   useEffect(() => {
     if (!catalog || datasets.some(item => item.id === datasetId) || datasetId.startsWith("unconnected:")) return;
     const firstAvailable = datasets.find(dataset => dataset.available && dataset.parameter) ?? datasets.find(dataset => dataset.available);
-    if (firstAvailable) setDatasetId(firstAvailable.id);
+    if (firstAvailable) {
+      setDatasetId(firstAvailable.id);
+      if (firstAvailable.defaultPeriod) {
+        const period = firstAvailable.defaultPeriod;
+        setStart(period.start); setEnd(period.end);
+        setDraftStart(period.start); setDraftEnd(period.end);
+      }
+    }
   }, [activeTopic, catalog, datasetId, datasets]);
 
   useEffect(() => {
@@ -211,7 +218,7 @@ export default function Page() {
     setDetailIndicator(null);
     const choices = catalog?.datasets.filter(dataset => dataset.topicId === topicId) ?? [];
     const first = choices.find(dataset => dataset.available && dataset.parameter) ?? choices.find(dataset => dataset.available);
-    setDatasetId(first?.id ?? "");
+    chooseDataset(first?.id ?? "");
     setResult(null);
   }
 
@@ -223,10 +230,15 @@ export default function Page() {
 
   function chooseDataset(nextId: string) {
     setDatasetId(nextId);
+    const period = catalog?.datasets.find(dataset => dataset.id === nextId)?.defaultPeriod;
+    if (period) {
+      setStart(period.start); setEnd(period.end);
+      setDraftStart(period.start); setDraftEnd(period.end);
+    }
     if (nextId === "fire-detections") {
-      setStart(questionDate(9));
+      setStart(questionDate(6));
       setEnd(questionDate(0));
-      setDraftStart(questionDate(9));
+      setDraftStart(questionDate(6));
       setDraftEnd(questionDate(0));
     }
   }
@@ -318,7 +330,7 @@ export default function Page() {
                             <div key={indicator.label} className={chosen ? "rail-indicator rail-indicator-active" : "rail-indicator"}>
                               <button type="button" className="rail-indicator-title" aria-pressed={chosen} onClick={() => chooseIndicator(indicator)}>
                                 {indicator.label}
-                                {dataset && !dataset.available && <span className="rail-indicator-tag">no data yet</span>}
+                                {dataset && !dataset.available && <span className="rail-indicator-tag">{dataset.setupRequired ? "finish setup" : "access needed"}</span>}
                                 {!indicator.datasetId && <span className="rail-indicator-tag">no data yet</span>}
                               </button>
                               <button
@@ -399,12 +411,13 @@ export default function Page() {
                     <select id="dataset-select" value={datasetId} onChange={(event) => chooseDataset(event.target.value)} disabled={!datasets.length}>
                       <option value="">Choose a dataset</option>
                       {datasets.map((dataset) => (
-                        <option key={dataset.id} value={dataset.id} disabled={!dataset.available}>
-                          {dataset.label} ({dataset.unit}){dataset.available ? "" : " — unavailable"}
+                        <option key={dataset.id} value={dataset.id}>
+                          {dataset.label} ({dataset.unit}){dataset.available ? "" : dataset.setupRequired ? " — finish setup" : " — access needed"}
                         </option>
                       ))}
                     </select>
                     {selectedDataset && !selectedDataset.available && <p className="field-hint">{selectedDataset.reason}</p>}
+                    {selectedDataset?.coverage && <p className="field-hint">Published archive: {selectedDataset.coverage.start} to {selectedDataset.coverage.end}. {selectedDataset.temporalResolution}. Selecting this dataset opens a suitable historical range.</p>}
                     {!datasets.length && <p className="field-hint">No datasets are listed for this topic.</p>}
                   </div>
                   <div className="field-control">

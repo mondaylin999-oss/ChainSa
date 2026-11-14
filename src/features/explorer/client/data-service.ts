@@ -14,6 +14,7 @@ export interface ExploreCatalog {
 export interface Observation {
   date: string;
   value: number | null;
+  validAreaKm2?: number | null;
 }
 
 export interface ObservationResponse {
@@ -27,6 +28,8 @@ export interface ObservationResponse {
   geographicCoverage: string;
   observedAt: string;
   missingCount: number;
+  spatialSelection?: "polygon-mean" | "representative-point";
+  qaPolicy?: string;
 }
 
 export async function fetchExploreCatalog(signal?: AbortSignal): Promise<ExploreCatalog> {

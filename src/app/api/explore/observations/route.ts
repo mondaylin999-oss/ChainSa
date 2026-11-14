@@ -1,10 +1,13 @@
 import { getConfig } from "@/features/earthlens-chat/server/env";
-import { fetchFires } from "@/features/earthlens-chat/server/nasa/firms";
+import { fetchPublicFires } from "@/features/explorer/server/public-fires";
 import { getRegion } from "@/features/earthlens-chat/regions";
 import { addDays, fetchPowerDaily } from "@/features/earthlens-chat/server/nasa/power";
 import { getTownshipPoint } from "@/features/explorer/township-location";
 import { DATASETS } from "@/features/explorer/catalog";
 import { fetchNdviRange } from "@/features/earthlens-chat/server/nasa/modis-ndvi";
+import { earthEngineConfigured, fetchSatelliteObservations } from "@/features/explorer/server/earth-engine";
+import { EARTH_ENGINE_SETUP_MESSAGE } from "@/features/explorer/satellite-products";
+import { PUBLIC_MODIS_DATASETS, fetchPublicModis } from "@/features/explorer/server/modis-products";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -58,17 +61,37 @@ export async function POST(request: Request) {
   if (end > today) return error("Future observation dates are not available.", 400);
 
   const config = getConfig();
-  if (dataset.id === "fire-detections") {
-    if (township) return error("Township fire detections are not connected. Select all townships to view regional fire data.", 503);
-    if (!config.firmsMapKey) return error("NASA FIRMS is unavailable. Configure FIRMS_MAP_KEY on the server.", 503);
-    if (days > 10 || end !== today) return error("NASA FIRMS supports only the most recent 10 days ending today. Select an available recent date range.", 400);
+  if (dataset.engine === "earth-engine") {
+    if (!earthEngineConfigured() && !PUBLIC_MODIS_DATASETS.has(dataset.id)) return error(EARTH_ENGINE_SETUP_MESSAGE, 503);
+    if (dataset.coverage && (end < dataset.coverage.start || start > dataset.coverage.end)) {
+      return error(`Choose dates between ${dataset.coverage.start} and ${dataset.coverage.end} for this published satellite archive.`, 400);
+    }
     try {
-      const { detections } = await fetchFires(region, days, config.firmsMapKey, config.nasaTimeoutMs);
+      const polygon = earthEngineConfigured();
+      const result = polygon ? await fetchSatelliteObservations(dataset.id, region, townshipId as string | undefined, start, end) : {
+        observations: await fetchPublicModis(dataset.id, location.lat, location.lon, start, end),
+        geographicCoverage: "Mean of valid product pixels in a small MODIS grid subset extending about 1 km around the selected reference point. This is not a township or state/region average. Google Earth Engine access is required for boundary-wide analysis.",
+        spatialSelection: "representative-point", qaPolicy: dataset.limitations,
+      };
+      const actualDataset = polygon ? dataset : { ...dataset, engine: undefined, source: { name: `${dataset.source.name.split(" via ")[0]} via NASA ORNL DAAC point subsets`, url: "https://modis.ornl.gov/data/modis_webservice.html" } };
+      return Response.json({ ...result, summary: summarize(result.observations.map(d => d.value)), dataset: actualDataset,
+        region: { id: region.id, name: region.name, nameMy: region.nameMy, lat: region.lat, lon: region.lon }, location,
+        period: { start, end }, source: actualDataset.source, observedAt: new Date().toISOString(),
+        missingCount: result.observations.filter(d => d.value === null).length,
+      }, { headers: { "cache-control": "no-store" } });
+    } catch (cause) {
+      return error(cause instanceof Error ? cause.message : "Satellite observations could not be retrieved. Please try again.", 502);
+    }
+  }
+  if (dataset.id === "fire-detections") {
+    if (days > 7 || start < addDays(today, -6)) return error("The public fire feed covers the most recent seven days. Choose dates within that period.", 400);
+    try {
+      const { detections, coverage, latestFeedDate } = await fetchPublicFires(region, townshipId as string | undefined);
       const byDate = new Map<string, number>();
-      for (const detection of detections) byDate.set(detection.date, (byDate.get(detection.date) ?? 0) + 1);
+      for (const detection of detections) if (detection.date >= start && detection.date <= end) byDate.set(detection.date, (byDate.get(detection.date) ?? 0) + 1);
       const observations = Array.from({ length: days }, (_, offset) => {
         const date = addDays(start, offset);
-        return { date, value: byDate.get(date) ?? 0 };
+        return { date, value: date > latestFeedDate ? null : byDate.get(date) ?? 0 };
       });
       return Response.json({
         observations,
@@ -78,9 +101,9 @@ export async function POST(request: Request) {
         location,
         period: { start, end },
         source: dataset.source,
-        geographicCoverage: "Detections inside the state/region boundary; representative-point fallback where no boundary is bundled.",
+        geographicCoverage: `${coverage} Public trailing-seven-day feed, latest detection date ${latestFeedDate}. Current-day totals are incomplete. Zero means no detections in this feed, not proof of no fires.`,
         observedAt: new Date().toISOString(),
-        missingCount: 0,
+        missingCount: observations.filter(d => d.value === null).length,
       }, { headers: { "cache-control": "no-store" } });
     } catch (cause) {
       console.error("[explore] NASA FIRMS request failed:", cause);
