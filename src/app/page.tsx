@@ -27,6 +27,8 @@ import { MyanmarMap } from "@/features/explorer/components/MyanmarMap";
 import { fetchExploreCatalog, fetchObservations, type ExploreCatalog, type ObservationResponse } from "@/features/explorer/client/data-service";
 import { TOPICS, type TopicId, type TopicIndicator } from "@/features/explorer/catalog";
 
+import { ReferenceHome } from "./reference-home";
+
 type View = "home" | "explore";
 type Lang = "en" | "my";
 type ChartState = "initial" | "loading" | "ready" | "empty" | "unavailable" | "error";
@@ -271,41 +273,7 @@ export default function Page() {
 
       {view === "home" ? (
         <div className="page-shell">
-          <section className="home-hero" aria-labelledby="hero-title">
-            <div className="hero-copy">
-              <span className="hero-kicker"><span className="kicker-dot" /> Earth observation for Myanmar</span>
-              <h1 id="hero-title">Myanmar<br /><span>EarthLens</span></h1>
-              <p className="hero-slogan">Understand Myanmar.<br />Discover Change.</p>
-              <p className="hero-description">
-                Explore agriculture, disasters, environmental change, infrastructure, water, and energy across Myanmar. Discover township-level insights through Earth observation data, interactive charts, and AI-assisted explanations.
-              </p>
-              <div className="hero-actions">
-                <button className="button-primary" onClick={() => setView("explore")}>Explore Map <ArrowRight size={17} /></button>
-                <button className="button-secondary" onClick={askAI}><MessageCircle size={16} /> Ask AI <ArrowDownRight size={15} /></button>
-              </div>
-              <div className="hero-note"><MapPin size={15} /> 14 state and region boundaries bundled locally</div>
-            </div>
-
-            <section className="home-map-card panel" aria-labelledby="home-map-title">
-              <div className="map-card-heading">
-                <div><p className="eyebrow">Explore the landscape</p><h2 id="home-map-title">Myanmar — States and Regions</h2></div>
-                <span className="map-heading-icon"><MapPin size={17} /></span>
-              </div>
-              <MyanmarMap selectedRegionId={regionId} onSelectRegion={chooseRegion} language={lang} />
-              <div className="map-card-footer">
-                <span><i className="map-key map-key-pastel" /> States &amp; regions</span>
-                <span><i className="map-key map-key-city" /> Major cities</span>
-                <small>Boundaries: Natural Earth 1:10m Admin-1, public domain · <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Attribution <ExternalLink size={11} /></a></small>
-              </div>
-            </section>
-          </section>
-
-          <section className="home-data-note" aria-label="Geographic coverage notice">
-            <div className="note-icon"><MapPin size={18} /></div>
-            <p><strong>Township boundaries are available in Explore Map.</strong> Select a region to reveal its townships. NASA chart data uses a representative point for the selected region or township, not an area average.</p>
-            <button className="text-button" onClick={() => setView("explore")}>View data coverage <ArrowRight size={14} /></button>
-          </section>
-
+          <ReferenceHome onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={askAI} onRegion={(id) => { chooseRegion(id); setView("explore"); }} />
           <ChatPanel lang={lang} selectedRegionId={regionId} inputRef={chatInputRef} />
           <footer className="site-footer">
             <span>Myanmar EarthLens · Evidence first, limitations included</span>
