@@ -17,6 +17,7 @@ function Og() {
   const [param, setParam] = ft.useState("rainfall");
   const mode = "live";
   const [boundaries, setBoundaries] = ft.useState(null);
+  const [townshipBoundaries, setTownshipBoundaries] = ft.useState(null);
   const [boundaryError, setBoundaryError] = ft.useState(false);
   const [result, setResult] = ft.useState(null);
   const [busy, setBusy] = ft.useState(false);
@@ -37,6 +38,7 @@ function Og() {
   const t = key => yw[lang][key] || key;
   const text = (en, my) => lang === "my" ? my : en;
   const region = Tr.find(item => item.id === regionId);
+  const township = townships.find(item => item.id === townshipId);
   const name = item => lang === "my" ? item.nameMy : item.name;
   const context = ft.useMemo(() => ({lang, t, setLang}), [lang]);
   const options = dh[topic];
@@ -49,10 +51,15 @@ function Og() {
   }, []);
   ft.useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/regions", {signal: controller.signal}).then(response => {
-      if (!response.ok) throw new Error("Boundaries unavailable");
-      return response.json();
-    }).then(data => setBoundaries(data.boundaries)).catch(err => {
+    Promise.all([
+      fetch("/api/regions", {signal: controller.signal}),
+      fetch("/township-boundaries.geojson", {signal: controller.signal})
+    ]).then(async ([regionResponse, townshipResponse]) => {
+      if (!regionResponse.ok || !townshipResponse.ok) throw new Error("Boundaries unavailable");
+      const [regionData, townshipData] = await Promise.all([regionResponse.json(), townshipResponse.json()]);
+      setBoundaries(regionData.boundaries);
+      setTownshipBoundaries(townshipData);
+    }).catch(err => {
       if (err.name !== "AbortError") setBoundaryError(true);
     });
     return () => controller.abort();
@@ -82,6 +89,13 @@ function Og() {
     if (!dh[key].includes(param)) setParam(dh[key].find(id => Ha[id].status !== "coming-soon"));
   }
   function selectRegion(id) { setRegionId(id); setTownshipId(""); setTownshipSearch(""); }
+  function selectTownship(id) {
+    const selected = townships.find(item => item.id === id);
+    if (!selected) return;
+    setRegionId(selected.regionId);
+    setTownshipId(id);
+    setTownshipSearch("");
+  }
   function panelTitle(title, small) {
     return h("div", {className:"terra-panel-title"}, h("h2", null, title), small && h("span", null, small));
   }
@@ -121,10 +135,11 @@ function Og() {
         h("div", {className:"terra-content"},
           h("div", {className:"terra-center"},
             (!narrow || mobileView === "map") && h("section", {className:"terra-map-panel", "aria-label":t("navMap"), key:narrow ? "mobile-map" : "desktop-map"},
-              h("div", {className:"terra-map-heading"}, h("div", null, icon(ol, 17), h("strong", null, region ? name(region) : text("Explore Myanmar", "မြန်မာနိုင်ငံကို လေ့လာရန်"))),
+              h("div", {className:"terra-map-heading"}, h("div", null, icon(ol, 17), h("strong", null, township ? `${name(township)} · ${name(region)}` : region ? name(region) : text("Explore Myanmar", "မြန်မာနိုင်ငံကို လေ့လာရန်"))),
                 h("span", null, region ? label(param) : text("Select a state or region", "ပြည်နယ် သို့မဟုတ် တိုင်းဒေသကြီး ရွေးရန်"))),
               h("div", {className:"terra-map-canvas", id:"map"},
-                h(O9e, {regions:Tr, boundaries, selectedId:regionId, onSelect:selectRegion, fires:result?.fires, loading:busy})),
+                h(O9e, {regions:Tr, boundaries, selectedId:regionId, onSelect:selectRegion, fires:result?.fires, loading:busy,
+                  townships, townshipBoundaries:regionId && townshipBoundaries ? {...townshipBoundaries, features:townshipBoundaries.features.filter(feature=>townships.some(item=>item.id===feature.properties.TS_PCODE && item.regionId===regionId))} : null, selectedTownshipId:townshipId, onSelectTownship:selectTownship})),
               boundaryError && h("p", {role:"alert", className:"terra-error"}, text("Map boundaries could not load. Use the location selector to continue.", "မြေပုံနယ်နိမိတ်များ မရရှိပါ။ နေရာရွေးချယ်မှုကို အသုံးပြုပါ။"))),
             null),
           h("aside", {className:"terra-inspector", "aria-label":text("Location and insights", "နေရာနှင့် သုံးသပ်ချက်များ")},
@@ -142,7 +157,7 @@ function Og() {
                 h("select", {value:townshipId, "aria-label":text("Township", "မြို့နယ်"), onChange:event=>setTownshipId(event.target.value)},
                   h("option", {value:""}, text("Choose a township", "မြို့နယ် ရွေးပါ")),
                   townships.filter(item=>item.regionId===regionId && (item.id===townshipId || `${item.name} ${item.nameMy} ${item.id}`.toLowerCase().includes(townshipSearch.toLowerCase()))).map(item=>h("option", {key:item.id,value:item.id}, `${name(item)} · ${item.id}`))),
-                h("small", null, townshipError ? text("Township list could not load. Reload to try again.", "မြို့နယ်စာရင်း မရရှိပါ။ ပြန်ဖွင့်ပါ။") : text("MIMU 9.7 · January 2026. Measurements below use the state/region reference point. Township boundaries are pending.", "MIMU 9.7 · ဇန်နဝါရီ ၂၀၂၆။ အောက်ပါဒေတာသည် တိုင်း/ပြည်နယ် ကိုယ်စားပြုနေရာအတွက် ဖြစ်သည်။ မြို့နယ်နယ်နိမိတ်များ ထည့်သွင်းရန် ကျန်ရှိသည်။")))),
+                h("small", null, townshipError ? text("Township names could not load. Reload to try again.", "မြို့နယ်အမည်များ မရရှိပါ။ ပြန်ဖွင့်ပါ။") : text("MIMU PCode 9.4 boundaries. Measurements still use the selected state/region reference point.", "MIMU PCode 9.4 နယ်နိမိတ်များ။ ဒေတာသည် ရွေးထားသော တိုင်း/ပြည်နယ် ကိုယ်စားပြုနေရာအတွက် ဖြစ်သည်။")))),
               h("label", {className:"terra-field"}, h("span", null, t("chooseData")),
                 h("select", {value:param, onChange:event=>setParam(event.target.value)}, options.map(key=>h("option", {key, value:key, disabled:Ha[key].status === "coming-soon"},
                   label(key) + (Ha[key].status === "coming-soon" ? ` · ${t("comingSoon")}` : ""))))),
@@ -153,13 +168,13 @@ function Og() {
                 h("span", null, t(key === "start" ? "from" : "to")), h("input", {type:"date", min:"1981-01-01", max:new Date().toISOString().slice(0,10), value:range[key], onChange:event=>setRange(previous=>({...previous, [key]:event.target.value}))})))),
               h("button", {className:"terra-analyze", onClick:()=>setRefresh(value=>value+1), disabled:busy || !regionId || (!latest && (!range.start || !range.end))},
                 icon(busy ? go : _d, 16), t(busy ? "analyzing" : "analyze")),
-              h("p", {className:"terra-scope-note"}, text("State / region data. Township coverage is not available yet.", "ပြည်နယ် / တိုင်းဒေသကြီး ဒေတာ။ မြို့နယ်အဆင့် မရရှိသေးပါ။"))),
+              h("p", {className:"terra-scope-note"}, text("Township outlines are available on the map; measurements still use the state / region reference point.", "မြို့နယ်နယ်နိမိတ်များကို မြေပုံတွင် ကြည့်နိုင်ပါသည်။ တိုင်းတာချက်များသည် ပြည်နယ် / တိုင်းဒေသကြီး ကိုယ်စားပြုအမှတ်ကို ဆက်လက်အသုံးပြုပါသည်။"))),
             error && h("div", {className:"terra-error", role:"alert"}, error, h("button", {onClick:()=>setRefresh(value=>value+1)}, text("Try again", "ထပ်ကြိုးစားရန်"))),
             h("section", {className:"terra-panel terra-chart", "aria-busy":busy},
               panelTitle(text("Observation trend", "လေ့လာတွေ့ရှိချက် လမ်းကြောင်း"), Ha[param].unit),
               result && h("p", {className:"terra-period"}, `${result.period.start} → ${result.period.end}`),
               busy ? h("div", {className:"terra-empty", role:"status"}, icon(go, 24), t("analyzing")) :
-              selectedResult?.status === "ok" && selectedResult.series?.length && selectedResult.codes?.length ? h(TerraEarthbeatPanel, {key:`${regionId}:${param}:${mode}:${refresh}`, result:selectedResult, lang, mode, visible:!narrow || mobileView === "insights"}) :
+              selectedResult?.status === "ok" && selectedResult.series?.length && selectedResult.codes?.length ? h(TerraEarthbeatPanel, {key:`${regionId}:${param}:${mode}:${refresh}`, result:selectedResult, observationContext:result, lang, mode, visible:!narrow || mobileView === "insights"}) :
               h("div", {className:"terra-empty"}, icon(yo, 32), h("strong", null, region ? text("No chart available", "ဂရပ် မရရှိပါ") : text("Your graph appears here", "ဂရပ်ကို ဤနေရာတွင် ပြပါမည်")),
                 h("p", null, selectedResult?.message || (region ? text("Try another measurement or date range.", "အခြားဒေတာ သို့မဟုတ် ရက်စွဲကို ရွေးပါ။") : text("Choose a location to see its measurements over time.", "အချိန်အလိုက် ဒေတာကြည့်ရန် နေရာရွေးပါ။"))))),
             h("section", {className:"terra-panel terra-details"},
