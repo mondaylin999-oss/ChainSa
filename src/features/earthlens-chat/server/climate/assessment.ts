@@ -69,6 +69,8 @@ export function computeAssessment(ctx: Ctx): Assessment {
     track(past);
     add({ id: `rain_${days}d`, param: "rainfall", kind: "observation", label: `Rainfall, last ${days} days`, labelMy: `ပြီးခဲ့သော ${my(days)} ရက် မိုးရေချိန်`, value: now, unit: "mm", decimals: 1, period: { start, end: latest } });
     const median = quantile(past.map((p) => p.value), 0.5);
+    if (median !== undefined && past.length >= 20)
+      add({ id: `rain_${days}d_ref`, param: "rainfall", kind: "comparison", label: `Typical rainfall for the same ${days} days in past years (median)`, labelMy: `ယခင်နှစ်များ၏ တူညီသော ${my(days)} ရက် ပုံမှန် မိုးရေချိန် (အလယ်ကိန်း)`, value: median, unit: "mm", decimals: 1, period: { start, end: latest } });
     if (median !== undefined && median < DRY_SEASON_MEDIAN_MM) {
       if (days === 30) drySeasonNow = true;
       continue; // dry season: a percentile of near-zero totals is not meaningful
@@ -84,6 +86,9 @@ export function computeAssessment(ctx: Ctx): Assessment {
   if (soilNow !== undefined) {
     const sample = seasonalSample(soil, latest, 7, FIRST_YEAR, addDays(latest, -7));
     const p = percentileRank(soilNow, sample);
+    const soilMed = quantile(sample, 0.5);
+    if (soilMed !== undefined && sample.length >= 200)
+      add({ id: "soil_ref", param: "soilWetness", kind: "comparison", label: "Typical root-zone soil wetness for this date in past years (median)", labelMy: "ယခင်နှစ်များ၏ ဤရက် ပုံမှန် မြေဆီလွှာ စိုစွတ်မှု (အလယ်ကိန်း)", value: soilMed, unit: "fraction (0–1)", decimals: 2, date: latest });
     if (p !== undefined && sample.length >= 200) {
       pct.soil_pct = p;
       add({ id: "soil_pct", param: "soilWetness", kind: "comparison", label: "Rank of root-zone soil wetness among past years for this date (percentile)", labelMy: "ဤရက်အတွက် ယခင်နှစ်များနှင့် နှိုင်းယှဉ် မြေဆီလွှာ စိုစွတ်မှု အဆင့် (ရာခိုင်နှုန်းအဆင့်)", value: p, unit: "percentile", decimals: 0, date: latest });
@@ -93,6 +98,17 @@ export function computeAssessment(ctx: Ctx): Assessment {
   // ---- Heat: hottest day in the last 7 days vs the same season ----
   const t7 = windowMax(tmax, addDays(latest, -6), latest);
   if (t7 !== undefined) {
+    add({ id: "tmax_7d", param: "temperature", kind: "observation", label: "Hottest day in the last 7 days (2 m maximum)", labelMy: "ပြီးခဲ့သော ၇ ရက်အတွင်း အပူဆုံးနေ့ (၂ မီတာ အမြင့်ဆုံး)", value: t7, unit: "°C", decimals: 1, period: { start: addDays(latest, -6), end: latest } });
+    // Same 7-day window in each past year: hottest day, then the median across years.
+    const pastMax: number[] = [];
+    for (let y = FIRST_YEAR; y < Number(latest.slice(0, 4)); y++) {
+      const end = sameDateInYear(latest, y);
+      const m = windowMax(tmax, addDays(end, -6), end);
+      if (m !== undefined) pastMax.push(m);
+    }
+    const tRef = quantile(pastMax, 0.5);
+    if (tRef !== undefined && pastMax.length >= 20)
+      add({ id: "tmax_7d_ref", param: "temperature", kind: "comparison", label: "Typical hottest day for the same 7 days in past years (median)", labelMy: "ယခင်နှစ်များ၏ တူညီသော ၇ ရက် ပုံမှန် အပူဆုံးနေ့ (အလယ်ကိန်း)", value: tRef, unit: "°C", decimals: 1, period: { start: addDays(latest, -6), end: latest } });
     const sample = seasonalSample(tmax, latest, 7, FIRST_YEAR, addDays(latest, -7));
     const p = percentileRank(t7, sample);
     if (p !== undefined && sample.length >= 200) {

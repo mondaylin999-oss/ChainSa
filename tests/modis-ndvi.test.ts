@@ -88,9 +88,14 @@ describe("chatbot uses MODIS NDVI", () => {
     const { f } = mockFetch({ "https://power.larc.nasa.gov": nasa, [BASE]: ornl() });
     await fetchNdviSummary(21.4, 95.95, 1000, f, BASE, "wait"); // warm the past-year cache
     const r = await answerChat({ message: "How are rice crops in Mandalay?" }, { config: baseConfig(), fetchImpl: f, today: "2026-11-13" });
-    expect(r.sections.current).toContain("Vegetation greenness (MODIS NDVI, 16-day composite): 0.65 NDVI (2026-10-16 to 2026-10-31)");
-    expect(r.sections.history).toContain("Average NDVI for the same 16 days in 2016–2025: 0.59");
-    expect(r.sections.history).toMatch(/Vegetation greenness vs the same 16 days in past years \(percentile\): 100/);
+    const row = r.dataTable!.rows.find((x) => x.param === "vegetation")!;
+    expect(row.latest).toMatchObject({ value: 0.65, unit: "NDVI", when: "2026-10-16 → 2026-10-31" });
+    expect(row.reference?.value).toBe(0.59); // 0.595 shown with NDVI's 2-decimal precision
+    expect(row.referenceLabel).toBe("mean 2016–2025");
+    expect(row.difference?.value).toBe(0.06);
+    expect(row.rank).toBe(100);
+    expect(r.sections.current).toContain("| Vegetation greenness (MODIS NDVI) | 0.65 NDVI (2026-10-16 → 2026-10-31) | 0.59 NDVI (mean 2016–2025) | +0.06 NDVI, rank 100 |");
+    expect(r.sections.history).toContain("vegetation greenness (NDVI) is well above usual (rank 100 of 100)");
     expect(r.sections.sources).toContain("MOD13Q1");
     expect(r.sections.sources).toContain("modis.ornl.gov");
     expect(r.facts.some((x) => x.source === "nasa-modis-ndvi")).toBe(true);
@@ -127,6 +132,6 @@ describe("NDVI comparison without the long-term POWER record", () => {
     await fetchNdviSummary(21.4, 95.95, 1000, f, BASE, "wait");
     const r = await answerChat({ message: "rice crops Mandalay" }, { config: baseConfig(), fetchImpl: f, today: "2026-11-13" });
     expect(r.sections.history).toContain("could not be retrieved");
-    expect(r.sections.history).toContain("Average NDVI for the same 16 days in 2016–2025");
+    expect(r.sections.history).toContain("vegetation greenness (NDVI) is well above usual");
   });
 });

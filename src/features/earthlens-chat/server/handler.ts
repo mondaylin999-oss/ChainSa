@@ -13,6 +13,7 @@ import { buildRecommendations } from "./recommendations";
 import { getValidatedOutlook } from "./forecast/validated-outlook";
 import { buildAnswer } from "./answer-builder";
 import { buildVegetation } from "./vegetation";
+import { buildActionCards, buildDataTable, detectDecisions } from "./presentation";
 import { buildGeneralPrompt, buildMessages, buildSystemPrompt } from "./prompt";
 import { runProviderChain } from "./providers/chain";
 import { buildAllowed, forbiddenClaims, verifyAnswer, type VerifyResult } from "./verify";
@@ -58,14 +59,27 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
   const recs = buildRecommendations(a, lang);
   const nasaDataAvailable = g.nasaDataAvailable || a.available;
 
-  let aiImpacts: string | null = null;
+  // Structured presentation, built only from NASA facts (never by the AI).
+  // detectTopics returns all three topics when the question names none; cards should follow the question.
+  const explicitTopics = topics.length === 3 && topics[0] === "agriculture" ? [] : topics;
+  const decisions = detectDecisions(message, explicitTopics);
+  const allFactsForUi = [...g.facts, ...a.facts];
+  const dataTable = buildDataTable(allFactsForUi, a, { topics: explicitTopics, decisions, asked: detected, lang });
+  const { cards: actionCards, note: actionNote } = nasaDataAvailable
+    ? buildActionCards({
+        facts: allFactsForUi, a, topics: explicitTopics, decisions, lang, today: deps.today ?? new Date().toISOString().slice(0, 10),
+        // a question about one specific parameter (wind, humidity, fires…) gets no alert cards about other parameters
+        focused: detected.some((p) => p === "wind" || p === "humidity" || p === "fires" || p === "vegetation"),
+      })
+    : { cards: [], note: lang === "my" ? "ယုံကြည်စိတ်ချရသော လုပ်ဆောင်ချက် အကြံပြုချက် ပေးရန် အထောက်အထား မလုံလောက်ပါ။" : "Insufficient evidence to generate a reliable action recommendation." };
+
   let aiDirect: string | null = null;
   let provider: ChatResponseBody["provider"] = null;
   let model: string | null = null;
   let attempts: ChatResponseBody["attempts"] = [];
   let verification: VerifyResult | null = null;
 
-  // The AI is only asked when there is real NASA data to ground it in, and only writes section 3.
+  // The AI is only asked when there is real NASA data to ground it in, and only writes the direct answer.
   if (nasaDataAvailable) {
     const allFacts = [...g.facts, ...a.facts];
     const allowed = buildAllowed(allFacts, region);
@@ -97,13 +111,16 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
     );
     attempts = chain.attempts;
     if (chain.text) {
-      ({ direct: aiDirect, impacts: aiImpacts } = splitAiText(chain.text));
+      // The AI is asked for 1–3 plain sentences; if it still writes bullets, they are joined into one paragraph.
+      const sp = splitAiText(chain.text);
+      const bullets = sp.impacts?.split("\n").map((l) => l.replace(/^•\s*/, "")).join(" ") ?? null;
+      aiDirect = sp.direct ? (bullets ? `${sp.direct} ${bullets}` : sp.direct) : bullets;
       provider = chain.provider;
       model = chain.model;
     }
   }
 
-  const built = buildAnswer({ lang, fmt, g, a, recs, outlook, aiImpacts, aiDirect, topics, limitations });
+  const built = buildAnswer({ lang, fmt, g, a, outlook, aiDirect, topics, limitations, table: dataTable, cards: actionCards, cardNote: actionNote });
   const v = verification as VerifyResult | null;
 
   return {
@@ -115,7 +132,7 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
     facts: [...g.facts, ...a.facts],
     dataFooter: built.sections.sources,
     limitations: [...limitations, ...g.notes],
-    generator: aiImpacts || aiDirect ? "llm" : "template",
+    generator: aiDirect ? "llm" : "template",
     provider,
     model,
     attempts,
@@ -128,6 +145,9 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
     outlook: { window: a.outlookWindow, forecastAvailable: !!outlook?.probabilities.length, historical: a.facts.filter((f) => f.kind === "historical") },
     recommendations: recs,
     sections: built.sections,
+    dataTable,
+    actionCards,
+    actionNote: actionCards.length ? null : actionNote,
   };
 }
 
@@ -156,7 +176,7 @@ async function answerGeneral(message: string, lang: Lang, req: ValidChatRequest,
   const body = chain.text?.trim() || GENERAL_TEMPLATE[lang];
   const disclaimer = fmt.generalDisclaimer[lang];
   const region = getRegion(req.selectedRegionId) ?? getRegion(DEFAULT_REGION_ID)!;
-  const empty = { direct: body, current: "", history: "", outlook: "", impacts: "", decision: "", sources: "", disclaimer };
+  const empty = { direct: body, current: "", history: "", outlook: "", actions: "", sources: "", disclaimer };
   return {
     answer: `${body}\n\n${disclaimer}`,
     lang,
@@ -179,6 +199,9 @@ async function answerGeneral(message: string, lang: Lang, req: ValidChatRequest,
     outlook: { window: { start: "", end: "" }, forecastAvailable: false, historical: [] },
     recommendations: [],
     sections: empty,
+    dataTable: null,
+    actionCards: [],
+    actionNote: null,
   };
 }
 

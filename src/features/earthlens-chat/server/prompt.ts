@@ -31,8 +31,8 @@ export interface PromptInput {
 }
 
 /**
- * The AI writes ONLY the direct answer (section 1) and "Potential Risks and Impacts" (section 5). All other
- * sections are built by the server, so the model cannot present history as a forecast or invent sources.
+ * The AI writes ONLY the short direct answer (section 1). All other sections, the data table and the
+ * Action Cards are built by the server, so the model cannot present history as a forecast or invent evidence.
  */
 export function buildSystemPrompt(p: PromptInput): string {
   const langName = p.lang === "my" ? "Myanmar (Burmese, Unicode script)" : "English";
@@ -54,16 +54,15 @@ export function buildSystemPrompt(p: PromptInput): string {
     "NDVI facts (if any) come from NASA MODIS and measure vegetation greenness (about 0.2 sparse, above 0.6 dense). They are observations, not crop-yield estimates or forecasts.",
     "VALIDATED 30-DAY FORECAST: NONE. No forecast model has been validated, so there is no forecast and no probability.",
     "",
-    "RECOMMENDATIONS THE APP WILL SHOW IN THE DECISION SUPPORT SECTION (do not repeat them; your impacts should be consistent with them):",
+    "RECOMMENDATIONS THE APP WILL SHOW IN THE ACTION CARDS (do not repeat them; your answer should be consistent with them):",
     ...p.recommendations.map((r) => `- ${r.text}`),
     "",
     "NOTES AND LIMITATIONS (the app shows these too):",
     ...[...p.notes, ...p.limitations].map((n) => `- ${n}`),
     "",
-    "YOUR TASK, in this exact layout:",
-    "Line 1: ONE plain sentence (no bullet) that directly answers the user's question using the data above.",
-    "Then 2–4 bullet points starting with \"• \" describing possible risks and impacts on agriculture, water resources, communities and the environment — only the relevant ones.",
-    "If essential information is missing for an agriculture question (crop type, planting date or growth stage, irrigation), end with one bullet asking the user for it.",
+    "YOUR TASK: write ONLY the short direct answer to the user's question — 1 to 3 plain sentences, no bullets, no headings.",
+    "Say what the data shows for their question in simple words. The app shows the data table, comparison, outlook, action cards and sources separately, so do not repeat them.",
+    "If essential information is missing for an agriculture question (crop type, growth stage, irrigation), end with one short question asking for it.",
     "",
     "RULES:",
     "- Use only the numbers and dates above, copied exactly with their units (rounding to fewer decimals is allowed). Write no other numbers.",

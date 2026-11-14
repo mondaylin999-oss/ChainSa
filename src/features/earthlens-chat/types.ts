@@ -95,11 +95,64 @@ export interface ChatResponseBody {
   /** 30-day outlook. `forecastAvailable` stays false until a model passes validation. */
   outlook: { window: { start: string; end: string }; forecastAvailable: boolean; historical: Fact[] };
   recommendations: { id: string; text: string; reason: string; uncertainty: string }[];
-  /** The eight answer sections as separate strings (same text as `answer`). Empty for general questions, except direct + disclaimer. */
-  sections: Record<"direct" | "current" | "history" | "outlook" | "impacts" | "decision" | "sources" | "disclaimer", string>;
+  /** The answer sections as separate strings (same text as `answer`). Empty for general questions, except direct + disclaimer. */
+  sections: Record<SectionKey, string>;
+  /** Compact table of the most relevant NASA measurements (null for general questions or without data). */
+  dataTable: DataTable | null;
+  /** Evidence-based Action Cards built by the server from NASA facts (never by the AI). */
+  actionCards: ActionCard[];
+  /** Shown instead of cards when the evidence is not enough for a reliable recommendation. */
+  actionNote: string | null;
 }
 
 export interface ChatErrorBody {
   error: string;
   code: "invalid_request" | "rate_limited" | "server_error" | "forbidden_origin";
+}
+
+export type SectionKey = "direct" | "current" | "history" | "outlook" | "actions" | "sources" | "disclaimer";
+
+export interface TableValue {
+  value: number;
+  unit: string;
+  /** Observation date or period, or the reference period, as text. */
+  when: string;
+}
+
+/** One measurement row. Values come from NASA facts; `difference` is calculated by the server. */
+export interface DataTableRow {
+  param: ParamKey;
+  label: string;
+  latest: TableValue;
+  /** Typical value for the same dates in past years (median or mean, as named in `referenceLabel`). Null if unavailable. */
+  reference: TableValue | null;
+  referenceLabel: string | null;
+  /** latest − reference, same unit. Null when there is no reference. */
+  difference: { value: number; unit: string } | null;
+  /** Percentile rank among past years, when calculated. */
+  rank: number | null;
+  /** Fact ids used for this row. */
+  factIds: string[];
+}
+
+export interface DataTable {
+  rows: DataTableRow[];
+}
+
+export type ConfidenceLevel = "high" | "moderate" | "low" | "insufficient";
+
+export type DecisionType = "agriculture" | "water" | "electricity" | "disaster" | "heat" | "vegetation";
+
+export interface ActionCard {
+  id: string;
+  decisionType: DecisionType;
+  title: string;
+  observedChange: string;
+  potentialImpact: string;
+  suggestedOptions: string[];
+  evidenceNeeded: string[];
+  /** Strength of the evidence behind this card — NOT a probability. */
+  confidence: { level: ConfidenceLevel; reason: string };
+  /** Ids of the NASA facts the observed change is based on (built server-side). */
+  evidenceRefs: string[];
 }

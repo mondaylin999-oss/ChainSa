@@ -1,24 +1,22 @@
 /**
  * ANSWER FORMAT — edit this file to change how the chatbot answers.
  *
- * Every environmental answer has the same eight sections in English and Myanmar:
- *   1 Direct Answer                 — first sentence written by the AI (numbers checked), or a rule-based template
- *   2 Current NASA Data             — built by the server from NASA POWER/FIRMS values (dates, units, datasets)
- *   3 Historical Data Comparison    — built by the server: percentile ranks vs the same dates since 1981
- *   4 Next 30-Day Outlook           — built by the server: validated forecast (none yet) + clearly labelled historical pattern
- *   5 Potential Risks and Impacts   — written by the AI (numbers checked) or by the template
- *   6 Decision Support              — rule-based recommendations, each with its reason and uncertainty
- *   7 Data Sources and Forecast Model — datasets, links, data dates, model and validation information
- *   8 Disclaimer                    — the fixed disclaimer text below, always appended by the server
+ * Every environmental answer has the same seven concise sections in English and Myanmar:
+ *   1 Direct Answer                — 1–3 sentences written by the AI (numbers checked), or a rule-based template
+ *   2 Current NASA Data            — compact table: latest value · typical past value · calculated difference
+ *   3 Historical Comparison        — one or two sentences: how the latest values rank against past years
+ *   4 Next 30-Day Outlook          — validated forecast (none yet) + one clearly labelled historical-pattern sentence
+ *   5 Evidence-Based Action Cards  — rule-based cards built from NASA facts, each with a confidence level
+ *   6 Data Sources                 — datasets, observation dates, links, forecast model
+ *   7 Disclaimer                   — the fixed disclaimer text below, always the last text, added by the server
  *
- * Sections 2, 3, 4, 6, 7 and 8 are never written by the AI, so historical data can never be
- * presented as a forecast and no percentages can be invented there.
+ * Only section 1 is written by the AI, so it cannot invent evidence, cards, forecasts or percentages.
  * Questions that are not about the environment get a short answer plus `generalDisclaimer`.
  */
 
 import type { Lang } from "../types";
 
-export type SectionId = "direct" | "current" | "history" | "outlook" | "impacts" | "decision" | "sources" | "disclaimer";
+export type SectionId = "direct" | "current" | "history" | "outlook" | "actions" | "sources" | "disclaimer";
 
 export interface AnswerFormat {
   /** Section order and headings. Numbers are added automatically when `numberHeadings` is true. */
@@ -47,15 +45,14 @@ export const answerFormat: AnswerFormat = {
   sections: [
     { id: "direct", heading: { en: "Direct Answer", my: "တိုက်ရိုက် အဖြေ" } },
     { id: "current", heading: { en: "Current NASA Data", my: "လက်ရှိ NASA အချက်အလက်" } },
-    { id: "history", heading: { en: "Historical Data Comparison", my: "ယခင်မှတ်တမ်းများနှင့် နှိုင်းယှဉ်ချက်" } },
+    { id: "history", heading: { en: "Historical Comparison", my: "ယခင်မှတ်တမ်းများနှင့် နှိုင်းယှဉ်ချက်" } },
     { id: "outlook", heading: { en: "Next 30-Day Outlook", my: "လာမည့် ရက် ၃၀ အလားအလာ" } },
-    { id: "impacts", heading: { en: "Potential Risks and Impacts", my: "ဖြစ်နိုင်သော အန္တရာယ်နှင့် သက်ရောက်မှုများ" } },
-    { id: "decision", heading: { en: "Decision Support and Recommendations", my: "ဆုံးဖြတ်ချက်ချရန် အထောက်အကူနှင့် အကြံပြုချက်များ" } },
-    { id: "sources", heading: { en: "Data Sources and Forecast Model", my: "အချက်အလက် ရင်းမြစ်များနှင့် ခန့်မှန်းမော်ဒယ်" } },
+    { id: "actions", heading: { en: "Evidence-Based Action Cards", my: "အထောက်အထားအခြေပြု လုပ်ဆောင်ချက် ကတ်များ" } },
+    { id: "sources", heading: { en: "Data Sources", my: "အချက်အလက် ရင်းမြစ်များ" } },
     { id: "disclaimer", heading: { en: "Disclaimer", my: "သတိပေးချက်" } },
   ],
   numberHeadings: true,
-  aiMaxWords: 160,
+  aiMaxWords: 60,
   showUnits: true,
   showDates: true,
   showSourceLinks: true,

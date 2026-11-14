@@ -36,16 +36,30 @@ those routes call NASA for real.
 
 ## 0. What's new: 30-day drought / flood / agriculture decision support (Phase 1)
 
-Every environmental answer has the same eight sections in English and Myanmar:
-**1 Direct Answer · 2 Current NASA Data · 3 Historical Data Comparison · 4 Next 30-Day Outlook · 5 Potential Risks and Impacts ·
-6 Decision Support and Recommendations · 7 Data Sources and Forecast Model · 8 Disclaimer.**
+Every environmental answer has the same seven concise sections in English and Myanmar:
+**1 Direct Answer · 2 Current NASA Data · 3 Historical Comparison · 4 Next 30-Day Outlook · 5 Evidence-Based Action Cards ·
+6 Data Sources · 7 Disclaimer.**
 
-- **Sections 2, 3, 4, 6, 7 and 8 are built by the server.** The AI writes only the direct-answer sentence (section 1) and the
-  risks/impacts bullets (section 5), and its numbers are checked against the NASA facts. Without AI, both come from templates.
+- **Only the Direct Answer is written by the AI** (1–3 sentences, numbers checked against the NASA facts; template without AI).
+  Everything else is built by the server.
+- **Current NASA Data is a table** (`server/presentation.ts` → `dataTable` in the response, rendered by
+  `components/AnswerView.tsx`): at most 4 rows chosen for the question, each with the latest value and date, the typical value
+  for the same dates in past years (median since 1981, or the 10-year NDVI mean), and the difference calculated by the server
+  with its percentile rank. A parameter without a historical reference shows `--`; parameters without data are left out.
+- **Evidence-Based Action Cards** (`actionCards` in the response) are rule-based, never AI-written. Each has Observed change,
+  Potential impact, Suggested options, Evidence needed and Confidence, plus `evidenceRefs` pointing at real fact ids. Cards are
+  made only for what the question asks about (crops, water, flood/emergency, electricity, heat) or, for open questions, for
+  unusual conditions in the data. Otherwise: "Insufficient evidence to generate a reliable action recommendation."
+  - Confidence is High / Moderate / Low / Insufficient Evidence with a reason (number of agreeing NASA comparisons, data age,
+    missing local data). It is never a probability.
+  - Water cards always ask for reservoir, river, demand and operational data and are never High. Electricity cards ask for
+    demand, generation, reservoir/hydropower and grid data and stay Low. Flood/emergency cards ask for official DMH warnings,
+    river gauges and local reports, and say the assistant cannot issue evacuation orders.
 - **The disclaimer is appended by the server and is always the last text of every answer**, using the exact wording from the
   project brief. Questions that are not about the environment (e.g. "hello") get a short answer without NASA analysis and a
   separate general disclaimer (`generalDisclaimer` in `config/answer-format.ts` — its wording is ours, please review).
-- **No forecast yet.** Section 4 says a reliable 30-day forecast cannot be calculated yet. It then shows a **historical pattern**
+- The plain-text `answer` still contains everything (the table as Markdown, cards as text), so chat history and other clients keep working.
+- **No forecast yet.** The outlook section says a reliable 30-day forecast cannot be calculated yet. It then shows a **historical pattern**
   (what happened on the same calendar dates in 1981–last year, from NASA POWER), clearly marked "NOT a forecast".
   The validation plan for adding a real forecast is in `docs/FORECAST_VALIDATION_PLAN.md`.
 - **Current conditions** compare the last 30/90 days of rain, soil wetness and recent heat with the same dates in past years (percentiles).
@@ -67,9 +81,9 @@ Browser (ChatWidget)  ──POST /api/earthlens-chat──►  Route Handler (se
                                                      3. fetch NASA POWER: last ~30 days (all variables) + 1981→today
                                                         (rain, soil wetness, max temperature) → facts, percentiles,
                                                         historical pattern, indicators, rule-based recommendations
-                                                     4. AI writes sections 1+5 only: OpenRouter free → Groq free
+                                                     4. AI writes the direct answer only: OpenRouter free → Groq free
                                                      5. reject AI text with numbers not in the facts or forecast wording
-                                                     6. nothing works → template text for sections 1+5
+                                                     6. nothing works → template direct answer
                                                      7. server assembles the eight sections
 ```
 
@@ -226,7 +240,7 @@ Edit `src/features/earthlens-chat/config/answer-format.ts`:
 - `sections` — the eight headings (English + Myanmar); `numberHeadings` adds "1." … "8."
 - `disclaimer` — the exact required texts (English and Myanmar); `noModelNote` — shown while no forecast model is used
 - `decisionSupportStatus` — the "pending expert review" line (set to `null` after review)
-- `aiMaxWords`, `extraRules` — limits and extra rules for the AI-written sections 1 and 5
+- `aiMaxWords`, `extraRules` — limits and extra rules for the AI-written direct answer
 - `showUnits`, `showDates`, `showSourceLinks`
 
 ## 7. Integrate into the original EarthLens project (tomorrow)
