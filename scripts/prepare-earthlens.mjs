@@ -39,6 +39,10 @@ source = replaceOnce(source,
   'p=g=>{let w=g.properties.iso===c;return{color:',
   'p=g=>{let w=g.properties.iso===c;return{className:c&&!w?"terra-region-unfocused":"",color:',
   "unfocused region styling");
+source = replaceOnce(source,
+  'color:w?"#7cc7ff":"rgba(148,190,255,0.45)",weight:w?2.5:1,fillColor:w?"#2b8fe8":h[g.properties.iso]?.coastal?"#1f6a8a":"#2c6b4f",fillOpacity:w?.45:.22',
+  'color:"rgba(148,190,255,0.45)",weight:1,fillColor:h[g.properties.iso]?.coastal?"#1f6a8a":"#2c6b4f",fillOpacity:.22',
+  "preserve original region appearance when selected");
 const adapter = await readFile(new URL("./earthlens-adapter.js", import.meta.url), "utf8");
 const dashboard = await readFile(new URL("./earthlens-dashboard.js", import.meta.url), "utf8");
 const dashboardCss = await readFile(new URL("./earthlens-dashboard.css", import.meta.url), "utf8");
