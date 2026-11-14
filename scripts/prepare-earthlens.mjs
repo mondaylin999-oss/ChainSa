@@ -51,6 +51,13 @@ const earthbeatCore = ts.transpileModule(earthbeatSource, {
   compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
 }).outputText.replace(/^export /gm, "");
 const earthbeatPanel = await readFile(new URL("./earthbeat-panel.js", import.meta.url), "utf8");
+const environmentalFiles = ["processing/statistics.ts", "analysis/explainChanges.ts", "analysis/dataTrendInsight.ts", "components/chartModel.ts", "components/EnvironmentalChart.tsx", "components/DataTrendInsight.tsx"];
+let environmentalModule = "";
+for (const file of environmentalFiles) {
+  const input = await readFile(new URL(`../src/features/environmental/${file}`, import.meta.url), "utf8");
+  environmentalModule += ts.transpileModule(input, {fileName:file, compilerOptions:{target:ts.ScriptTarget.ES2022, module:ts.ModuleKind.ESNext, jsx:ts.JsxEmit.React, jsxFactory:"ft.createElement"}}).outputText
+    .replace(/^import .*;\r?\n/gm, "").replace(/^export /gm, "").replace(/\buseMemo\(/g,"ft.useMemo(").replace(/\buseState\(/g,"ft.useState(") + "\n";
+}
 const earthbeatCss = await readFile(new URL("./earthbeat-panel.css", import.meta.url), "utf8");
 const start = source.indexOf('window.fetch=async(e,t)=>');
 const end = source.indexOf('(0,uq.createRoot)', start);
@@ -67,7 +74,7 @@ const liveReference = source.slice(componentEnd, start)
 if (liveReference.includes("function N9e(") || liveReference.includes("return N9e(")) {
   throw new Error("The reference sample generator changed; review live-only preparation.");
 }
-const html = (source.slice(0, componentStart) + earthbeatCore + "\n" + earthbeatPanel + "\n" + dashboard + "\n" + liveReference + adapter + source.slice(end))
+const html = (source.slice(0, componentStart) + earthbeatCore + "\n" + environmentalModule + "\n" + earthbeatPanel + "\n" + dashboard + "\n" + liveReference + adapter + source.slice(end))
   .replace("</head>", `<style>${dashboardCss}\n${earthbeatCss}</style></head>`)
   .replace("minZoom:5,zoomSnap:.25", "minZoom:3.5,zoomSnap:.25")
   .replace("Myanmar EarthLens — Demo preview", "Myanmar EarthLens — NASA environmental insights")

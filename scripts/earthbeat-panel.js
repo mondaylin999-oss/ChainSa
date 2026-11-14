@@ -1,5 +1,5 @@
 /** EARTHBEAT graph/player, adapted to the host bundle's React and measurement model. */
-function TerraEarthbeatPanel({result, lang, visible}) {
+function TerraEarthbeatPanel({result, lang, visible, observationContext}) {
   const h = ft.createElement;
   const text = (en, my) => lang === "my" ? my : en;
   const [code, setCode] = ft.useState(result.codes[0]);
@@ -44,7 +44,7 @@ function TerraEarthbeatPanel({result, lang, visible}) {
     setHover(-1); setActive(index);
     if (supported) run(()=>engine.current?.seek(index));
   }
-  const left = 51, right = 582, top = 16, bottom = 193;
+  const left = 64, right = 876, top = 28, bottom = 312;
   const pad = Math.max((range[1] - range[0]) * 0.12, Math.abs(range[0]) * 0.02, 0.1);
   const yMin = range[0] >= 0 ? Math.max(0, range[0] - pad) : range[0] - pad, yMax = range[1] + pad;
   const x = point => left + earthbeatTimeFraction(point, points) * (right-left);
@@ -58,7 +58,10 @@ function TerraEarthbeatPanel({result, lang, visible}) {
   }
   function pointerIndex(event) {
     const bounds = event.currentTarget.getBoundingClientRect();
-    return earthbeatNearest(points, ((event.clientX-bounds.left)/bounds.width*600-left)/(right-left));
+    const fraction = Math.max(0,Math.min(1,((event.clientX-bounds.left)/bounds.width*900-left)/(right-left)));
+    const first = Date.parse(valid[0].date), last = Date.parse(valid.at(-1).date);
+    const fullStart = Date.parse(points[0].date), fullEnd = Date.parse(points.at(-1).date);
+    return earthbeatNearest(points,(first+fraction*(last-first)-fullStart)/Math.max(1,fullEnd-fullStart));
   }
   function pointerDown(event) {
     if (event.button !== 0 && event.pointerType === "mouse") return;
@@ -89,21 +92,14 @@ function TerraEarthbeatPanel({result, lang, visible}) {
   }
   function toggle() { setHover(-1); if (state === "playing") engine.current?.pause(); else run(()=>engine.current?.play()); }
   const hasData = valid.length > 0;
+  const environmentalSeries = {indicator:result.param === "temperature" ? "temperature" : result.param === "rainfall" ? "precipitation" : label, dataset:`NASA POWER · ${label}`,datasetId:"NASA_POWER",spatialResolution:"One NASA POWER grid cell at the region reference point",temporalResolution:"Daily",spatialSelection:"representative-point",observations:valid.map(point=>({...point,unit,source:"NASA POWER"})),validObservationCount:valid.length,missingObservationCount:points.length-valid.length,requestedStartDate:observationContext?.period?.start || points[0]?.date,requestedEndDate:observationContext?.period?.end || points.at(-1)?.date,limitations:observationContext?.limitations || ["Point measurements are not a regional average."],processing:["Missing measurements are excluded from statistics and remain silent during playback.", "Date gaps remain visible. Trend is descriptive only." ]};
+
   return h("div", {className:"earthbeat", "data-playback":state},
     result.codes.length > 1 && h("label", {className:"earthbeat-channel"}, text("Measurement", "တိုင်းတာချက်"),
       h("select", {value:code, onChange:event=>setCode(event.target.value)}, result.codes.map(item=>h("option", {key:item,value:item}, NB[item] || item)))),
     hasData ? h(ft.Fragment, null,
       h("p", {className:"earthbeat-readout", "aria-live":state === "playing" ? "off" : "polite"}, inspected ? `${inspected.date} · ${format(inspected.value)} ${unit}` : text("Touch the graph to hear a measurement", "တိုင်းတာချက်အသံ ကြားရန် ဂရပ်ကို ထိပါ")),
-      h("svg", {className:"earthbeat-graph",viewBox:"0 0 600 225",role:"slider",tabIndex:0,
-        "aria-label":text("Interactive observation graph", "အသံနှင့် ချိတ်ဆက်ထားသော ဂရပ်"),"aria-valuemin":0,"aria-valuemax":Math.max(0,points.length-1),"aria-valuenow":Math.max(0,active),
-        "aria-valuetext":current ? `${current.date}: ${current.value} ${unit}` : text("No observation selected", "တိုင်းတာချက် မရွေးရသေးပါ"),
-        onPointerDown:pointerDown,onPointerMove:pointerMove,onPointerUp:()=>{dragging.current=false;},onPointerCancel:()=>{dragging.current=false;},onLostPointerCapture:()=>{dragging.current=false;},onPointerLeave:()=>{if(!dragging.current)setHover(-1);},onKeyDown:keyboard},
-        h("title", null, `${lang === "my" ? config.labelMy : config.label} · ${label}`),
-        [0,1,2,3,4].map(tick=>{const value=yMin+(yMax-yMin)*tick/4;return h("g",{key:tick},h("line",{x1:left,x2:right,y1:y(value),y2:y(value),className:"earthbeat-grid"}),h("text",{x:left-8,y:y(value)+4,textAnchor:"end"},formatTick(value)));}),
-        result.param === "rainfall" ? points.filter(point=>point.value!==null).map(point=>h("line",{key:point.date,x1:x(point),x2:x(point),y1:y(0),y2:y(point.value),className:"earthbeat-bar",strokeWidth:Math.max(2,Math.min(22,(right-left)/points.length*0.55))})) : h("path",{d:path,className:"earthbeat-line"}),
-        valid.map(point=>h("circle",{key:point.date,cx:x(point),cy:y(point.value),r:2.5,className:"earthbeat-point"})),
-        inspected && h("g", null,h("line",{x1:x(inspected),x2:x(inspected),y1:top,y2:bottom,className:"earthbeat-cursor"}),h("circle",{cx:x(inspected),cy:y(inspected.value),r:5,className:"earthbeat-selected"})),
-        h("text",{x:left,y:217},points[0].date.slice(5)),h("text",{x:right,y:217,textAnchor:"end"},points.at(-1).date.slice(5)))) :
+      h(EnvironmentalChart, {series:environmentalSeries, locationName:observationContext?.region?.name || "Selected location", startDate:environmentalSeries.requestedStartDate, endDate:environmentalSeries.requestedEndDate, activeDate:inspected?.date, interactions:{role:"slider",tabIndex:0,"aria-label":text("Interactive observation graph", "အသံနှင့် ချိတ်ဆက်ထားသော ဂရပ်"),"aria-valuemin":0,"aria-valuemax":Math.max(0,points.length-1),"aria-valuenow":Math.max(0,active),"aria-valuetext":current ? `${current.date}: ${current.value} ${unit}` : "No observation selected",onPointerDown:pointerDown,onPointerMove:pointerMove,onPointerUp:()=>{dragging.current=false;},onPointerCancel:()=>{dragging.current=false;},onLostPointerCapture:()=>{dragging.current=false;},onPointerLeave:()=>{if(!dragging.current)setHover(-1);},onKeyDown:keyboard}})) :
       h("p",{className:"earthbeat-readout"},text("No valid measurements to graph or play.", "ဂရပ်နှင့် အသံအတွက် မှန်ကန်သော ဒေတာ မရှိပါ။")),
     h("div",{className:"earthbeat-player"},
       h("div",{className:"earthbeat-player-heading"},h("strong",null,"EARTHBEAT"),h("span",null,text("Graph ↔ sound", "ဂရပ် ↔ အသံ"))),
@@ -115,5 +111,6 @@ function TerraEarthbeatPanel({result, lang, visible}) {
       h("p",{className:"earthbeat-help"},text("Tap or drag to hear a point; Play loops from there until you press Stop. Arrow keys select points. Higher value = higher pitch.", "အမှတ်တစ်ခု၏ အသံကြားရန် ထိပါ သို့မဟုတ် ဆွဲပါ။ Play သည် ထိုနေရာမှ ဆက်ဖွင့်သည်။ မြှားခလုတ်များဖြင့် ရွေးနိုင်သည်။ တန်ဖိုးမြင့်လျှင် အသံမြင့်သည်။")),
       h("p",{className:"earthbeat-scale"},text(`Relative pitch: ${format(range[0])}–${format(range[1])} ${unit} → 220–880 Hz. Equal playback steps; date gaps remain visible in the graph. Missing data is silent. Synthesized tones from NASA measurements.`, `နှိုင်းရအသံ: ${format(range[0])}–${format(range[1])} ${unit} → 220–880 Hz။ ဒေတာတစ်ခုစီကို တူညီသောအချိန်ဖြင့် ဖွင့်သည်။ ဒေတာမရှိလျှင် အသံမရှိပါ။ NASA ဒေတာမှ ဖန်တီးထားသော အသံများ။`)),
       !supported && h("p",{role:"status"},text("Sound is unavailable in this browser. The graph remains interactive.", "ဤဘရောက်ဇာတွင် အသံ မရရှိပါ။ ဂရပ်ကို ရွေးကြည့်နိုင်ပါသည်။")),
-      error && h("p",{role:"alert",className:"terra-error"},error)));
+      error && h("p",{role:"alert",className:"terra-error"},error)),
+    hasData && h(DataTrendInsight,{series:environmentalSeries,analysis:analyzeSeries(environmentalSeries),locationName:observationContext?.region?.name,latitude:observationContext?.region?.lat,longitude:observationContext?.region?.lon}));
 }
