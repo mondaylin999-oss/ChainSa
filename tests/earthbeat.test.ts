@@ -69,7 +69,12 @@ describe("EARTHBEAT audio and graph synchronization",()=>{
     expect(progress.mock.calls[1][0]).toBe(2);
     expect(audio.frequencies).toEqual([220,880]);
     vi.advanceTimersByTime(250);
-    expect(state).toHaveBeenLastCalledWith("ended");
+    expect(state).toHaveBeenLastCalledWith("playing");
+    expect(progress.mock.calls[2][0]).toBe(0);
+    expect(audio.frequencies).toEqual([220,880,220]);
+    player.pause();
+    vi.advanceTimersByTime(1000);
+    expect(progress).toHaveBeenCalledTimes(3);
     player.dispose();
   });
   it("selecting a graph point auditions that point and Play resumes from the selection",async()=>{

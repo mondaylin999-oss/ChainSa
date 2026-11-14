@@ -136,9 +136,8 @@ export class EarthbeatEngine {
   private next() {
     while (this.index < this.points.length && this.points[this.index].value === null) this.index++;
     if (this.index >= this.points.length) {
-      this.setState("ended");
       this.index = Math.max(0, this.points.findIndex(point => point.value !== null));
-      return;
+      if (!this.points[this.index] || this.points[this.index].value === null) return;
     }
     const index = this.index;
     const point = this.points[index];
