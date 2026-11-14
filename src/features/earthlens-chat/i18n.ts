@@ -36,6 +36,11 @@ export const UI_STRINGS = {
     evidenceNeeded: "Evidence needed",
     confidence: "Confidence",
     confidenceNote: "Confidence describes how strong the evidence is. It is not a probability. Options are suggestions, not instructions.",
+    summaryRegion: "Region",
+    summaryFindings: "Key findings",
+    summaryRecommendation: "Key recommendation",
+    expandHint: "Tap a section to open or close its details.",
+    noRegion: "no location selected",
     suggestions: [
       "Is there a drought risk for rice farmers in Magway in the next 30 days?",
       "What is the flood risk in Ayeyarwady over the next month?",
@@ -75,6 +80,11 @@ export const UI_STRINGS = {
     evidenceNeeded: "ထပ်မံလိုအပ်သော အထောက်အထား",
     confidence: "ယုံကြည်စိတ်ချရမှု",
     confidenceNote: "ယုံကြည်စိတ်ချရမှုသည် အထောက်အထား ခိုင်မာမှုကို ပြခြင်းဖြစ်ပြီး ဖြစ်နိုင်ခြေ ရာခိုင်နှုန်း မဟုတ်ပါ။ လုပ်ဆောင်ချက်များသည် အကြံပြုချက်များသာ ဖြစ်ပြီး ညွှန်ကြားချက် မဟုတ်ပါ။",
+    summaryRegion: "တိုင်းဒေသကြီး / ပြည်နယ်",
+    summaryFindings: "အဓိကတွေ့ရှိချက်",
+    summaryRecommendation: "အဓိကအကြံပြုချက်",
+    expandHint: "အသေးစိတ် ကြည့်ရန် ခေါင်းစဉ်ကို နှိပ်ပါ။ ထပ်နှိပ်လျှင် ပြန်ပိတ်ပါမည်။",
+    noRegion: "တည်နေရာ မရွေးချယ်ရသေးပါ",
     suggestions: [
       "မကွေးတိုင်းဒေသကြီးရှိ စပါးတောင်သူများအတွက် လာမည့် ရက် ၃၀ အတွင်း မိုးခေါင်နိုင်ခြေ ရှိပါသလား။",
       "ဧရာဝတီတိုင်းဒေသကြီးတွင် လာမည့် တစ်လအတွင်း ရေကြီးနိုင်ခြေ မည်သို့ရှိပါသလဲ။",

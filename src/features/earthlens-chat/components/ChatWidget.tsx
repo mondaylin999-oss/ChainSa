@@ -159,7 +159,7 @@ function MessageBubble({ m, lang }: { m: UiMessage; lang: Lang }) {
         {m.error ? `${t.errorPrefix} ${m.content}` : m.role === "assistant" ? (rich ?? <AnswerText text={m.content} />) : m.content}
         {r && (
           <div className="mt-2 text-[10px] text-slate-500">
-            {lang === "my" ? r.region.nameMy : r.region.name}
+            {r.region ? (lang === "my" ? r.region.nameMy : r.region.name) : t.noRegion}
             {r.period ? ` · ${r.period.start} → ${r.period.end}` : ` · ${t.noData}`}
             {" · "}
             {r.generator === "llm" ? `${t.aiWritten}${r.model ? ` (${r.model})` : ""}` : t.template}

@@ -40,10 +40,17 @@ Every environmental answer starts with an **Executive Summary** (`summary` in th
 **Detailed Analysis** with six numbered sections, in English and Myanmar:
 **1 Current NASA Data · 2 Historical Comparison · 3 Next 30-Day Outlook · 4 Evidence-Based Action Cards · 5 Data Sources · 6 Disclaimer.**
 
-- **Executive Summary (2–4 sentences):** a direct answer (the only AI-written text, 1–2 sentences, numbers checked; template
-  without AI), up to two key findings from the data table, and the main impact and option of the most relevant Action Card.
-  For water, electricity and emergency questions it also names the local data to check first. It contains no value that is
-  not in the detailed sections; when evidence is insufficient it says so.
+- **Executive Summary = three paragraphs** (`summaryParts` in the response):
+  1. **Region** — the state/region the answer is about and whether it was named in the question or selected on the map
+     (both are shown if they differ). **No region is ever guessed:** with none named or selected, the answer is
+     "Location not selected yet", no NASA data is fetched, and the user is asked to pick one.
+  2. **Key findings** — the direct answer (the only AI-written text, 1–2 sentences, numbers checked) plus up to two findings
+     from the data table.
+  3. **Key recommendation** — the first option of the most relevant Action Card; water, electricity and emergency cards add
+     the local data to check before acting. Without enough evidence it says so and what to ask.
+  The summary never contains a value that is not in the detailed sections, and the browser never builds a summary itself.
+- **Detailed sections are an accordion:** all six start closed (titles only, each with a round toggle icon); each opens and
+  closes on its own with a smooth animation.
 - **Current NASA Data is a table** (`server/presentation.ts` → `dataTable` in the response, rendered by
   `components/AnswerView.tsx`): at most 4 rows chosen for the question, each with the latest value and date, the typical value
   for the same dates in past years (median since 1981, or the 10-year NDVI mean), and the difference calculated by the server

@@ -39,7 +39,7 @@ describe("seven-section concise answer format", () => {
     inOrder(r.answer, EN_HEADINGS);
     expect(r.answer).toContain(DISCLAIMER_EN);
     expect(r.answer.endsWith(DISCLAIMER_EN)).toBe(true);
-    expect(r.answer.startsWith("Executive Summary\nFor Ayeyarwady: ")).toBe(true);
+    expect(r.answer.startsWith("Executive Summary\nRegion: Ayeyarwady Region (named in your question)\n\nKey findings: For Ayeyarwady: ")).toBe(true);
     expect(r.summary).toBe(r.sections.summary);
     expect(r.sections.history).toMatch(/Compared with the same dates in past years \(1981–20\d\d\)/);
     expect(r.sections.current).toContain("Ayeyarwady — NASA grid point 16.75°N, 95.11°E");
@@ -61,7 +61,7 @@ describe("seven-section concise answer format", () => {
     const { f } = mockFetch({ "https://power.larc.nasa.gov": nasa() });
     const r = await answerChat({ message: "ရန်ကုန်မှာ လာမည့် ရက် ၃၀ အတွင်း ရေကြီးနိုင်ခြေ ရှိလား" }, { config: baseConfig(), fetchImpl: f, today: TODAY });
     expect(r.lang).toBe("my");
-    expect(r.region.id).toBe("yangon");
+    expect(r.region!.id).toBe("yangon");
     inOrder(r.answer, MY_HEADINGS);
     expect(r.answer.endsWith(DISCLAIMER_MY)).toBe(true);
     expect(r.answer).not.toContain(DISCLAIMER_EN);
@@ -132,7 +132,7 @@ describe("AI provider chain (direct answer only)", () => {
       "https://openrouter.test": () => completion("Rice fields in Ayeyarwady look normal for the season.\n• Water supply matters for rice."),
     });
     const r = await answerChat({ message: "rice farming Ayeyarwady" }, { config: keys(), fetchImpl: f, today: TODAY });
-    expect(r.sections.summary.startsWith("Rice fields in Ayeyarwady look normal for the season. Water supply matters for rice.")).toBe(true);
+    expect(r.summaryParts!.keyFindings.startsWith("Rice fields in Ayeyarwady look normal for the season. Water supply matters for rice.")).toBe(true);
     expect(r.sections.actions).not.toContain("Water supply matters for rice");
     expect(r.answer.endsWith(DISCLAIMER_EN)).toBe(true);
   });

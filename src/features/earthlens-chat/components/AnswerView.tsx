@@ -1,7 +1,8 @@
 "use client";
 
-import { CloudRain, Droplets, Flame, Leaf, ShieldAlert, Sparkles, Sprout, Zap } from "lucide-react";
-import type { ActionCard, ChatResponseBody, ConfidenceLevel, DataTable, DecisionType, Lang } from "../types";
+import { useId, useState, type ReactNode } from "react";
+import { CheckCircle2, ChevronDown, CloudRain, Droplets, Flame, Leaf, MapPin, Search, ShieldAlert, Sparkles, Sprout, Zap } from "lucide-react";
+import type { ActionCard, ChatResponseBody, ConfidenceLevel, DataTable, DecisionType, Lang, SummaryParts } from "../types";
 import { answerFormat } from "../config/answer-format";
 import { UI_STRINGS } from "../i18n";
 
@@ -121,69 +122,147 @@ export function ActionCardView({ card, lang }: { card: ActionCard; lang: Lang })
 /** Detailed sections are numbered 1–6; the Executive Summary above them has no number. */
 const DETAILED = answerFormat.sections.filter((s) => s.id !== "summary");
 
-function Heading({ id, lang, first }: { id: string; lang: Lang; first?: boolean }) {
-  const i = DETAILED.findIndex((s) => s.id === id);
-  if (i < 0) return null;
-  return <h3 className={`font-display text-[13px] font-semibold text-ocean-300 ${first ? "" : "mt-3"}`}>{`${i + 1}. ${DETAILED[i].heading[lang]}`}</h3>;
-}
-
 const Lines = ({ text, className = "" }: { text: string; className?: string }) => (
   <div className={`whitespace-pre-wrap ${className}`}>{text}</div>
 );
 
-/** Rich view for environmental answers. Returns null when the response has no structured data (older messages). */
+/** Executive Summary as three separate paragraphs: region · key findings · key recommendation. */
+function SummaryBlock({ parts, lang }: { parts: SummaryParts; lang: Lang }) {
+  const t = UI_STRINGS[lang];
+  const rows: { icon: typeof MapPin; label: string; text: string; tone: string }[] = [
+    { icon: MapPin, label: t.summaryRegion, text: parts.region, tone: parts.regionSelected ? "text-ocean-300" : "text-amber-300" },
+    { icon: Search, label: t.summaryFindings, text: parts.keyFindings, tone: "text-ocean-300" },
+    { icon: CheckCircle2, label: t.summaryRecommendation, text: parts.recommendation, tone: "text-leaf-300" },
+  ];
+  return (
+    <section aria-label={answerFormat.sections[0].heading[lang]} className="rounded-xl border border-ocean-400/30 bg-ocean-500/10 p-3">
+      <h3 className="mb-2 flex items-center gap-1.5 font-display text-[14px] font-semibold text-white">
+        <Sparkles className="h-4 w-4 text-ocean-300" />
+        {answerFormat.sections[0].heading[lang]}
+      </h3>
+      <div className="space-y-2.5">
+        {rows.map((r) => (
+          <div key={r.label} className="flex gap-2">
+            <r.icon className={`mt-0.5 h-4 w-4 shrink-0 ${r.tone}`} aria-hidden />
+            <p className="text-[13.5px] leading-relaxed text-slate-100">
+              <span className={`mr-1 font-semibold ${r.tone}`}>{r.label}:</span>
+              {r.text}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/** One collapsible detailed section. Closed by default; each section opens and closes on its own. */
+function AccordionSection({ id, n, title, open, onToggle, children, uid }: { id: string; n: number; title: string; open: boolean; onToggle: () => void; children: ReactNode; uid: string }) {
+  const panelId = `${uid}-${id}`;
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02]">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        aria-controls={panelId}
+        className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-ocean-400/60"
+      >
+        <span className="flex-1 font-display text-[13.5px] font-semibold text-slate-100">
+          <span className="mr-1.5 text-ocean-300">{n}.</span>
+          {title}
+        </span>
+        <span
+          aria-hidden
+          className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${open ? "border-ocean-400/60 bg-ocean-500/25 text-white" : "border-white/15 bg-white/[0.04] text-slate-300"}`}
+        >
+          <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+        </span>
+      </button>
+      {/* grid-rows 0fr → 1fr gives a smooth height animation without measuring the content */}
+      <div
+        id={panelId}
+        role="region"
+        aria-label={title}
+        inert={!open}
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+      >
+        <div className="overflow-hidden">
+          <div className="px-3 pb-3 pt-0.5 text-[13px] leading-relaxed">{children}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Rich view: Executive Summary (three paragraphs) on top, then the six detailed sections as an accordion,
+ * all closed at first. Returns null for responses without structured data (older messages, general answers).
+ */
 export function StructuredAnswer({ r, lang }: { r: ChatResponseBody; lang: Lang }) {
   const t = UI_STRINGS[lang];
+  const uid = useId();
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const toggle = (id: string) => setOpen((o) => ({ ...o, [id]: !o[id] }));
+
+  // No location chosen: only the three-part summary and the general disclaimer.
+  if (r.kind === "needs_region" && r.summaryParts) {
+    return (
+      <div className="space-y-2">
+        <SummaryBlock parts={r.summaryParts} lang={lang} />
+        <p className="text-[11px] text-slate-400">{r.sections.disclaimer}</p>
+      </div>
+    );
+  }
   if (r.kind !== "environmental" || !r.sections || !("summary" in r.sections)) return null;
   const s = r.sections;
   const [locationLine] = s.current.split("\n");
-  return (
-    <div className="space-y-1 text-[13px] leading-relaxed">
-      <section aria-label={answerFormat.sections[0].heading[lang]} className="rounded-xl border border-ocean-400/30 bg-ocean-500/10 p-3">
-        <h3 className="mb-1 flex items-center gap-1.5 font-display text-[13px] font-semibold text-white">
-          <Sparkles className="h-3.5 w-3.5 text-ocean-300" />
-          {answerFormat.sections.find((x) => x.id === "summary")!.heading[lang]}
-        </h3>
-        <p className="text-[13px] leading-relaxed text-slate-100">{s.summary}</p>
-      </section>
 
-      <div className="flex items-center gap-2 pt-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+  const bodies: Record<string, ReactNode> = {
+    current: r.dataTable ? (
+      <>
+        <p className="text-[11px] text-slate-400">{locationLine}</p>
+        <DataTableView table={r.dataTable} lang={lang} />
+      </>
+    ) : (
+      <Lines text={s.current} className="text-slate-300" />
+    ),
+    history: <Lines text={s.history} className="text-slate-300" />,
+    outlook: <Lines text={s.outlook} className="text-slate-300" />,
+    actions: r.actionCards?.length ? (
+      <div className="space-y-2">
+        {r.actionCards.map((c) => <ActionCardView key={c.id} card={c} lang={lang} />)}
+        <p className="flex items-start gap-1 text-[11px] text-slate-500"><ShieldAlert className="mt-0.5 h-3 w-3 shrink-0" />{t.confidenceNote}</p>
+      </div>
+    ) : (
+      <p className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1.5 text-[12.5px] text-slate-300">{r.actionNote ?? s.actions}</p>
+    ),
+    sources: <Lines text={s.sources} className="text-[12px] text-slate-400" />,
+    disclaimer: <Lines text={s.disclaimer} className="text-[12px] text-slate-400" />,
+  };
+
+  return (
+    <div className="space-y-2 text-[13px] leading-relaxed">
+      {/* The summary is only shown when the server sent it — it is never put together in the browser. */}
+      {r.summaryParts ? (
+        <SummaryBlock parts={r.summaryParts} lang={lang} />
+      ) : (
+        s.summary && <Lines text={s.summary} className="rounded-xl border border-ocean-400/30 bg-ocean-500/10 p-3 text-slate-100" />
+      )}
+
+      <div className="flex items-center gap-2 pt-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-slate-500">
         <span className="h-px flex-1 bg-white/10" />
         {answerFormat.detailedHeading[lang]}
         <span className="h-px flex-1 bg-white/10" />
       </div>
+      <p className="text-center text-[11px] text-slate-500">{t.expandHint}</p>
 
-      <Heading id="current" lang={lang} first />
-      {r.dataTable ? (
-        <>
-          <p className="text-[11px] text-slate-400">{locationLine}</p>
-          <DataTableView table={r.dataTable} lang={lang} />
-        </>
-      ) : (
-        <Lines text={s.current} />
-      )}
-
-      <Heading id="history" lang={lang} />
-      <Lines text={s.history} className="text-slate-300" />
-
-      <Heading id="outlook" lang={lang} />
-      <Lines text={s.outlook} className="text-slate-300" />
-
-      <Heading id="actions" lang={lang} />
-      {r.actionCards?.length ? (
-        <div className="space-y-2">
-          {r.actionCards.map((c) => <ActionCardView key={c.id} card={c} lang={lang} />)}
-          <p className="flex items-start gap-1 text-[10px] text-slate-500"><ShieldAlert className="mt-0.5 h-3 w-3 shrink-0" />{t.confidenceNote}</p>
-        </div>
-      ) : (
-        <p className="rounded-lg border border-white/10 bg-white/[0.03] px-2 py-1.5 text-[12px] text-slate-300">{r.actionNote ?? s.actions}</p>
-      )}
-
-      <Heading id="sources" lang={lang} />
-      <Lines text={s.sources} className="text-[11px] text-slate-400" />
-
-      <Heading id="disclaimer" lang={lang} />
-      <Lines text={s.disclaimer} className="text-[11px] text-slate-400" />
+      <div className="space-y-1.5">
+        {DETAILED.map((sec, i) => (
+          <AccordionSection key={sec.id} id={sec.id} n={i + 1} title={sec.heading[lang]} open={!!open[sec.id]} onToggle={() => toggle(sec.id)} uid={uid}>
+            {bodies[sec.id]}
+          </AccordionSection>
+        ))}
+      </div>
     </div>
   );
 }

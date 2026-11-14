@@ -1,6 +1,6 @@
 import "server-only";
 import type { ChatErrorBody, ChatResponseBody, Lang, ParamKey } from "../types";
-import { DEFAULT_REGION_ID, detectRegion, getRegion } from "../regions";
+import { detectRegion, getRegion } from "../regions";
 import { audienceOf, detectLimitations, detectParams, detectTopics, isEnvironmentalQuestion } from "../params";
 import { detectLang } from "../i18n";
 import { answerFormat as defaultFormat, type AnswerFormat } from "../config/answer-format";
@@ -37,7 +37,12 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
   const lang: Lang = detectLang(message, req.lang ?? "en");
   const named = detectRegion(message);
   if (!isEnvironmentalQuestion(message, Boolean(named))) return answerGeneral(message, lang, req, cfg, fmt, deps);
-  const region = named ?? getRegion(req.selectedRegionId) ?? getRegion(DEFAULT_REGION_ID)!;
+  const selected = getRegion(req.selectedRegionId);
+  // Never guess a location: without one named in the question or selected on the map, ask for it.
+  if (!named && !selected) return answerNeedsRegion(lang, fmt);
+  const region = (named ?? selected)!;
+  const regionSource: "question" | "map" = named ? "question" : "map";
+  const mapRegionName = named && selected && selected.id !== named.id ? (lang === "my" ? selected.nameMy : selected.name) : null;
   const detected = detectParams(message);
   const params: ParamKey[] = [...CORE_PARAMS, ...(detected.includes("fires") ? (["fires"] as ParamKey[]) : [])];
   const topics = detectTopics(message);
@@ -120,7 +125,7 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
     }
   }
 
-  const built = buildAnswer({ lang, fmt, g, a, outlook, aiDirect, topics, limitations, table: dataTable, cards: actionCards, cardNote: actionNote });
+  const built = buildAnswer({ lang, fmt, g, a, outlook, aiDirect, topics, limitations, table: dataTable, cards: actionCards, cardNote: actionNote, regionSource, mapRegionName });
   const v = verification as VerifyResult | null;
 
   return {
@@ -146,6 +151,7 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
     recommendations: recs,
     sections: built.sections,
     summary: built.sections.summary,
+    summaryParts: built.summaryParts,
     dataTable,
     actionCards,
     actionNote: actionCards.length ? null : actionNote,
@@ -176,12 +182,12 @@ async function answerGeneral(message: string, lang: Lang, req: ValidChatRequest,
   );
   const body = chain.text?.trim() || GENERAL_TEMPLATE[lang];
   const disclaimer = fmt.generalDisclaimer[lang];
-  const region = getRegion(req.selectedRegionId) ?? getRegion(DEFAULT_REGION_ID)!;
+  const region = getRegion(req.selectedRegionId) ?? null;
   const empty = { summary: body, current: "", history: "", outlook: "", actions: "", sources: "", disclaimer };
   return {
     answer: `${body}\n\n${disclaimer}`,
     lang,
-    region: { id: region.id, name: region.name, nameMy: region.nameMy },
+    region: region ? { id: region.id, name: region.name, nameMy: region.nameMy } : null,
     period: null,
     sources: [],
     facts: [],
@@ -201,6 +207,49 @@ async function answerGeneral(message: string, lang: Lang, req: ValidChatRequest,
     recommendations: [],
     sections: empty,
     summary: body,
+    summaryParts: null,
+    dataTable: null,
+    actionCards: [],
+    actionNote: null,
+  };
+}
+
+/** Environmental question without any location: no NASA data is fetched and no region is guessed. */
+function answerNeedsRegion(lang: Lang, fmt: AnswerFormat): ChatResponseBody {
+  const T = <V,>(t: { en: V; my: V }) => t[lang];
+  const parts = {
+    region: T({ en: "Location not selected yet", my: "တည်နေရာ မရွေးချယ်ရသေးပါ" }),
+    keyFindings: T({ en: "No NASA data was retrieved, because no state or region has been chosen.", my: "ပြည်နယ် သို့မဟုတ် တိုင်းဒေသကြီး မရွေးချယ်ရသေးသဖြင့် NASA အချက်အလက် မရယူရသေးပါ။" }),
+    recommendation: T({ en: "Select a state or region on the map, or name one in your question (for example: “drought risk in Magway”).", my: "မြေပုံပေါ်တွင် ပြည်နယ်/တိုင်းဒေသကြီး တစ်ခု ရွေးပါ၊ သို့မဟုတ် မေးခွန်းတွင် ထည့်ရေးပါ (ဥပမာ - “မကွေးတိုင်းဒေသကြီး မိုးခေါင်နိုင်ခြေ”)။" }),
+    regionSelected: false,
+  };
+  const disclaimer = fmt.generalDisclaimer[lang];
+  const lab = lang === "my" ? ["တိုင်းဒေသကြီး / ပြည်နယ်", "အဓိကတွေ့ရှိချက်", "အဓိကအကြံပြုချက်"] : ["Region", "Key findings", "Key recommendation"];
+  const body = `${lab[0]}: ${parts.region}\n\n${lab[1]}: ${parts.keyFindings}\n\n${lab[2]}: ${parts.recommendation}`;
+  return {
+    answer: `${body}\n\n${disclaimer}`,
+    lang,
+    region: null,
+    period: null,
+    sources: [],
+    facts: [],
+    dataFooter: "",
+    limitations: [],
+    generator: "template",
+    provider: null,
+    model: null,
+    attempts: [],
+    verification: null,
+    nasaDataAvailable: false,
+    mode: "live",
+    kind: "needs_region",
+    topics: [],
+    indicators: { drought: "unknown", wet: "unknown", heat: "unknown" },
+    outlook: { window: { start: "", end: "" }, forecastAvailable: false, historical: [] },
+    recommendations: [],
+    sections: { summary: body, current: "", history: "", outlook: "", actions: "", sources: "", disclaimer },
+    summary: body,
+    summaryParts: parts,
     dataTable: null,
     actionCards: [],
     actionNote: null,

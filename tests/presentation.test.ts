@@ -146,11 +146,11 @@ describe("shorter answers", () => {
   });
 });
 
-describe("Executive Summary", () => {
-  it("English: summary first, then the six numbered detailed sections, disclaimer last", async () => {
+describe("Executive Summary (region · key findings · key recommendation)", () => {
+  it("English: three-part summary first, then the six numbered detailed sections, disclaimer last", async () => {
     const r = await ask("Is there drought risk for rice farmers in Magway?", DRY);
-    expect(r.answer.startsWith("Executive Summary\n")).toBe(true);
-    const order = ["Executive Summary", "— Detailed Analysis —", "1. Current NASA Data", "2. Historical Comparison", "3. Next 30-Day Outlook", "4. Evidence-Based Action Cards", "5. Data Sources", "6. Disclaimer"];
+    expect(r.answer.startsWith("Executive Summary\nRegion: Magway Region (named in your question)\n\nKey findings: ")).toBe(true);
+    const order = ["Executive Summary", "Region:", "Key findings:", "Key recommendation:", "— Detailed Analysis —", "1. Current NASA Data", "2. Historical Comparison", "3. Next 30-Day Outlook", "4. Evidence-Based Action Cards", "5. Data Sources", "6. Disclaimer"];
     let pos = -1;
     for (const h of order) {
       const i = r.answer.indexOf(h);
@@ -160,37 +160,73 @@ describe("Executive Summary", () => {
     expect(r.answer.endsWith(answerFormat.disclaimer.en)).toBe(true);
   });
 
-  it("summary is 2–4 sentences and only uses values shown in the table and cards", async () => {
+  it("returns the three parts as a structured field", async () => {
     const r = await ask("Is there drought risk for rice farmers in Magway?", DRY);
-    const sentences = r.summary.split(/(?<=[.။])\s+/).filter(Boolean);
-    expect(sentences.length).toBeGreaterThanOrEqual(2);
-    expect(sentences.length).toBeLessThanOrEqual(4);
-    // every number in the summary appears in the data table or the action cards
+    const p = r.summaryParts!;
+    expect(p.region).toBe("Magway Region (named in your question)");
+    expect(p.regionSelected).toBe(true);
+    expect(p.keyFindings.length).toBeGreaterThan(20);
+    expect(p.recommendation.length).toBeGreaterThan(10);
+  });
+
+  it("key findings and recommendation only use values from the table and cards", async () => {
+    const r = await ask("Is there drought risk for rice farmers in Magway?", DRY);
+    const p = r.summaryParts!;
     const allowed = JSON.stringify({ t: r.dataTable, c: r.actionCards });
-    for (const n of r.summary.match(/\d+(?:\.\d+)?/g) ?? []) expect(allowed, n).toContain(n);
-    // key finding and main option come from the detailed sections
-    expect(r.summary).toContain(r.dataTable!.rows[0].latest.value.toString());
-    expect(r.summary).toContain(r.actionCards[0].potentialImpact);
+    for (const n of `${p.keyFindings} ${p.recommendation}`.match(/\d+(?:\.\d+)?/g) ?? []) expect(allowed, n).toContain(n);
+    expect(p.keyFindings).toContain(r.dataTable!.rows[0].latest.value.toString());
+    expect(p.recommendation.startsWith(r.actionCards[0].suggestedOptions[0].replace(/\.$/, ""))).toBe(true);
   });
 
-  it("high-impact summary names the local data to check first", async () => {
+  it("uses the map-selected region and says so", async () => {
+    const { f } = mockFetch({ "https://power.larc.nasa.gov": nasa(), "https://modis.ornl.gov": () => new Response("down", { status: 503 }) });
+    const r = await answerChat({ message: "How are crops doing?", selectedRegionId: "tanintharyi" }, { config: baseConfig(), fetchImpl: f, today: TODAY });
+    expect(r.region!.id).toBe("tanintharyi");
+    expect(r.summaryParts!.region).toBe("Tanintharyi Region (selected on the map)");
+  });
+
+  it("when the question names another region, shows both so the user is not confused", async () => {
+    const { f } = mockFetch({ "https://power.larc.nasa.gov": nasa(), "https://modis.ornl.gov": () => new Response("down", { status: 503 }) });
+    const r = await answerChat({ message: "drought in Magway?", selectedRegionId: "tanintharyi" }, { config: baseConfig(), fetchImpl: f, today: TODAY });
+    expect(r.summaryParts!.region).toBe("Magway Region (named in your question; map selection: Tanintharyi)");
+  });
+
+  it("never guesses a region: no location → 'Location not selected yet' and no NASA calls", async () => {
+    const { f, calls } = mockFetch({});
+    const r = await answerChat({ message: "Is there a drought risk for my crops?" }, { config: baseConfig(), fetchImpl: f, today: TODAY });
+    expect(r.kind).toBe("needs_region");
+    expect(r.region).toBeNull();
+    expect(r.summaryParts).toMatchObject({ region: "Location not selected yet", regionSelected: false });
+    expect(r.summaryParts!.recommendation).toMatch(/Select a state or region on the map/);
+    expect(calls).toHaveLength(0);
+    expect(r.answer.endsWith(answerFormat.generalDisclaimer.en)).toBe(true);
+  });
+
+  it("Myanmar: no location → Myanmar message", async () => {
+    const r = await answerChat({ message: "မိုးခေါင်နိုင်ခြေ ရှိပါသလား" }, { config: baseConfig(), today: TODAY });
+    expect(r.summaryParts!.region).toBe("တည်နေရာ မရွေးချယ်ရသေးပါ");
+    expect(r.answer.endsWith(answerFormat.generalDisclaimer.my)).toBe(true);
+  });
+
+  it("high-impact recommendation names the local data to check first", async () => {
     const r = await ask("Should we change irrigation water distribution from the reservoir in Magway?", DRY);
-    const first = r.actionCards[0];
-    expect(first.decisionType).toBe("water");
-    expect(r.summary).toMatch(/check reservoir storage levels, river water levels first/);
+    expect(r.actionCards[0].decisionType).toBe("water");
+    expect(r.summaryParts!.recommendation).toMatch(/check reservoir storage levels, river water levels before acting/);
   });
 
-  it("Myanmar: Myanmar summary on top", async () => {
+  it("Myanmar: three Myanmar paragraphs on top", async () => {
     const r = await ask("မကွေးတိုင်းဒေသကြီးရှိ စပါးတောင်သူများအတွက် မိုးခေါင်နိုင်ခြေ ရှိပါသလား", DRY);
-    expect(r.answer.startsWith("အကျဉ်းချုပ်အဖြေ\n")).toBe(true);
-    expect(r.summary).toContain("အဓိက တွေ့ရှိချက်");
+    expect(r.answer.startsWith("အကျဉ်းချုပ်အဖြေ\nတိုင်းဒေသကြီး / ပြည်နယ်: မကွေးတိုင်းဒေသကြီး (သင့်မေးခွန်းတွင် ဖော်ပြထားသည်)")).toBe(true);
+    expect(r.answer).toContain("\n\nအဓိကတွေ့ရှိချက်: ");
+    expect(r.answer).toContain("\n\nအဓိကအကြံပြုချက်: ");
     expect(r.answer).toContain("— အသေးစိတ်အချက်အလက် —");
     expect(r.answer.endsWith(answerFormat.disclaimer.my)).toBe(true);
   });
 
-  it("says evidence is insufficient in the summary when no card can be made", async () => {
+  it("says evidence is insufficient (and what to ask) when no card can be made", async () => {
     const r = await ask("wind speed in Yangon");
-    expect(r.summary).toContain("Insufficient evidence to generate a reliable action recommendation.");
+    expect(r.summaryParts!.recommendation).toContain("Insufficient evidence to generate a reliable action recommendation.");
+    expect(r.summaryParts!.recommendation).toContain("Ask about a specific decision");
   });
 });
 

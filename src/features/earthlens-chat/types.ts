@@ -70,7 +70,8 @@ export interface ProviderAttempt {
 export interface ChatResponseBody {
   answer: string;
   lang: Lang;
-  region: { id: string; name: string; nameMy: string };
+  /** Null when no location was named in the question or selected on the map. */
+  region: { id: string; name: string; nameMy: string } | null;
   period: { start: string; end: string } | null;
   sources: { name: string; url: string }[];
   facts: Fact[];
@@ -87,7 +88,7 @@ export interface ChatResponseBody {
   /** Kept for compatibility with the original EarthLens chat panel. */
   mode: "live";
   /** environmental = eight-section NASA answer; general = short answer without NASA data. */
-  kind: "environmental" | "general";
+  kind: "environmental" | "general" | "needs_region";
   /** Priority topics detected in the question. */
   topics: ("drought" | "flood" | "agriculture")[];
   /** EarthLens indicators (rule-based, not official declarations). */
@@ -99,6 +100,8 @@ export interface ChatResponseBody {
   sections: Record<SectionKey, string>;
   /** Executive Summary shown at the top (same text as sections.summary). */
   summary: string;
+  /** The summary as three separate paragraphs (region · key findings · key recommendation). Null for general questions. */
+  summaryParts: SummaryParts | null;
   /** Compact table of the most relevant NASA measurements (null for general questions or without data). */
   dataTable: DataTable | null;
   /** Evidence-based Action Cards built by the server from NASA facts (never by the AI). */
@@ -110,6 +113,17 @@ export interface ChatResponseBody {
 export interface ChatErrorBody {
   error: string;
   code: "invalid_request" | "rate_limited" | "server_error" | "forbidden_origin";
+}
+
+export interface SummaryParts {
+  /** Which state/region the answer is about, and whether it came from the question or the map. */
+  region: string;
+  /** 1–2 most important findings, taken from the NASA data table. */
+  keyFindings: string;
+  /** Most important option to consider, from the top Action Card (or what evidence is missing). */
+  recommendation: string;
+  /** False when the user has not chosen any location. */
+  regionSelected: boolean;
 }
 
 export type SectionKey = "summary" | "current" | "history" | "outlook" | "actions" | "sources" | "disclaimer";

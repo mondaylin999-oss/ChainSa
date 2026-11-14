@@ -1,5 +1,5 @@
 import "server-only";
-import type { ActionCard, DataTable, Fact, Lang } from "../types";
+import type { ActionCard, DataTable, Fact, Lang, SummaryParts } from "../types";
 import type { AnswerFormat, SectionId } from "../config/answer-format";
 import type { Grounding } from "./grounding";
 import type { Assessment } from "./climate/assessment";
@@ -42,6 +42,10 @@ export interface BuildInput {
   table: DataTable | null;
   cards: ActionCard[];
   cardNote: string | null;
+  /** Where the region came from: named in the question, or selected on the map. */
+  regionSource: "question" | "map";
+  /** Region selected on the map when the question names a different one. */
+  mapRegionName?: string | null;
 }
 
 /** The summary has no number; the detailed sections are numbered 1–6. */
@@ -226,45 +230,66 @@ const SUMMARY_RANK: [number, T][] = [
  * Executive Summary (2–4 sentences): the direct answer, up to 2 key findings from the data table, and the main
  * impact + first option of the most relevant Action Card. No new numbers: every value comes from the table/cards.
  */
-export function buildSummary(input: BuildInput): string {
-  const { lang, table, cards, cardNote } = input;
-  const out: string[] = [input.aiDirect ?? templateDirect(input)];
+export function buildSummaryParts(input: BuildInput): SummaryParts {
+  const { lang, table, cards, cardNote, g } = input;
+  const L = (t: T) => t[lang];
   const end = lang === "my" ? "။" : ".";
+
+  // (1) Region — exactly the one the answer is about, and where it came from.
+  const name = lang === "my" ? g.region.nameMy : `${g.region.name} ${g.region.type}`;
+  const source = input.regionSource === "question"
+    ? L({ en: "named in your question", my: "သင့်မေးခွန်းတွင် ဖော်ပြထားသည်" })
+    : L({ en: "selected on the map", my: "မြေပုံပေါ်တွင် ရွေးချယ်ထားသည်" });
+  const other = input.mapRegionName ? L({ en: `; map selection: ${input.mapRegionName}`, my: `၊ မြေပုံတွင် ရွေးထားသည် - ${input.mapRegionName}` }) : "";
+  const region = `${name} (${source}${other})`;
+
+  // (2) Key findings — the direct answer plus up to 2 findings from the data table.
+  const findings: string[] = [input.aiDirect ?? templateDirect(input)];
   const rows = (table?.rows ?? []).filter((r) => r.reference && r.rank !== null).slice(0, 2);
   if (rows.length) {
     const parts = rows.map((r) => {
       const word = SUMMARY_RANK.find(([max]) => r.rank! < max)![1][lang];
       return lang === "my"
         ? `${r.label} ${r.latest.value} ${r.latest.unit} (${word}၊ ပုံမှန် ${r.reference!.value} ${r.reference!.unit})`
-        : `${r.label.toLowerCase()} was ${r.latest.value} ${r.latest.unit} (${word}; typical ${r.reference!.value} ${r.reference!.unit})`;
+        : `${r.label.charAt(0).toUpperCase()}${r.label.slice(1)}: ${r.latest.value} ${r.latest.unit} (${word}; typical ${r.reference!.value} ${r.reference!.unit})`;
     });
-    out.push(lang === "my" ? `အဓိက တွေ့ရှိချက် - ${parts.join("၊ ")}${end}` : `Key findings: ${parts.join("; ")}${end}`);
+    findings.push(`${parts.join(lang === "my" ? "၊ " : "; ")}${end}`);
   } else if (table?.rows.length) {
     const r = table.rows[0];
-    out.push(lang === "my"
-      ? `နောက်ဆုံး တိုင်းတာချက် - ${r.label} ${r.latest.value} ${r.latest.unit} (ယခင်နှစ်များနှင့် နှိုင်းယှဉ်ချက် မရရှိပါ)${end}`
-      : `Latest measurement: ${r.label.toLowerCase()} ${r.latest.value} ${r.latest.unit} (no comparison with past years available)${end}`);
+    findings.push(lang === "my"
+      ? `${r.label} ${r.latest.value} ${r.latest.unit} (ယခင်နှစ်များနှင့် နှိုင်းယှဉ်ချက် မရရှိပါ)${end}`
+      : `${r.label}: ${r.latest.value} ${r.latest.unit} (no comparison with past years available)${end}`);
   }
+
+  // (3) Key recommendation — first option of the top card; high-impact cards name the local data to check first.
+  let recommendation: string;
   const card = cards[0];
-  if (card) {
-    const opt = card.suggestedOptions[0]?.replace(/[.။]$/, "");
+  const opt = card?.suggestedOptions[0]?.replace(/[.။]$/, "");
+  if (card && opt) {
     const highImpact = card.decisionType === "water" || card.decisionType === "electricity" || card.decisionType === "disaster";
     const check = highImpact ? card.evidenceNeeded.slice(0, 2).join(lang === "my" ? "၊ " : ", ") : "";
-    out.push(card.potentialImpact);
-    if (opt)
-      out.push(lang === "my"
-        ? `အဓိက အကြံပြုချက် - ${opt}${check ? ` (မလုပ်ဆောင်မီ ${check} ကို စစ်ဆေးပါ)` : ""}${end}`
-        : `Main option to consider: ${opt.charAt(0).toLowerCase()}${opt.slice(1)}${check ? ` (check ${check.toLowerCase()} first)` : ""}${end}`);
-  } else if (cardNote) {
-    out.push(cardNote);
+    recommendation = lang === "my"
+      ? `${opt}${check ? ` — မလုပ်ဆောင်မီ ${check} ကို စစ်ဆေးပါ` : ""}${end}`
+      : `${opt.charAt(0).toUpperCase()}${opt.slice(1)}${check ? ` — check ${check.toLowerCase()} before acting` : ""}${end}`;
+  } else {
+    recommendation = `${cardNote ?? L({ en: "Insufficient evidence to generate a reliable action recommendation.", my: "ယုံကြည်စိတ်ချရသော လုပ်ဆောင်ချက် အကြံပြုချက် ပေးရန် အထောက်အထား မလုံလောက်ပါ။" })} ${L({ en: "Ask about a specific decision (crops, water, flooding or heat) to get one.", my: "အကြံပြုချက် ရရှိရန် သီးနှံ၊ ရေ၊ ရေကြီးမှု သို့မဟုတ် အပူ စသည့် ဆုံးဖြတ်ချက်တစ်ခုကို တိကျစွာ မေးပါ။" })}`;
   }
-  return out.join(" ");
+  return { region, keyFindings: findings.join(" "), recommendation, regionSelected: true };
 }
 
-export function buildAnswer(input: BuildInput): { text: string; sections: Record<SectionId, string> } {
+/** Plain-text summary: three labelled paragraphs. */
+export function summaryText(p: SummaryParts, lang: Lang): string {
+  const lab = lang === "my"
+    ? ["တိုင်းဒေသကြီး / ပြည်နယ်", "အဓိကတွေ့ရှိချက်", "အဓိကအကြံပြုချက်"]
+    : ["Region", "Key findings", "Key recommendation"];
+  return `${lab[0]}: ${p.region}\n\n${lab[1]}: ${p.keyFindings}\n\n${lab[2]}: ${p.recommendation}`;
+}
+
+export function buildAnswer(input: BuildInput): { text: string; sections: Record<SectionId, string>; summaryParts: SummaryParts } {
   const { lang, fmt } = input;
+  const summaryParts = buildSummaryParts(input);
   const bodies: Record<SectionId, string[]> = {
-    summary: [buildSummary(input)],
+    summary: [summaryText(summaryParts, lang)],
     current: current(input),
     history: history(input),
     outlook: outlookSection(input),
@@ -280,5 +305,5 @@ export function buildAnswer(input: BuildInput): { text: string; sections: Record
     parts.push(`${heading(fmt, s.id, lang)}\n${body}`);
     if (s.id === "summary") parts.push(`— ${fmt.detailedHeading[lang]} —`);
   }
-  return { text: parts.join("\n\n"), sections };
+  return { text: parts.join("\n\n"), sections, summaryParts };
 }
