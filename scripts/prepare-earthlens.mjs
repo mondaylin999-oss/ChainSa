@@ -35,6 +35,10 @@ source = replaceOnce(source,
   "e.map(g=>(0,Je.jsx)(rm,{center:[g.lat,g.lon]",
   "V?.features.map(feature=>{let township=Y.find(item=>item.id===feature.properties.TS_PCODE);if(!township)return null;let center=pj.default.geoJSON(feature).getBounds().getCenter();return(0,Je.jsx)(rm,{center,radius:township.id===W?7:4,pathOptions:{color:township.id===W?\"#ffffff\":\"#7cc7ff\",weight:1,fillColor:township.id===W?\"#4fd18b\":\"#2b8fe8\",fillOpacity:.95},eventHandlers:{click:()=>X?.(township.id)},children:(0,Je.jsx)(nm,{className:\"region-tip\",children:u===\"my\"?township.nameMy:township.name})},township.id)}),!a&&e.map(g=>(0,Je.jsx)(rm,{center:[g.lat,g.lon]",
   "region and township marker drilldown");
+source = replaceOnce(source,
+  'p=g=>{let w=g.properties.iso===c;return{color:',
+  'p=g=>{let w=g.properties.iso===c;return{className:c&&!w?"terra-region-unfocused":"",color:',
+  "unfocused region styling");
 const adapter = await readFile(new URL("./earthlens-adapter.js", import.meta.url), "utf8");
 const dashboard = await readFile(new URL("./earthlens-dashboard.js", import.meta.url), "utf8");
 const dashboardCss = await readFile(new URL("./earthlens-dashboard.css", import.meta.url), "utf8");
