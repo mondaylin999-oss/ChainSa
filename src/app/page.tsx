@@ -318,7 +318,6 @@ export default function Page() {
           </button>
           <div className="page-heading">
             <div><p className="eyebrow">Explore Myanmar</p><h1>Map &amp; data workspace</h1><p>Choose a topic, then view a connected observation series and its source details.</p></div>
-            <button className="button-secondary" onClick={askAI}><MessageCircle size={16} /> Ask AI</button>
           </div>
           <div className="explore-grid">
             <aside className="topic-rail" aria-label="Explore by topic">
