@@ -166,7 +166,7 @@ function Og() {
               panelTitle(text("Observation trend", "လေ့လာတွေ့ရှိချက် လမ်းကြောင်း"), Ha[param].unit),
               result && h("p", {className:"terra-period"}, `${result.period.start} → ${result.period.end}`),
               busy ? h("div", {className:"terra-empty", role:"status"}, icon(go, 24), t("analyzing")) :
-              selectedResult?.status === "ok" && selectedResult.series?.length ? h(_9e, {r:selectedResult}) :
+              selectedResult?.status === "ok" && selectedResult.series?.length && selectedResult.codes?.length ? h(TerraEarthbeatPanel, {key:`${regionId}:${param}:${mode}:${refresh}`, result:selectedResult, lang, mode, visible:!narrow || mobileView === "insights"}) :
               h("div", {className:"terra-empty"}, icon(yo, 32), h("strong", null, region ? text("No chart available", "ဂရပ် မရရှိပါ") : text("Your graph appears here", "ဂရပ်ကို ဤနေရာတွင် ပြပါမည်")),
                 h("p", null, selectedResult?.message || (region ? text("Try another measurement or date range.", "အခြားဒေတာ သို့မဟုတ် ရက်စွဲကို ရွေးပါ။") : text("Choose a location to see its measurements over time.", "အချိန်အလိုက် ဒေတာကြည့်ရန် နေရာရွေးပါ။"))))),
             h("section", {className:"terra-panel terra-details"},
