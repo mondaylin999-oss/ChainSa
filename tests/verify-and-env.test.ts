@@ -71,3 +71,17 @@ describe("free-only model configuration", () => {
     expect(getConfig().groq.models).toEqual(["openai/gpt-oss-20b"]);
   });
 });
+
+describe("AI_LANGUAGES setting", () => {
+  afterEach(() => {
+    delete process.env.AI_LANGUAGES;
+    resetConfigForTests();
+  });
+  it("defaults to English only and accepts en,my", () => {
+    resetConfigForTests();
+    expect(getConfig().aiLanguages).toEqual(["en"]);
+    process.env.AI_LANGUAGES = "en,my,fr";
+    resetConfigForTests();
+    expect(getConfig().aiLanguages).toEqual(["en", "my"]);
+  });
+});

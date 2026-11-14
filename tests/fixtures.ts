@@ -34,6 +34,7 @@ export const baseConfig = (over: Partial<ServerConfig> = {}): ServerConfig => ({
   openrouter: { name: "openrouter", apiKey: "", baseUrl: "https://openrouter.test/api/v1", models: ["openrouter/free", "meta-llama/llama-3.3-70b-instruct:free"], rejectedModels: [] },
   groq: { name: "groq", apiKey: "", baseUrl: "https://groq.test/openai/v1", models: ["openai/gpt-oss-20b"], rejectedModels: [] },
   firmsMapKey: "",
+  aiLanguages: ["en", "my"],
   aiTimeoutMs: 5000,
   verifyMode: "strict",
   nasaTimeoutMs: 5000,

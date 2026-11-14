@@ -173,6 +173,7 @@ npm run check:secrets       # after build: confirms no key is in browser files
 | `GROQ_EXTRA_FREE_MODELS` | no | Add a new Groq free model to the allowlist yourself |
 | `NASA_FIRMS_MAP_KEY` | for fires | Free NASA FIRMS key: https://firms.modaps.eosdis.nasa.gov/api/map_key/ (old name `FIRMS_MAP_KEY` still works) |
 | `AI_ALLOW_PAID_MODELS` | no | Must be `false`. Paid models are never used; any other value is ignored with a warning |
+| `AI_LANGUAGES` | no | Answer languages the AI may write in: `en` (default) or `en,my`. Other languages always use the template wording |
 | `CHAT_RATE_LIMIT_MAX` / `CHAT_RATE_LIMIT_WINDOW_SECONDS` | no | Default 10 requests per 60 s |
 | `TRUST_PROXY` | no | `true` only behind a trusted proxy (e.g. Vercel), so each user gets their own limit |
 | `CHAT_ALLOWED_ORIGINS` | no | e.g. `https://your-site.org`; blocks other websites from calling the API |
@@ -296,3 +297,15 @@ The original demo looks like a Next.js app (it uses `next/dynamic`-style code), 
   **Its real response time has not been measured** — test it on your computer.
 - Not yet integrated: GloFAS river forecasts, SMAP / IMERG satellite data, streaming replies.
 - Decision-support rules and the new Myanmar wording need review by agricultural experts and a native speaker.
+
+## AI on/off comparison (`npm run compare:ai`)
+
+Asks 20 questions (10 English, 10 Myanmar; `scripts/compare-ai/questions.ts`) twice with the same NASA data — AI off
+(template) and AI on — and writes a side-by-side report to `reports/` (git-ignored). Needs keys in `.env.local`.
+`COMPARE_LIMIT=5` runs fewer questions; `COMPARE_ALLOW_NO_KEYS=1` is a template-only dry run.
+
+Findings of the first run (2026-11-14, Groq `openai/gpt-oss-20b`; OpenRouter not tested):
+- English: more responsive than the template, all numbers verified, but it sometimes called far-from-usual data "normal" or
+  made forecast-like risk statements. Both are now rejected (`contradictsData`, extra forbidden phrases in `server/verify.ts`).
+- Myanmar: wrong or meaningless terms, so the AI writes English only by default (`AI_LANGUAGES=en`).
+- A rejected API key (401/403) now skips that provider at once instead of trying its next model.

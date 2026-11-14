@@ -16,7 +16,7 @@ import { buildVegetation } from "./vegetation";
 import { buildActionCards, buildDataTable, detectDecisions } from "./presentation";
 import { buildGeneralPrompt, buildMessages, buildSystemPrompt } from "./prompt";
 import { runProviderChain } from "./providers/chain";
-import { buildAllowed, forbiddenClaims, verifyAnswer, type VerifyResult } from "./verify";
+import { buildAllowed, contradictsData, forbiddenClaims, verifyAnswer, type VerifyResult } from "./verify";
 
 export interface HandlerDeps {
   config?: ServerConfig;
@@ -84,8 +84,11 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
   let attempts: ChatResponseBody["attempts"] = [];
   let verification: VerifyResult | null = null;
 
-  // The AI is only asked when there is real NASA data to ground it in, and only writes the direct answer.
-  if (nasaDataAvailable) {
+  // The AI is only asked when there is real NASA data to ground it in, only for enabled answer languages
+  // (AI_LANGUAGES), and only writes the direct answer.
+  const aiAllowed = cfg.aiLanguages.includes(lang);
+  if (nasaDataAvailable && !aiAllowed) attempts = [{ provider: "openrouter", model: "-", outcome: "language_disabled" }];
+  if (nasaDataAvailable && aiAllowed) {
     const allFacts = [...g.facts, ...a.facts];
     const allowed = buildAllowed(allFacts, region);
     const system = buildSystemPrompt({
@@ -103,6 +106,11 @@ export async function answerChat(req: ValidChatRequest, deps: HandlerDeps = {}):
         if (bad.length) {
           console.warn(`[earthlens-chat] AI answer rejected (forecast/probability wording): ${bad.join(" | ")}`);
           return "forbidden_claim";
+        }
+        const contradiction = contradictsData(text, allFacts);
+        if (contradiction) {
+          console.warn(`[earthlens-chat] AI answer rejected (contradicts NASA comparison): ${contradiction}`);
+          return "contradicts_data";
         }
         const v = verifyAnswer(text, allowed);
         if (!v.ok) console.warn(`[earthlens-chat] AI answer had numbers not in NASA data: ${v.unverified.join(", ")}`);
@@ -174,12 +182,14 @@ const GENERAL_TEMPLATE = {
 
 /** Non-environmental questions: short answer, no NASA analysis, general disclaimer added by the server. */
 async function answerGeneral(message: string, lang: Lang, req: ValidChatRequest, cfg: ServerConfig, fmt: AnswerFormat, deps: HandlerDeps): Promise<ChatResponseBody> {
-  const chain = await runProviderChain(
-    buildMessages(buildGeneralPrompt(lang), req.history, message),
-    cfg,
-    (text) => (forbiddenClaims(text).length ? "forbidden_claim" : true),
-    deps.fetchImpl,
-  );
+  const chain = cfg.aiLanguages.includes(lang)
+    ? await runProviderChain(
+        buildMessages(buildGeneralPrompt(lang), req.history, message),
+        cfg,
+        (text) => (forbiddenClaims(text).length ? "forbidden_claim" : true),
+        deps.fetchImpl,
+      )
+    : { text: null, provider: null, model: null, attempts: [{ provider: "openrouter" as const, model: "-", outcome: "language_disabled" as const }] };
   const body = chain.text?.trim() || GENERAL_TEMPLATE[lang];
   const disclaimer = fmt.generalDisclaimer[lang];
   const region = getRegion(req.selectedRegionId) ?? null;

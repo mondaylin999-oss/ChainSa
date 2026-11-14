@@ -101,7 +101,34 @@ const FORBIDDEN: RegExp[] = [
   /\b(?:forecast|outlook)\s+(?:shows?|predicts?|indicates?|suggests?)\b/i,
   /ဖြစ်နိုင်ခြေ[^။\n]*[0-9၀-၉]/, // "probability … <number>"
   /ခန့်မှန်းချက်(?:အရ|က\s*ပြ)/, // "according to the forecast"
+  // a risk statement about the coming weeks is a forecast, and there is no validated forecast
+  /\b(?:no|low|high|little|small|big|major)\s+(?:\w+\s+){0,2}risk\b[^.\n]{0,60}\b(?:next|coming|following)\s+(?:\d+\s+)?(?:days?|weeks?|month)/i,
+  /\b(?:in|over|during)\s+the\s+(?:next|coming)\s+(?:\d+\s+)?(?:days?|weeks?|month)\b[^.\n]{0,40}\b(?:no|low|high)\s+(?:\w+\s+){0,2}risk\b/i,
 ];
+
+/** Words claiming conditions are normal. */
+const NORMAL_WORDS: RegExp[] = [
+  /\b(?:within|in)\s+(?:the\s+)?normal\s+(?:range|ranges|levels?|limits)\b/i,
+  /\bnear[- ]normal\b/i,
+  /\bnormal\s+levels?\b/i,
+  /\bsame\s+as\s+usual\b|\bjust\s+as\s+usual\b|\bconditions\s+(?:are|look)\s+(?:as\s+)?usual\b/i, // not "wetter than usual"
+  /\btypical\s+(?:levels?|range)\b/i,
+  /\bnothing\s+unusual\b/i,
+  /ပုံမှန်အတိုင်းအတာအတွင်း/,
+];
+
+/**
+ * Rejects AI text that calls conditions "normal" while the NASA comparison shows rainfall or soil wetness
+ * far from usual (rank ≥ 80 or ≤ 20 of 100). The number check cannot catch this because no number is wrong.
+ */
+export function contradictsData(text: string, facts: Fact[]): string | null {
+  const extreme = facts.filter(
+    (f) => f.unit === "percentile" && ["rain_30d_pct", "rain_90d_pct", "soil_pct"].includes(f.id) && (f.value >= 80 || f.value <= 20),
+  );
+  if (!extreme.length) return null;
+  const hit = NORMAL_WORDS.find((re) => re.test(text));
+  return hit ? `says "normal" but ${extreme.map((f) => `${f.id}=${f.value}`).join(", ")}` : null;
+}
 
 export function forbiddenClaims(text: string): string[] {
   return FORBIDDEN.filter((re) => re.test(text)).map((re) => re.source);

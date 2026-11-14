@@ -13,7 +13,7 @@ export interface ChainResult {
 }
 
 /** Return true to accept an answer, or the rejection reason to make the chain try the next model. */
-export type AnswerCheck = (text: string) => true | "unverified_numbers" | "forbidden_claim";
+export type AnswerCheck = (text: string) => true | "unverified_numbers" | "forbidden_claim" | "contradicts_data";
 
 const MAX_ATTEMPTS_PER_PROVIDER = 3;
 const TOTAL_BUDGET_MS = 50_000;
@@ -57,8 +57,9 @@ export async function runProviderChain(
       const r = await chatCompletion({ baseUrl: p.baseUrl, apiKey: p.apiKey, model, messages, timeoutMs: cfg.aiTimeoutMs, fetchImpl, ...extras(p, model, cfg) });
       if (r.outcome !== "ok" || !r.text) {
         attempts.push({ provider: p.name, model, outcome: r.outcome });
-        // 402 from OpenRouter means the account would need credits — stop using this provider entirely.
-        if (r.status === 402) break;
+        // 402 = the account would need credits; 401/403 = the key was rejected.
+        // Neither gets better with another model, so go straight to the backup provider.
+        if (r.status === 402 || r.outcome === "invalid_credentials") break;
         continue;
       }
       const verdict = accept(r.text);
