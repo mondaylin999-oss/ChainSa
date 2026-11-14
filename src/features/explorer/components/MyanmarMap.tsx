@@ -1,5 +1,7 @@
 "use client";
 
+import type { CSSProperties } from "react";
+
 import boundaries from "../../earthlens-chat/server/nasa/myanmar-admin1.json";
 import { REGIONS } from "../../earthlens-chat/regions";
 
@@ -13,25 +15,6 @@ type BoundaryCollection = {
 };
 
 const boundaryData = boundaries as unknown as BoundaryCollection;
-// One distinct fill per state/region (admin-1), so neighbours never share a colour.
-const REGION_FILLS: Record<string, string> = {
-  "MM-11": "#cfe3f7", // Kachin
-  "MM-01": "#e4dcf4", // Sagaing
-  "MM-17": "#f7e3b2", // Shan
-  "MM-14": "#d7eedb", // Chin
-  "MM-04": "#f6d6c6", // Mandalay
-  "MM-12": "#c9e8e4", // Kayah
-  "MM-03": "#eef0c6", // Magway
-  "MM-13": "#f3d2de", // Kayin
-  "MM-16": "#bfe0d2", // Rakhine
-  "MM-02": "#dfe6f6", // Bago
-  "MM-07": "#f0e7cf", // Ayeyarwady
-  "MM-06": "#f9dcb4", // Yangon
-  "MM-15": "#d9e7bd", // Mon
-  "MM-05": "#e8d8ef", // Tanintharyi
-};
-const FALLBACK_FILLS = ["#d9eddd", "#f7e9b5", "#e7dff4", "#f1e4ce", "#f5d9c8", "#dce9f2", "#e8edcc"];
-
 function project(position: Position) {
   const [longitude, latitude] = position;
   return { x: 310 + (longitude - 97) * 31.3, y: 22 + (28.5 - latitude) * 33 };
@@ -42,6 +25,26 @@ function polygonPath(polygon: Polygon) {
     const { x, y } = project(point);
     return `${index ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(" ") + " Z").join(" ");
+}
+
+const MAP_WIDTH = 620;
+const MAP_HEIGHT = 700;
+
+/** Projected bounding box of a feature, used to zoom the map onto it. */
+function featureBounds(geometry: Geometry) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const polygon of geometryPolygons(geometry)) {
+    for (const ring of polygon) {
+      for (const position of ring) {
+        const { x, y } = project(position);
+        if (x < minX) minX = x;
+        if (y < minY) minY = y;
+        if (x > maxX) maxX = x;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+  return { minX, minY, maxX, maxY };
 }
 
 function geometryPolygons(geometry: Geometry): Polygon[] {
@@ -55,10 +58,37 @@ interface MyanmarMapProps {
 }
 
 export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }: MyanmarMapProps) {
+  // The selected region is drawn last so its enlarged shape overlaps its neighbours.
+  const orderedFeatures = [...boundaryData.features].sort((first, second) => {
+    const firstActive = REGIONS.find((item) => item.iso === first.properties.iso)?.id === selectedRegionId;
+    const secondActive = REGIONS.find((item) => item.iso === second.properties.iso)?.id === selectedRegionId;
+    return Number(firstActive) - Number(secondActive);
+  });
+
+  // Zoom the whole drawing onto the selected area so it appears large on the map.
+  const selectedFeature = boundaryData.features.find(
+    (feature) => REGIONS.find((item) => item.iso === feature.properties.iso)?.id === selectedRegionId,
+  );
+  let zoomTransform = "translate(0, 0) scale(1)";
+  let zoom = 1;
+  if (selectedFeature) {
+    const { minX, minY, maxX, maxY } = featureBounds(selectedFeature.geometry);
+    const padding = 22;
+    const scale = Math.min(
+      6,
+      Math.max(1, Math.min(MAP_WIDTH / (maxX - minX + padding), MAP_HEIGHT / (maxY - minY + padding))),
+    );
+    const centreX = (minX + maxX) / 2;
+    const centreY = (minY + maxY) / 2;
+    zoomTransform = `translate(${MAP_WIDTH / 2 - centreX * scale}, ${MAP_HEIGHT / 2 - centreY * scale}) scale(${scale})`;
+    zoom = scale;
+  }
+
   return (
     <svg
       className="myanmar-map"
       viewBox="0 0 620 700"
+      style={{ "--map-zoom": zoom } as CSSProperties}
       role="img"
       aria-labelledby="myanmar-map-title myanmar-map-desc"
     >
@@ -67,17 +97,12 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }
         A map using locally bundled Natural Earth state and region boundaries. Select a region to use its representative data point.
       </desc>
       <defs>
-        <linearGradient id="map-background" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#edf3ee" />
-          <stop offset=".52" stopColor="#edf3ee" />
-          <stop offset="1" stopColor="#dcedf3" />
-        </linearGradient>
-        <filter id="map-active-glow" x="-25%" y="-25%" width="150%" height="150%">
-          <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#2f9f6b" floodOpacity=".55" />
-          <feDropShadow dx="0" dy="0" stdDeviation="11" floodColor="#49c98a" floodOpacity=".32" />
+        <filter id="map-active-glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#f5c400" floodOpacity=".6" />
+          <feDropShadow dx="0" dy="0" stdDeviation="12" floodColor="#ffd800" floodOpacity=".34" />
         </filter>
       </defs>
-      <rect width="620" height="700" fill="url(#map-background)" />
+      <g className="map-zoom-layer" transform={zoomTransform}>
       <text x="54" y="338" className="map-neighbor-label">INDIA</text>
       <text x="148" y="235" className="map-neighbor-label">BANGLADESH</text>
       <text x="318" y="63" className="map-neighbor-label">CHINA</text>
@@ -85,7 +110,7 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }
       <text x="450" y="545" className="map-neighbor-label">THAILAND</text>
 
       <g aria-label="State and region boundaries">
-        {boundaryData.features.map((feature, index) => {
+        {orderedFeatures.map((feature) => {
           const region = REGIONS.find((item) => item.iso === feature.properties.iso);
           const active = region?.id === selectedRegionId;
           const paths = geometryPolygons(feature.geometry).map(polygonPath).join(" ");
@@ -93,9 +118,10 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }
             <path
               key={feature.properties.iso}
               d={paths}
-              fill={active ? "#8fd7a7" : REGION_FILLS[feature.properties.iso] ?? FALLBACK_FILLS[index % FALLBACK_FILLS.length]}
-              stroke={active ? "#176b4b" : "#596b5d"}
-              strokeWidth={active ? 2.8 : 1.15}
+              fill={active ? "#ffd400" : "#fdfdfc"}
+              stroke={active ? "#8a6d00" : "#6d7b71"}
+              strokeWidth={active ? 1.9 : 1.15}
+              vectorEffect="non-scaling-stroke"
               filter={active ? "url(#map-active-glow)" : undefined}
               fillRule="evenodd"
               className={`${onSelectRegion ? "map-region-selectable" : ""}${active ? " map-region-active" : ""}`.trim()}
@@ -120,9 +146,9 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }
         const label = language === "my" ? region.nameMy : region.name;
         return (
           <g key={region.id} className="map-label" aria-hidden="true">
-            {selected && <circle cx={point.x} cy={point.y} r="11" className="map-pulse-ring" fill="none" stroke="#2f9f6b" strokeWidth="2" />}
-            <circle cx={point.x} cy={point.y} r={selected ? 4.3 : 2.7} fill={selected ? "#176b4b" : "#26382f"} stroke="#fff" strokeWidth="1.5" />
-            {!["naypyidaw", "mandalay", "yangon"].includes(region.id) && <text x={point.x + 5} y={point.y - 5} className="map-region-label">{label}</text>}
+            {selected && <circle cx={point.x} cy={point.y} r={11 / zoom} className="map-pulse-ring" fill="none" stroke="#e8b800" strokeWidth={2 / zoom} />}
+            <circle cx={point.x} cy={point.y} r={(selected ? 4.3 : 2.7) / zoom} fill={selected ? "#8a6d00" : "#55615a"} stroke="#fff" strokeWidth={1.5 / zoom} />
+            {!["naypyidaw", "mandalay", "yangon"].includes(region.id) && <text x={point.x + 5 / zoom} y={point.y - 5 / zoom} className="map-region-label">{label}</text>}
           </g>
         );
       })}
@@ -135,11 +161,12 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }
         const point = project([city.lon, city.lat]);
         return (
           <g key={city.name} aria-label={city.name}>
-            <circle cx={point.x} cy={point.y} r="5.2" fill="#df7648" stroke="#fff" strokeWidth="2" />
-            <text x={point.x + 8} y={point.y + 4} className="map-city-label">{city.name}</text>
+            <circle cx={point.x} cy={point.y} r={5.2 / zoom} fill="#55615a" stroke="#fff" strokeWidth={2 / zoom} />
+            <text x={point.x + 8 / zoom} y={point.y + 4 / zoom} className="map-city-label">{city.name}</text>
           </g>
         );
       })}
+      </g>
     </svg>
   );
 }
