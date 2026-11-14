@@ -478,4 +478,4 @@ a { color: inherit; }
 .explore-back:focus-visible{outline:2px solid #176b4b;outline-offset:3px}
 @media(min-width:761px) and (max-height:700px){.is-exploring .explore-shell{padding-top:12px}.is-exploring .page-heading{margin-bottom:12px}.is-exploring .page-heading h1{font-size:25px}.is-exploring .page-heading p:not(.eyebrow){display:none}.is-exploring .map-stage{padding:12px}.is-exploring .map-drilldown-actions{gap:6px;padding:5px}.is-exploring .map-drilldown-actions small{display:none}}
 
-.structured-answer-host{min-width:0;overflow-wrap:anywhere;border-radius:12px;padding:14px;background:#0a1426;color:#e2e8f0}.structured-answer-host details{margin-top:10px}.structured-answer-host summary{cursor:pointer}.message-assistant:has(.structured-answer-host){max-width:100%;min-width:0}
+.structured-answer-host{min-width:0;overflow-wrap:anywhere;border-radius:12px;padding:0;background:transparent;color:var(--ink)}.structured-answer-host details{margin-top:10px}.structured-answer-host summary{cursor:pointer}.message-assistant:has(.structured-answer-host){max-width:100%;min-width:0}
