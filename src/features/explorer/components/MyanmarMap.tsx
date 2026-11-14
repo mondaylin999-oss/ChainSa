@@ -18,20 +18,20 @@ type BoundaryCollection = {
 const boundaryData = boundaries as unknown as BoundaryCollection;
 // One distinct fill per state/region (admin-1), so neighbours never share a colour.
 const REGION_FILLS: Record<string, string> = {
-  "MM-11": "#cfe3f7", // Kachin
-  "MM-01": "#e4dcf4", // Sagaing
-  "MM-17": "#f7e3b2", // Shan
-  "MM-14": "#d7eedb", // Chin
-  "MM-04": "#f6d6c6", // Mandalay
-  "MM-12": "#c9e8e4", // Kayah
-  "MM-03": "#eef0c6", // Magway
-  "MM-13": "#f3d2de", // Kayin
-  "MM-16": "#bfe0d2", // Rakhine
-  "MM-02": "#dfe6f6", // Bago
-  "MM-07": "#f0e7cf", // Ayeyarwady
-  "MM-06": "#f9dcb4", // Yangon
-  "MM-15": "#d9e7bd", // Mon
-  "MM-05": "#e8d8ef", // Tanintharyi
+  "MM-11": "#344d80", // Kachin
+  "MM-01": "#4b3c79", // Sagaing
+  "MM-17": "#295b6e", // Shan
+  "MM-14": "#535385", // Chin
+  "MM-04": "#315d59", // Mandalay
+  "MM-12": "#5c477d", // Kayah
+  "MM-03": "#3c426e", // Magway
+  "MM-13": "#33617a", // Kayin
+  "MM-16": "#62517e", // Rakhine
+  "MM-02": "#3e5983", // Bago
+  "MM-07": "#43686b", // Ayeyarwady
+  "MM-06": "#455179", // Yangon
+  "MM-15": "#5a416b", // Mon
+  "MM-05": "#3c6973", // Tanintharyi
 };
 const FALLBACK_FILLS = ["#d9eddd", "#f7e9b5", "#e7dff4", "#f1e4ce", "#f5d9c8", "#dce9f2", "#e8edcc"];
 
@@ -94,9 +94,9 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en", 
       </desc>
       <defs>
         <linearGradient id="map-background" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#edf3ee" />
-          <stop offset=".52" stopColor="#edf3ee" />
-          <stop offset="1" stopColor="#dcedf3" />
+          <stop offset="0" stopColor="#091329" />
+          <stop offset=".52" stopColor="#091329" />
+          <stop offset="1" stopColor="#101a38" />
         </linearGradient>
         <filter id="map-active-glow" x="-25%" y="-25%" width="150%" height="150%">
           <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#2f9f6b" floodOpacity=".55" />
@@ -120,7 +120,7 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en", 
               key={feature.properties.iso}
               d={paths}
               fill={REGION_FILLS[feature.properties.iso] ?? FALLBACK_FILLS[index % FALLBACK_FILLS.length]}
-              stroke="#596b5d"
+              stroke="#a395c9"
               strokeWidth={1.15} vectorEffect="non-scaling-stroke"
               style={focusRegion && !active ? {filter:"blur(2px)",opacity:.2} : undefined}
               fillRule="evenodd"
@@ -144,7 +144,7 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en", 
         {visibleTownships.map(feature=>{
           const township=townships.find(item=>item.id===feature.properties.TS_PCODE);if(!township)return null;
           const selected=township.id===selectedTownshipId;const bounds=boundsFor(feature.geometry);const sample=townshipPoints.townships.find(item=>item.id===township.id);const anchor=sample?project([sample.lon,sample.lat]):{x:(bounds.minX+bounds.maxX)/2,y:(bounds.minY+bounds.maxY)/2};const x=anchor.x,y=anchor.y;
-          return <g key={township.id}><path d={geometryPolygons(feature.geometry).map(polygonPath).join(" ")} fill={selected?"#8fd7a7":"transparent"} stroke="#596b5d" strokeWidth={selected?1.5:.6} vectorEffect="non-scaling-stroke" role="button" tabIndex={0} aria-label={language==="my"?township.nameMy:township.name} onClick={()=>onSelectTownship?.(township.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();onSelectTownship?.(township.id);}}}><title>{language==="my"?township.nameMy:township.name}</title></path><circle cx={x} cy={y} r={selected?markerRadius*1.5:markerRadius} fill="#176b4b" pointerEvents="none"/></g>;
+          return <g key={township.id}><path d={geometryPolygons(feature.geometry).map(polygonPath).join(" ")} fill={selected?"#8462c4":"transparent"} stroke="#a395c9" strokeWidth={selected?1.5:.6} vectorEffect="non-scaling-stroke" role="button" tabIndex={0} aria-label={language==="my"?township.nameMy:township.name} onClick={()=>onSelectTownship?.(township.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();onSelectTownship?.(township.id);}}}><title>{language==="my"?township.nameMy:township.name}</title></path><circle cx={x} cy={y} r={selected?markerRadius*1.5:markerRadius} fill="#9fe870" pointerEvents="none"/></g>;
         })}
       </g>
       {!focusRegion && REGIONS.map((region) => {
@@ -154,7 +154,7 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en", 
         return (
           <g key={region.id} className="map-label" aria-hidden="true">
             {selected && <circle cx={point.x} cy={point.y} r="11" className="map-pulse-ring" fill="none" stroke="#2f9f6b" strokeWidth="2" />}
-            <circle cx={point.x} cy={point.y} r={selected ? 4.3 : 2.7} fill={selected ? "#176b4b" : "#26382f"} stroke="#fff" strokeWidth="1.5" />
+            <circle cx={point.x} cy={point.y} r={selected ? 4.3 : 2.7} fill={selected ? "#9fe870" : "#b5a2ff"} stroke="#0a1228" strokeWidth="1.5" />
             {!["naypyidaw", "mandalay", "yangon"].includes(region.id) && <text x={point.x + 5} y={point.y - 5} className="map-region-label">{label}</text>}
           </g>
         );
@@ -168,7 +168,7 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en", 
         const point = project([city.lon, city.lat]);
         return (
           <g key={city.name} aria-label={city.name}>
-            <circle cx={point.x} cy={point.y} r="5.2" fill="#df7648" stroke="#fff" strokeWidth="2" />
+            <circle cx={point.x} cy={point.y} r="5.2" fill="#df7648" stroke="#0a1228" strokeWidth="2" />
             <text x={point.x + 8} y={point.y + 4} className="map-city-label">{city.name}</text>
           </g>
         );

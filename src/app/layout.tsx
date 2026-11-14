@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./zip-theme.css";
 
 export const metadata: Metadata = {
   title: "Myanmar EarthLens — Understand Myanmar. Discover Change.",

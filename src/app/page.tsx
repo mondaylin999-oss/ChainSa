@@ -60,7 +60,7 @@ function DataChart({ state, result, error, onRetry }: { state: ChartState; resul
     return <div className="chart-state"><ChartNoAxesCombined size={25} /> Select a connected dataset and date range to view observations.</div>;
   }
   if (state === "unavailable") {
-    return <div className="chart-state chart-unavailable"><Radio size={24} /> This dataset is not connected to a live data service. No values are displayed.</div>;
+    return <div className="chart-state chart-unavailable"><Radio size={24} /> {error || "No observation data is available for this selection. The home preview contains illustrative figures, not measured data."}</div>;
   }
   if (state === "error") {
     return <div className="chart-state chart-error" role="alert"><TriangleAlert size={24} /><span>{error || "Could not retrieve observations."}<button className="text-button" onClick={onRetry}>Try again</button></span></div>;
@@ -136,10 +136,10 @@ export default function Page() {
   const selectedDataset = datasets.find((item) => item.id === datasetId);
 
   useEffect(() => {
-    if (!catalog || datasetId) return;
-    const firstAvailable = catalog.datasets.find((dataset) => dataset.topicId === activeTopic && dataset.available);
+    if (!catalog || datasets.some(item => item.id === datasetId) || datasetId.startsWith("unconnected:")) return;
+    const firstAvailable = datasets.find(dataset => dataset.available && dataset.parameter) ?? datasets.find(dataset => dataset.available);
     if (firstAvailable) setDatasetId(firstAvailable.id);
-  }, [activeTopic, catalog, datasetId]);
+  }, [activeTopic, catalog, datasetId, datasets]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -158,6 +158,7 @@ export default function Page() {
       if (!datasets.some((dataset) => dataset.available)) {
         setResult(null);
         setChartState("unavailable");
+        setChartError(selectedDataset?.reason || "No observation data is available for this indicator in the project. The home preview contains illustrative figures only.");
         return;
       }
       if (!catalog || !datasetId || !regionId || !selectedDataset) {
@@ -168,6 +169,7 @@ export default function Page() {
       if (!selectedDataset.available) {
         setResult(null);
         setChartState("unavailable");
+        setChartError(selectedDataset?.reason || "No observation data is available for this indicator in the project. The home preview contains illustrative figures only.");
         return;
       }
       if (!start || !end || start > end) {
@@ -207,7 +209,8 @@ export default function Page() {
     setActiveTopic(topicId);
     setIndicatorLabel("");
     setDetailIndicator(null);
-    const first = catalog?.datasets.find((dataset) => dataset.topicId === topicId && dataset.available);
+    const choices = catalog?.datasets.filter(dataset => dataset.topicId === topicId) ?? [];
+    const first = choices.find(dataset => dataset.available && dataset.parameter) ?? choices.find(dataset => dataset.available);
     setDatasetId(first?.id ?? "");
     setResult(null);
   }
@@ -254,8 +257,8 @@ export default function Page() {
     <main className={`earthlens-app${view === "explore" ? " is-exploring" : ""}`} lang={lang}>
       <header className="site-header">
         <a className="brand-lockup" href="#home" onClick={(event) => { event.preventDefault(); setView("home"); }} aria-label="Myanmar EarthLens home">
-          <span className="brand-mark" aria-hidden="true"><span /><span /><span /></span>
-          <span className="brand-text"><strong>Myanmar EarthLens</strong><small>Explore with evidence</small></span>
+          <img className="earthlens-brand-art" src="/home-exact/brand.svg" alt="" />
+          <span className="brand-text"><strong>Earth Trend Detective</strong><small>MYANMAR EARTH INTELLIGENCE</small></span>
         </a>
         <nav className="main-nav" aria-label="Main navigation">
           {(["home", "explore"] as const).map((page) => (
@@ -263,6 +266,7 @@ export default function Page() {
               {page === "home" ? "Home" : "Explore Map"}
             </button>
           ))}
+          <button className="nav-link" onClick={askAI}>AI Assistant</button>
         </nav>
         <div className="language-switch" role="group" aria-label="Interface language">
           {(["en", "my"] as const).map((language) => (
@@ -314,8 +318,8 @@ export default function Page() {
                             <div key={indicator.label} className={chosen ? "rail-indicator rail-indicator-active" : "rail-indicator"}>
                               <button type="button" className="rail-indicator-title" aria-pressed={chosen} onClick={() => chooseIndicator(indicator)}>
                                 {indicator.label}
-                                {dataset && !dataset.available && <span className="rail-indicator-tag">not connected</span>}
-                                {!indicator.datasetId && <span className="rail-indicator-tag">not connected</span>}
+                                {dataset && !dataset.available && <span className="rail-indicator-tag">no data yet</span>}
+                                {!indicator.datasetId && <span className="rail-indicator-tag">no data yet</span>}
                               </button>
                               <button
                                 type="button"
@@ -354,7 +358,7 @@ export default function Page() {
 
             <aside className="data-column" aria-label="Data selection and details">
               <div className="selection-panel panel">
-                <div className="panel-title-row selection-title"><div><p className="eyebrow">Build your view</p><h2>Data workspace</h2></div><span className="live-tag"><span className="status-dot" /> Live source</span></div>
+                <div className="panel-title-row selection-title"><div><p className="eyebrow">Build your view</p><h2>Data workspace</h2></div><span className="live-tag"><span className="status-dot" /> {chartState === "ready" ? "Observations loaded" : selectedDataset?.available ? "Data source available" : "No data available"}</span></div>
                 <div className="selection-grid">
                   <div className="field-control">
                     <label htmlFor="township-select">Select Township</label>

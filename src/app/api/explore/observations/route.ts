@@ -4,8 +4,10 @@ import { getRegion } from "@/features/earthlens-chat/regions";
 import { addDays, fetchPowerDaily } from "@/features/earthlens-chat/server/nasa/power";
 import { getTownshipPoint } from "@/features/explorer/township-location";
 import { DATASETS } from "@/features/explorer/catalog";
+import { fetchNdviRange } from "@/features/earthlens-chat/server/nasa/modis-ndvi";
 
 export const runtime = "nodejs";
+export const maxDuration = 120;
 export const dynamic = "force-dynamic";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -86,7 +88,23 @@ export async function POST(request: Request) {
     }
   }
 
-  if (!dataset.parameter) return error("This dataset is not connected to a live observation service.", 503);
+  if (dataset.id === "vegetation-index" || dataset.id === "agriculture-vegetation-index") {
+    if (days > 366) return error("Choose up to one year for vegetation charts.", 400);
+    try {
+      const observations = await fetchNdviRange(location.lat, location.lon, start, end, 50000);
+      return Response.json({
+        observations, summary: summarize(observations.map(d => d.value)), dataset,
+        region: { id: region.id, name: region.name, nameMy: region.nameMy, lat: region.lat, lon: region.lon }, location,
+        period: { start, end }, source: dataset.source,
+        geographicCoverage: "Satellite pixels within about 1 km of the selected reference point; not a township or region-wide average. Each value represents a 16-day composite beginning on the shown date.",
+        observedAt: new Date().toISOString(), missingCount: observations.filter(d => d.value === null).length,
+      }, { headers: { "cache-control": "no-store" } });
+    } catch (cause) {
+      console.error("[explore] MODIS request failed", cause);
+      return error("The vegetation data service could not respond. Try again or choose an earlier period; no sample values have been substituted.", 502);
+    }
+  }
+  if (!dataset.parameter) return error(dataset.reason || "No observation data is available for this indicator. The home preview contains illustrative figures only.", 503);
   try {
     const result = await fetchPowerDaily(
       location.lat,

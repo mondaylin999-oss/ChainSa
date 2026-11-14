@@ -112,6 +112,30 @@ async function getJson(url: string, timeoutMs: number, fetchImpl: typeof fetch):
   return res.json();
 }
 
+/** Return actual composite dates only, never interpolated daily values. */
+export async function fetchNdviRange(lat: number, lon: number, start: string, end: string, timeoutMs: number, fetchImpl: typeof fetch = fetch) {
+  const loc = `latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}`;
+  const key = `${lat.toFixed(3)},${lon.toFixed(3)}`;
+  let availableDates = datesCache.get(key);
+  if (!availableDates) {
+    const payload = await getJson(`${MODIS_BASE}/${MODIS_PRODUCT}/dates?${loc}`, timeoutMs, fetchImpl) as { dates?: { modis_date: string; calendar_date: string }[] };
+    if (!Array.isArray(payload.dates)) throw new NasaError("NASA returned an unreadable vegetation date list.");
+    availableDates = payload.dates;
+    datesCache.set(key, availableDates);
+  }
+  const dates = availableDates.filter(d => /^A\d{7}$/.test(d.modis_date) && d.calendar_date >= start && d.calendar_date <= end).sort((a,b)=>a.calendar_date.localeCompare(b.calendar_date));
+  if (dates.length > 30) throw new NasaError("Choose up to one year for vegetation charts.");
+  const requests: Promise<NdviComposite[]>[] = [];
+  for (let offset = 0; offset < dates.length; offset += 10) {
+    const batch = dates.slice(offset, offset + 10);
+    const url = `${MODIS_BASE}/${MODIS_PRODUCT}/subset?${loc}&band=${NDVI_BAND}&startDate=${batch[0].modis_date}&endDate=${batch[batch.length-1].modis_date}&kmAboveBelow=${KM}&kmLeftRight=${KM}`;
+    requests.push(getJson(url, timeoutMs, fetchImpl).then(parseNdviSubset));
+  }
+  const observations = (await Promise.all(requests)).flat();
+  const byDate = new Map(observations.map(d => [d.date, d.value]));
+  return dates.map(d => ({ date: d.calendar_date, value: byDate.get(d.calendar_date) ?? null }));
+}
+
 type HistoryEntry = { year: number; date: string; value: number };
 const historyCache = new TtlCache<HistoryEntry[]>(7 * 24 * 60 * 60 * 1000, 100);
 const historyInFlight = new Map<string, Promise<HistoryEntry[]>>();

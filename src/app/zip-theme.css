@@ -1,0 +1,96 @@
+/* Shared visual language from Home-html nasa.zip. */
+:root {
+  color-scheme: dark;
+  --font-display: "Inter", system-ui, sans-serif;
+  --ink: #e9edfa;
+  --muted: #a6b3d0;
+  --line: #1f2b52;
+  --green: #6d4aff;
+  --green-deep: #c3b6ff;
+  --green-soft: #211b46;
+  --paper: #040816;
+  --white: #0a1228;
+}
+body, .earthlens-app { background: #040816; color: #e9edfa; }
+.earthlens-app { font-family: Inter, system-ui, sans-serif; }
+.earthlens-app :is(button,a,input,select,summary,[role="button"]):focus-visible { outline: 2px solid #9fe870; outline-offset: 3px; }
+.earthlens-app .site-header { background: #050a18; border-color: #172142; min-height: 80px; height: auto; padding-block: 14px; }
+.earthlens-app .brand-text strong { color: #fff; font-size: 17px; letter-spacing: -.02em; }
+.earthlens-app .brand-text small { color: #a6b3d0; font-size: 9px; letter-spacing: .16em; }
+.earthlens-brand-art { width: 46px; height: 46px; }
+.earthlens-app .main-nav { gap: 12px; }
+.earthlens-app .nav-link { color: #e9edfa; font-size: 14px; min-height: 44px; padding: 0 16px; border-radius: 12px; }
+.earthlens-app .nav-link-active { background: #1b1740; color: #c3b6ff; }
+.earthlens-app .nav-link-active::after { display: none; }
+.earthlens-app .language-switch { background: #0c1532; border-color: #303e6b; }
+.earthlens-app .language-active { background: #29204e; color: #fff; }
+.earthlens-app :is(.panel,.topic-rail,.topic-list,.floating-ai-panel) { background: #0a1228; border: 1px solid #1f2b52; border-radius: 20px; box-shadow: 0 18px 40px #0003; }
+.earthlens-app :is(h1,h2,h3,.chart-stats strong,.detail-grid dd,.rail-indicator-title) { color: #e9edfa; }
+.earthlens-app :is(.eyebrow,.see-more-link,.text-button,.earthbeat-controls>strong) { color: #c3b6ff; }
+.earthlens-app :is(.page-heading p,.map-stage-note,.field-hint,.field-meta,.chart-heading p,.chart-state,.chart-legend,.chart-stats span,.chart-stats small,.detail-grid dt,.map-drilldown-actions,.chat-context,.loading-message,.message-evidence,.topic-info,.indicator-detail>p) { color: #a6b3d0; }
+.earthlens-app :is(.field-hint,.field-meta,.chart-stats span,.detail-grid dt,.chat-context) { font-size: 11px; line-height: 1.6; }
+.earthlens-app .page-heading h1 { font-size: 32px; font-weight: 700; }
+.earthlens-app .panel-title-row h2 { font-size: 18px; font-weight: 650; }
+.earthlens-app .rail-topic-button { min-height: 62px; color: #e9edfa; font-size: 13px; padding: 8px; border-radius: 14px; }
+.earthlens-app :is(.rail-topic-button:hover,.rail-topic-button-active,.rail-indicator-active) { background: #191630; border-color: #5a488c; }
+.earthlens-app :is(.topic-icon-tile,.topic-icon,.map-heading-icon) { background: #211b46; border-color: #34285d; color: #b9a5ff; }
+.earthlens-app .rail-topic-button-active .topic-icon-tile { background: #332461; color: #d6c9ff; border-color: #6d4aff; box-shadow: 0 0 0 3px #6d4aff22; }
+.earthlens-app .rail-indicators { border-color: #303e6b; }
+.earthlens-app .rail-indicator { border-color: #1f2b52; }
+.earthlens-app .rail-indicator-title { font-size: 12px; line-height: 1.5; }
+.earthlens-app .rail-indicator-tag { background: #27243b; color: #c9c0a5; }
+.earthlens-app :is(.button-primary,.chat-compose button) { background: #6d4aff; color: #fff; border-color: #6d4aff; box-shadow: 0 10px 30px #6d4aff30; }
+.earthlens-app :is(.button-primary:hover,.chat-compose button:hover:not(:disabled)) { background: #7c5dff; }
+.earthlens-app :is(.button-secondary,.explore-back,.suggested-questions button) { background: #0c1532; border-color: #3a4a86; color: #e9edfa; border-radius: 12px; }
+.earthlens-app :is(.button-secondary:hover,.explore-back:hover,.suggested-questions button:hover:not(:disabled)) { background: #191d42; border-color: #8872db; }
+.earthlens-app .explore-back { min-height: 44px; }
+.earthlens-app .field-control label { color: #c5cee6; font-size: 12px; }
+.earthlens-app :is(.field-control input,.field-control select,.chat-compose input,.earthbeat-settings select) { background: #0c1532; color: #e9edfa; border: 1px solid #303e6b; border-radius: 12px; font-size: 12px; min-height: 44px; }
+.earthlens-app input::placeholder { color: #8291b6; }
+.earthlens-app :is(input,select):disabled { background: #10182b; color: #8390ad; }
+.earthlens-app :is(.live-tag,.earthbeat-chart__badge) { background: #143027; color: #9fe870; border-color: #2c503b; }
+.earthlens-app .status-dot { background: #9fe870; }
+.earthlens-app :is(.chat-compose,.chart-stats,.site-footer,.message-evidence) { border-color: #263254; }
+.earthlens-app :is(.message,.detail-placeholder) { background: #121c38; color: #d7def0; }
+.earthlens-app .message-user { background: #5535c0; color: #fff; }
+.earthlens-app :is(.inline-notice,.coverage-card) { background: #292337; border-color: #5b4962; color: #ead5a5; }
+.earthlens-app :is(.notice-error,.message-error) { background: #321c30; border-color: #73415e; color: #ffb8bc; }
+.earthlens-app :is(.chart-error,.field-error) { color: #ffb8bc; }
+.earthlens-app :is(.chart-unavailable,.coverage-heading) { color: #ead5a5; }
+.earthlens-app .myanmar-map { background: #091329; border-color: #26375b; border-radius: 16px; }
+.earthlens-app .map-neighbor-label { fill: #7182ab; }
+.earthlens-app :is(.map-region-label,.map-city-label) { fill: #e9edfa; paint-order: stroke; stroke: #091329; stroke-width: 2px; }
+.earthlens-app .map-region-selectable { stroke: #7e8cc1; }
+.earthlens-app .map-region-selectable:hover { fill: #6951a4; }
+.earthlens-app .map-region-selectable:focus-visible { stroke: #9fe870; }
+.earthlens-app .chart-gridline { stroke: #243152; }
+.earthlens-app .chart-axis { stroke: #526185; }
+.earthlens-app :is(.chart-tick,.chart-axis-label) { fill: #a6b3d0; }
+.earthlens-app .chart-series { stroke: #a88cff; }
+.earthlens-app .chart-point { fill: #0a1228; stroke: #bda6ff; }
+.earthlens-app .legend-line { background: #a88cff; }
+.earthlens-app .earthbeat-chart { background: #0c1532; border-color: #26375b; color: #e9edfa; box-shadow: none; }
+.earthlens-app .earthbeat-chart :is(p,.earthbeat-chart__footer) { color: #a6b3d0; }
+.earthlens-app .earthbeat-chart__eyebrow { color: #c3b6ff; }
+.earthlens-app .data-insight { background: #0c1532; color: #e9edfa; border-color: #26375b; }
+.earthlens-app .data-insight :is(p,dt,li) { color: #a6b3d0; }
+.earthlens-app .data-insight :is(article,section,dl) { background: #101b35; border-color: #26375b; }
+.earthlens-app .earthbeat-controls { color: #c5cee6; }
+.earthlens-app .earthbeat-settings input { accent-color: #a88cff; }
+@media(max-width:760px) { .earthlens-app .site-header { padding: 12px 16px; gap: 12px; }.earthlens-app .brand-text strong { font-size: 14px; }.earthlens-app .main-nav { gap: 4px; }.earthlens-app .nav-link { padding: 0 9px; font-size: 12px; }.earthlens-brand-art { width: 36px; height: 36px; } }
+@media(prefers-reduced-motion:reduce) { .earthlens-app * { animation: none !important; transition: none !important; } }
+
+.earthlens-app .rail-topic-name { overflow-wrap: normal; word-break: normal; }
+.earthlens-app .rail-topic-button { align-items: flex-start; }
+.earthlens-app .language-switch button.language-active { background: #332461; color: #fff; }
+.earthlens-app .earthbeat-chart svg text { fill: #a6b3d0; }
+.earthlens-app .earthbeat-chart svg line[stroke="#dce8e3"] { stroke: #26375b; }
+.earthlens-app .earthbeat-chart__tooltip { background: #211b46; border: 1px solid #5a488c; }
+@media(min-width:761px) and (max-width:1100px) {
+ .earthlens-app .explore-grid { grid-template-columns: 175px minmax(240px,1fr) minmax(290px,1fr); gap: 12px; }
+ .earthlens-app .rail-topic-button { flex-direction: column; gap: 9px; padding: 12px; }
+ .earthlens-app .selection-grid { grid-template-columns: 1fr; }
+ .earthlens-app .page-shell { width: calc(100% - 32px); }
+}
+.earthlens-app :is(.data-insight__overview,.data-insight__stats)>div{background:#18213e}.earthlens-app :is(.data-insight__overview,.data-insight__stats) span{color:#a6b3d0}.earthlens-app :is(.data-insight__overview,.data-insight__stats) strong{color:#e9edfa}.earthlens-app :is(.data-insight__eyebrow,.data-insight__direction){color:#c3b6ff}
+.earthlens-app :is(.section-icon,.assistant-avatar){background:#211b46;color:#c3b6ff}.earthlens-app .service-ready{background:#143027;border-color:#2c503b;color:#b3ea98}.earthlens-app .assistant-intro{color:#a6b3d0}.earthlens-app .chat-panel-heading{border-color:#263254}.earthlens-app .conversation{scrollbar-color:#3a456c transparent}.earthlens-app :is(.detail-grid a,.message-evidence a){color:#c3b6ff}
