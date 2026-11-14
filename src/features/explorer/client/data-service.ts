@@ -1,12 +1,14 @@
 import type { DatasetDefinition, TopicId } from "../catalog";
 import type { Region } from "../../earthlens-chat/regions";
 
+export interface Township { id: string; regionId: string; name: string; nameMy: string }
+
 export interface ExploreCatalog {
   topics: typeof import("../catalog").TOPICS;
   datasets: DatasetDefinition[];
   regions: Region[];
-  townships: never[];
-  townshipCoverage: { available: false; reason: string };
+  townships: Township[];
+  townshipCoverage: { available: boolean; observationsAvailable: boolean; reason: string };
 }
 
 export interface Observation {

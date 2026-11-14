@@ -19,6 +19,7 @@ import {
   Zap,
 } from "lucide-react";
 import { REGIONS } from "@/features/earthlens-chat/regions";
+import { EarthbeatExperience } from "@/features/explorer/components/EarthbeatExperience";
 import { ChatPanel } from "@/features/explorer/components/ChatPanel";
 import { MyanmarMap } from "@/features/explorer/components/MyanmarMap";
 import { fetchExploreCatalog, fetchObservations, type ExploreCatalog, type ObservationResponse } from "@/features/explorer/client/data-service";
@@ -47,65 +48,6 @@ function formatValue(value: number | null, digits = 2) {
   return value === null ? "—" : new Intl.NumberFormat(undefined, { maximumFractionDigits: digits }).format(value);
 }
 
-function ObservationChart({ result }: { result: ObservationResponse }) {
-  const width = 800;
-  const height = 340;
-  const left = 72;
-  const right = 785;
-  const top = 26;
-  const bottom = 274;
-  const values = result.observations.map((observation) => observation.value).filter((value): value is number => value !== null);
-  const rawMin = Math.min(...values);
-  const rawMax = Math.max(...values);
-  const padding = rawMin === rawMax ? Math.max(Math.abs(rawMin) * 0.06, 1) : (rawMax - rawMin) * 0.1;
-  const min = rawMin - padding;
-  const max = rawMax + padding;
-  const points = result.observations.map((observation, index) => {
-    const x = left + (result.observations.length < 2 ? 0 : (index / (result.observations.length - 1)) * (right - left));
-    const y = bottom - (((observation.value ?? min) - min) / (max - min)) * (bottom - top);
-    return { ...observation, x, y };
-  });
-  let drawing = false;
-  const path = points.map((point) => {
-    if (point.value === null) {
-      drawing = false;
-      return "";
-    }
-    const command = `${drawing ? "L" : "M"}${point.x.toFixed(2)},${point.y.toFixed(2)}`;
-    drawing = true;
-    return command;
-  }).join(" ");
-
-  return (
-    <svg className="observation-chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${result.dataset.description} in ${result.region.name}, ${result.period.start} to ${result.period.end}, in ${result.dataset.unit}`}>
-      {[0, 1, 2, 3].map((step) => {
-        const value = min + ((max - min) * step) / 3;
-        const y = bottom - ((value - min) / (max - min)) * (bottom - top);
-        return (
-          <g key={step}>
-            <line x1={left} x2={right} y1={y} y2={y} className="chart-gridline" />
-            <text x={left - 12} y={y + 4} textAnchor="end" className="chart-tick">{formatValue(value)}</text>
-          </g>
-        );
-      })}
-      <line x1={left} x2={left} y1={top} y2={bottom} className="chart-axis" />
-      <line x1={left} x2={right} y1={bottom} y2={bottom} className="chart-axis" />
-      <path d={path} className="chart-series" />
-      {points.map((point) => point.value === null ? null : (
-        <circle key={point.date} cx={point.x} cy={point.y} r="3.3" className="chart-point">
-          <title>{point.date}: {formatValue(point.value)} {result.dataset.unit}</title>
-        </circle>
-      ))}
-      <text x={(left + right) / 2} y="329" textAnchor="middle" className="chart-axis-label">Observation date (UTC)</text>
-      <text x="17" y={(top + bottom) / 2} textAnchor="middle" className="chart-axis-label" transform={`rotate(-90 17 ${(top + bottom) / 2})`}>
-        {result.dataset.unit}
-      </text>
-      <text x={left} y="298" className="chart-tick">{result.observations[0]?.date}</text>
-      <text x={right} y="298" textAnchor="end" className="chart-tick">{result.observations.at(-1)?.date}</text>
-    </svg>
-  );
-}
-
 function DataChart({ state, result, error, onRetry }: { state: ChartState; result: ObservationResponse | null; error: string; onRetry: () => void }) {
   if (state === "loading") {
     return <div className="chart-state" role="status"><LoaderCircle className="spin" size={24} /> Retrieving observations from the configured data service…</div>;
@@ -126,13 +68,16 @@ function DataChart({ state, result, error, onRetry }: { state: ChartState; resul
     <div className="chart-plot">
       {result.summary.count === 0 ? (
         <div className="chart-state">NASA returned no valid observations for this period. Missing values are not plotted as zero.</div>
-      ) : <ObservationChart result={result} />}
+      ) : <EarthbeatExperience result={result} />}
       <div className="chart-legend"><span className="legend-line" />{result.dataset.description}<span className="legend-unit">{result.dataset.unit}</span></div>
     </div>
   );
 }
 
 export default function Page() {
+  const [townshipId,setTownshipId] = useState("");
+  const [mapFocused,setMapFocused] = useState(false);
+  const [chatOpen,setChatOpen] = useState(false);
   const [view, setView] = useState<View>("home");
   const [lang, setLang] = useState<Lang>("en");
   const [regionId, setRegionId] = useState("ayeyarwady");
@@ -211,7 +156,7 @@ export default function Page() {
       }
       if (!catalog || !datasetId || !regionId || !selectedDataset) {
         setResult(null);
-        setChartState(selectedDataset?.available === false ? "unavailable" : "initial");
+        setChartState(datasetId ? "unavailable" : "initial");
         return;
       }
       if (!selectedDataset.available) {
@@ -264,8 +209,7 @@ export default function Page() {
   function chooseIndicator(indicator: TopicIndicator) {
     setIndicatorLabel(indicator.label);
     setDetailIndicator((current) => (current ? indicator : current));
-    const dataset = catalog?.datasets.find((item) => item.id === indicator.datasetId);
-    if (dataset?.available) chooseDataset(dataset.id);
+    chooseDataset(indicator.datasetId || `unconnected:${indicator.label}`);
   }
 
   function chooseDataset(nextId: string) {
@@ -278,12 +222,15 @@ export default function Page() {
 
   function chooseRegion(regionId: string) {
     const region = REGIONS.find((item) => item.id === regionId);
-    if (!region) return;
+    setTownshipId("");
+    setMapFocused(Boolean(region));
+    if (!region) {setRegionId("");setRegionSearch("");return;}
     setRegionId(region.id);
     setRegionSearch(`${region.name} — ${region.type}`);
   }
 
   function askAI() {
+    if (view === "explore") {setChatOpen(true);return;}
     setFocusChatOnHome(true);
     setView("home");
   }
@@ -293,7 +240,7 @@ export default function Page() {
   const dateError = Boolean(start && end && start > end);
 
   return (
-    <main className="earthlens-app" lang={lang}>
+    <main className={`earthlens-app${view === "explore" ? " is-exploring" : ""}`} lang={lang}>
       <header className="site-header">
         <a className="brand-lockup" href="#home" onClick={(event) => { event.preventDefault(); setView("home"); }} aria-label="Myanmar EarthLens home">
           <span className="brand-mark" aria-hidden="true"><span /><span /><span /></span>
@@ -348,7 +295,7 @@ export default function Page() {
 
           <section className="home-data-note" aria-label="Geographic coverage notice">
             <div className="note-icon"><MapPin size={18} /></div>
-            <p><strong>Township boundaries are not available in this workspace.</strong> The bundled map shows verified state and region boundaries. Current NASA chart data is sampled at regional reference points, not township averages.</p>
+            <p><strong>Township boundaries are available in Explore Map.</strong> Select a region to reveal its townships. NASA chart data is sampled at regional reference points, not township averages.</p>
             <button className="text-button" onClick={() => setView("explore")}>View data coverage <ArrowRight size={14} /></button>
           </section>
 
@@ -420,12 +367,12 @@ export default function Page() {
               <section className="map-stage panel" aria-labelledby="map-stage-title">
                 <div className="panel-title-row"><div><p className="eyebrow">Myanmar</p><h2 id="map-stage-title">Select an area on the map</h2></div><MapPin size={17} /></div>
                 <div className="map-stage-figure">
-                  <MyanmarMap selectedRegionId={regionId} onSelectRegion={chooseRegion} language={lang} />
+                  <MyanmarMap selectedRegionId={regionId} onSelectRegion={chooseRegion} language={lang} focusRegion={mapFocused} townships={catalog?.townships} selectedTownshipId={townshipId} onSelectTownship={id=>{setTownshipId(id);setMapFocused(true);}} />
                 </div>
                 <p className="map-stage-note">
                   {selectedRegion
                     ? `Active area: ${selectedRegion.name} — ${selectedRegion.type}. Observations use its regional reference point.`
-                    : "Select a mapped state or region to set the regional reference point. Township boundaries are not available."}
+                    : "Select a mapped state or region to set the regional reference point. Select a region to reveal its township boundaries."}
                 </p>
               </section>
             </section>
@@ -435,9 +382,9 @@ export default function Page() {
                 <div className="panel-title-row selection-title"><div><p className="eyebrow">Build your view</p><h2>Data workspace</h2></div><span className="live-tag"><span className="status-dot" /> Live source</span></div>
                 <div className="selection-grid">
                   <div className="field-control">
-                    <label htmlFor="township-unavailable">Select Township</label>
-                    <select id="township-unavailable" disabled aria-describedby="township-help"><option>No verified township records available</option></select>
-                    <p className="field-hint" id="township-help">Township lookup is unavailable until verified township records are added.</p>
+                    <label htmlFor="township-select">Select Township</label>
+                    <select id="township-select" value={townshipId} disabled={!regionId || !catalog?.townships.length} onChange={event=>{setTownshipId(event.target.value);setMapFocused(true);}} aria-describedby="township-help"><option value="">All townships in this region</option>{catalog?.townships.filter(item=>item.regionId===regionId).map(item=><option key={item.id} value={item.id}>{lang==="my"?item.nameMy:item.name}</option>)}</select>
+                    <p className="field-hint" id="township-help">MIMU township map selection. Measurements still use the regional reference point.</p>
                   </div>
                   <div className="field-control">
                     <label htmlFor="regional-reference">Regional reference point <span className="field-meta">(not a township)</span></label>
@@ -449,8 +396,8 @@ export default function Page() {
                         const value = event.target.value;
                         setRegionSearch(value);
                         const match = REGIONS.find((region) => `${region.name} — ${region.type}` === value || `${region.nameMy} — ${region.type}` === value);
-                        if (match) setRegionId(match.id);
-                        else setRegionId("");
+                        if (match) chooseRegion(match.id);
+                        else {setRegionId("");setTownshipId("");setMapFocused(false);}
                       }}
                       onBlur={() => {
                         const match = REGIONS.find((region) => `${region.name} — ${region.type}` === regionSearch || `${region.nameMy} — ${region.type}` === regionSearch);
@@ -558,14 +505,15 @@ export default function Page() {
 
               <div className="coverage-card">
                 <div className="coverage-heading"><MapPin size={16} /><strong>Coverage note</strong></div>
-                <p>{catalog?.townshipCoverage.reason ?? "No verified township records are bundled. Available point observations use region reference locations."}</p>
-                <span>Township coverage: unavailable</span>
+                <p>{catalog?.townshipCoverage.reason ?? "Township boundaries are available for selection. Observations use regional reference locations."}</p>
+                <span>Township map coverage: available · Measurements: regional reference point</span>
               </div>
             </aside>
           </div>
           <footer className="site-footer"><span>Natural Earth admin-1 boundaries · NASA POWER daily · NASA FIRMS when configured</span><a href="/earthlens.html">Original dashboard preview <ExternalLink size={13} /></a></footer>
         </div>
       )}
+      {view === "explore" && <><button className="floating-ai-launcher button-primary" aria-expanded={chatOpen} aria-controls="floating-ai-panel" onClick={()=>setChatOpen(open=>!open)}><MessageCircle size={18}/> AI chat</button>{chatOpen && <section id="floating-ai-panel" className="floating-ai-panel" role="dialog" aria-label="EarthLens AI chat" onKeyDown={event=>{if(event.key==="Escape")setChatOpen(false);}}><button className="floating-ai-close button-secondary" onClick={()=>setChatOpen(false)} autoFocus>Close chat</button><ChatPanel lang={lang} selectedRegionId={regionId} inputRef={chatInputRef}/></section>}</>}
     </main>
   );
 }

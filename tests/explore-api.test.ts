@@ -12,11 +12,13 @@ afterEach(() => {
 });
 
 describe("explore catalogue API", () => {
-  it("reports township coverage as unavailable and lists existing regional points separately", async () => {
+  it("reports township map coverage separately from regional observation coverage", async () => {
     const response = await getCatalog();
     const catalog = await response.json();
     expect(response.status).toBe(200);
-    expect(catalog.townshipCoverage.available).toBe(false);
+    expect(catalog.townshipCoverage.available).toBe(true);
+    expect(catalog.townshipCoverage.observationsAvailable).toBe(false);
+    expect(catalog.townships).toHaveLength(330);
     expect(catalog.regions).toHaveLength(15);
     expect(catalog.datasets.find((dataset: { id: string }) => dataset.id === "rainfall")).toMatchObject({
       available: true,

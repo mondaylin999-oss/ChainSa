@@ -1,5 +1,5 @@
-import type { DataSeries } from "../types/environmental.js";
-import type { AnalysisResult } from "./explainChanges.js";
+import type { DataSeries } from "../types/environmental";
+import type { AnalysisResult } from "./explainChanges";
 
 export interface DataTrendInsightModel {
   overview: { location: string; coordinates: string; requestedPeriod: string; actualPeriod: string; selection: string };
@@ -51,7 +51,7 @@ export function buildDataTrendInsight(series: DataSeries, analysis: AnalysisResu
     sources: [
       { label: "Dataset", value: series.dataset },
       { label: "Dataset ID", value: series.datasetId ?? "Not available" },
-      { label: "Provider", value: series.datasetId === "NASA_POWER" ? "NASA POWER" : "NASA LP DAAC / USGS EROS" },
+      { label: "Provider", value: series.provider ?? (series.datasetId === "NASA_POWER" ? "NASA POWER" : "NASA LP DAAC / USGS EROS") },
       { label: "Satellite / instrument", value: [series.satellite, series.instrument].filter(Boolean).join(" / ") || "Not available" },
       { label: "Spatial resolution", value: series.spatialResolution },
       { label: "Temporal frequency", value: series.temporalResolution },

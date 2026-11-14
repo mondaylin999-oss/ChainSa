@@ -1,6 +1,6 @@
-import type { AnalysisResult } from "../analysis/explainChanges.js";
-import type { DataSeries } from "../types/environmental.js";
-import { buildDataTrendInsight } from "../analysis/dataTrendInsight.js";
+import type { AnalysisResult } from "../analysis/explainChanges";
+import type { DataSeries } from "../types/environmental";
+import { buildDataTrendInsight } from "../analysis/dataTrendInsight";
 
 export function DataTrendInsight({ series, analysis, locationName, latitude, longitude, loading = false, error }: { series?: DataSeries; analysis?: AnalysisResult; locationName?: string; latitude?: number; longitude?: number; loading?: boolean; error?: string }) {
   if (loading) return <section className="data-insight data-insight--state" aria-live="polite">Loading Data and Trend Insight…</section>;

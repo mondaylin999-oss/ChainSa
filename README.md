@@ -1,19 +1,20 @@
-# Myanmar EarthLens — local exploration prototype
+# Myanmar EarthLens
 
 The Next.js app now opens on a Home view with an accurate local state/region map, an evidence-grounded AI chat, and an Explore Map data workspace. The bilingual EarthLens chat and its server-side integrations remain in place.
 
 ## Current local interface
 
 - **Home:** project introduction, locally bundled Myanmar admin-1 boundaries, and a wide chat panel.
-- **Explore Map:** six topic panels, a clear unavailable township selector, searchable state/region reference points, topic-filtered datasets, date controls, NASA-backed charts and source/coverage details.
+- **Explore Map:** six topic panels, a MIMU township selector, searchable state/region reference points, topic-filtered datasets, date controls, NASA-backed charts and source/coverage details.
 - **Boundaries:** `src/features/earthlens-chat/server/nasa/myanmar-admin1.json`, Natural Earth 1:10m Admin-1, public domain. The map includes attribution. The bundled data has 14 state/region polygons; a Naypyidaw reference point is shown, but it has no separate boundary in this asset.
-- **Townships:** no verified township records or boundaries are bundled. Do not interpret the regional reference points as townships or township averages. Add a verified township source before enabling township-level selection or claims.
+- **Townships:** 330 MIMU township records and PCode 9.4 boundary features are bundled. Select a region to reveal its township boundaries and markers; other regions blur. Township selection changes the map focus; observations remain regional reference-point samples.
 - **Live chart data:** NASA POWER daily corrected precipitation, near-surface air temperature, modelled root-zone wetness, solar radiation and wind speed at existing state/region reference coordinates. NASA FIRMS detections are optional and require `FIRMS_MAP_KEY`. Unconnected data products are shown as unavailable, not simulated.
 - **AI:** existing `POST /api/earthlens-chat` server route; provider credentials remain server-side. The chat UI reports when no OpenRouter/Groq provider is configured.
+- **EARTHBEAT:** the handover chart, descriptive statistics, graph-to-sound selection and looping playback are integrated into the redesigned explorer. AI chat opens from a floating launcher in Explore Map.
 - The previous bundled dashboard is still available at `/earthlens.html`.
 
-> **Data coverage — please read.** Township records and boundaries are not bundled. The Explore Map
-> offers existing regional reference points and clearly labels NASA observations as point samples.
+> **Data coverage — please read.** Township records and boundaries support map selection. The Explore Map
+> clearly labels NASA POWER observations as regional reference-point samples, not township averages.
 > Real external NASA/provider requests depend on your network and configuration; they are not mocked
 > into successful live results.
 

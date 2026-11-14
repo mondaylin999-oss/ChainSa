@@ -1,4 +1,4 @@
-import type { DataSeries, Observation } from "../types/environmental.js";
+import type { DataSeries, Observation } from "../types/environmental";
 
 export interface SeriesStatistics {
   observationCount: number;

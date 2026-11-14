@@ -74,7 +74,7 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
 
       {provider === "unavailable" && (
         <div className="inline-notice" role="status">
-          No AI provider is configured. Add an OpenRouter or Groq server key in <code>.env.local</code> to enable evidence-grounded answers. Credentials remain on the server.
+          AI assistance is currently unavailable. You can still explore connected observations, charts and data sources.
         </div>
       )}
       {provider === "error" && (

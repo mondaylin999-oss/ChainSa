@@ -56,7 +56,7 @@ export const TOPICS: {
     description: "Review selected weather indicators and, when configured, recent satellite fire detections.",
     indicators: [
       { label: "Precipitation", datasetId: "disaster-rainfall", summary: "Rainfall as context for flood reports; it does not confirm flooding on its own." },
-      { label: "Satellite fire detections", datasetId: "fire-detections", summary: "VIIRS fire detections from NASA FIRMS; requires FIRMS_MAP_KEY and is not an official fire count." },
+      { label: "Satellite fire detections", datasetId: "fire-detections", summary: "VIIRS fire detections from NASA FIRMS; requires a configured NASA FIRMS connection and is not an official fire count." },
     ],
     uses: "Use rainfall as context when checking official flood information and identify recent satellite fire detections.",
     limitations: "Rainfall alone does not confirm flooding. Satellite detections can miss fires and are not an official incident report.",
@@ -287,7 +287,7 @@ export const DATASETS: DatasetDefinition[] = [
     description: "Daily VIIRS satellite fire detections",
     limitations: "Detections are not an official fire count; satellite overpass, cloud and confidence affect coverage.",
     available: false,
-    reason: "Configure FIRMS_MAP_KEY to enable this dataset.",
+    reason: "A NASA FIRMS connection must be configured to enable this dataset.",
   },
   {
     id: "water-rainfall",

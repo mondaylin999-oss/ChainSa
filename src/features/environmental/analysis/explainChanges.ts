@@ -1,5 +1,5 @@
-import type { DataSeries } from "../types/environmental.js";
-import { calculateStatistics, type SeriesStatistics } from "../processing/statistics.js";
+import type { DataSeries } from "../types/environmental";
+import { calculateStatistics, type SeriesStatistics } from "../processing/statistics";
 
 export interface AnalysisResult {
   statistics: SeriesStatistics;

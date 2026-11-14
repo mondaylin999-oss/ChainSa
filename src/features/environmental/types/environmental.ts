@@ -1,4 +1,4 @@
-export type Indicator = "temperature" | "ndvi" | "precipitation";
+export type Indicator = "temperature" | "ndvi" | "precipitation" | "environmental";
 
 export interface GeoJsonPolygon {
   type: "Polygon";
@@ -28,6 +28,7 @@ export interface Observation {
 export interface DataSeries {
   indicator: Indicator;
   dataset: string;
+  provider?: string;
   spatialResolution: string;
   temporalResolution: string;
   observations: Observation[];

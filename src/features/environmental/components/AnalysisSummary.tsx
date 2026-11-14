@@ -1,4 +1,4 @@
-import type { AnalysisResult } from "../analysis/explainChanges.js";
+import type { AnalysisResult } from "../analysis/explainChanges";
 
 export interface AnalysisSummaryProps {
   analysis?: AnalysisResult;

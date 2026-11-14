@@ -1,4 +1,4 @@
-import type { DataSeries } from "../types/environmental.js";
+import type { DataSeries } from "../types/environmental";
 
 export interface ChartPoint {
   date: string;

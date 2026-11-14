@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
-import type { DataSeries } from "../types/environmental.js";
-import { toChartPoints, type ChartPoint } from "./chartModel.js";
-import { calculateStatistics } from "../processing/statistics.js";
+import type { DataSeries } from "../types/environmental";
+import { toChartPoints, type ChartPoint } from "./chartModel";
+import { calculateStatistics } from "../processing/statistics";
 
 export interface EnvironmentalChartProps {
   series?: DataSeries; locationName: string; startDate: string; endDate: string;

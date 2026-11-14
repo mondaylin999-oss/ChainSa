@@ -2,6 +2,8 @@ import { getConfig } from "@/features/earthlens-chat/server/env";
 import { REGIONS } from "@/features/earthlens-chat/regions";
 import { DATASETS, TOPICS } from "@/features/explorer/catalog";
 
+import townshipDirectory from "../../../../../public/townships.json";
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -15,10 +17,11 @@ export async function GET() {
     topics: TOPICS,
     datasets,
     regions: REGIONS,
-    townships: [],
+    townships: townshipDirectory.townships,
     townshipCoverage: {
-      available: false,
-      reason: "No verified township records or boundaries are bundled. Available NASA observations use state/region representative points and are not township observations.",
+      available: true,
+      observationsAvailable: false,
+      reason: "MIMU township names and boundaries are available for map selection. NASA observations still use regional reference points, not township averages.",
     },
   }, { headers: { "cache-control": "no-store" } });
 }

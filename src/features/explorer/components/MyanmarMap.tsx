@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import type { Township } from "../client/data-service";
 import boundaries from "../../earthlens-chat/server/nasa/myanmar-admin1.json";
 import { REGIONS } from "../../earthlens-chat/regions";
 
@@ -9,7 +11,7 @@ type Geometry =
   | { type: "Polygon"; coordinates: Polygon }
   | { type: "MultiPolygon"; coordinates: Polygon[] };
 type BoundaryCollection = {
-  features: { properties: { iso: string; name: string }; geometry: Geometry }[];
+  features: { properties: { iso: string; name: string; TS_PCODE?: string }; geometry: Geometry }[];
 };
 
 const boundaryData = boundaries as unknown as BoundaryCollection;
@@ -52,13 +54,36 @@ interface MyanmarMapProps {
   selectedRegionId?: string;
   onSelectRegion?: (id: string) => void;
   language?: "en" | "my";
+  focusRegion?: boolean;
+  townships?: Township[];
+  selectedTownshipId?: string;
+  onSelectTownship?: (id: string) => void;
 }
 
-export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }: MyanmarMapProps) {
+export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en", focusRegion = false, townships = [], selectedTownshipId, onSelectTownship }: MyanmarMapProps) {
+  const [townshipData,setTownshipData] = useState<BoundaryCollection | null>(null);
+  const [townshipError,setTownshipError] = useState(false);
+  useEffect(()=>{if(!focusRegion || townshipData)return;const controller=new AbortController();fetch("/township-boundaries.geojson",{signal:controller.signal}).then(response=>{if(!response.ok)throw Error("Boundary data unavailable");return response.json();}).then(data=>{setTownshipData(data);setTownshipError(false);}).catch(()=>{if(!controller.signal.aborted)setTownshipError(true);});return()=>controller.abort();},[focusRegion,townshipData]);
+  const region = REGIONS.find(item=>item.id===selectedRegionId);
+  const visibleTownships = useMemo(()=>{
+    const ids=new Set(townships.filter(item=>item.regionId===selectedRegionId).map(item=>item.id));
+    return focusRegion ? townshipData?.features.filter(feature=>ids.has(feature.properties.TS_PCODE!)) ?? [] : [];
+  },[townships,selectedRegionId,focusRegion,townshipData]);
+  function boundsFor(geometry: Geometry) {
+    const points=geometryPolygons(geometry).flatMap(polygon=>polygon.flatMap(ring=>ring.map(project)));
+    const xs=points.map(point=>point.x),ys=points.map(point=>point.y);
+    const minX=Math.min(...xs),minY=Math.min(...ys),maxX=Math.max(...xs),maxY=Math.max(...ys);
+    return {minX,minY,maxX,maxY};
+  }
+  const focusedFeature = visibleTownships.find(feature=>feature.properties.TS_PCODE===selectedTownshipId) ?? (focusRegion ? boundaryData.features.find(feature=>feature.properties.iso===region?.iso) : undefined);
+  const focusedBounds=focusedFeature ? boundsFor(focusedFeature.geometry) : null;
+  const padding=selectedTownshipId ? 1.8 : 18;
+  const markerRadius=focusedBounds ? Math.max(.05, Math.max(focusedBounds.maxX-focusedBounds.minX,focusedBounds.maxY-focusedBounds.minY)/100) : .8;
+  const viewBox=focusedBounds ? `${focusedBounds.minX-padding} ${focusedBounds.minY-padding} ${Math.max(padding*2,focusedBounds.maxX-focusedBounds.minX+padding*2)} ${Math.max(padding*2,focusedBounds.maxY-focusedBounds.minY+padding*2)}` : "0 0 620 700";
   return (
-    <svg
+    <div className="map-interactive-wrapper" data-focused={focusRegion}><svg
       className="myanmar-map"
-      viewBox="0 0 620 700"
+      viewBox={viewBox}
       role="img"
       aria-labelledby="myanmar-map-title myanmar-map-desc"
     >
@@ -93,10 +118,10 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }
             <path
               key={feature.properties.iso}
               d={paths}
-              fill={active ? "#8fd7a7" : REGION_FILLS[feature.properties.iso] ?? FALLBACK_FILLS[index % FALLBACK_FILLS.length]}
-              stroke={active ? "#176b4b" : "#596b5d"}
-              strokeWidth={active ? 2.8 : 1.15}
-              filter={active ? "url(#map-active-glow)" : undefined}
+              fill={REGION_FILLS[feature.properties.iso] ?? FALLBACK_FILLS[index % FALLBACK_FILLS.length]}
+              stroke="#596b5d"
+              strokeWidth={1.15} vectorEffect="non-scaling-stroke"
+              style={focusRegion && !active ? {filter:"blur(2px)",opacity:.2} : undefined}
               fillRule="evenodd"
               className={`${onSelectRegion ? "map-region-selectable" : ""}${active ? " map-region-active" : ""}`.trim()}
               role={onSelectRegion && region ? "button" : undefined}
@@ -114,7 +139,14 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }
         })}
       </g>
 
-      {REGIONS.map((region) => {
+      <g aria-label="Township boundaries">
+        {visibleTownships.map(feature=>{
+          const township=townships.find(item=>item.id===feature.properties.TS_PCODE);if(!township)return null;
+          const selected=township.id===selectedTownshipId;const bounds=boundsFor(feature.geometry);const x=(bounds.minX+bounds.maxX)/2,y=(bounds.minY+bounds.maxY)/2;
+          return <g key={township.id}><path d={geometryPolygons(feature.geometry).map(polygonPath).join(" ")} fill={selected?"#8fd7a7":"transparent"} stroke="#596b5d" strokeWidth={selected?1.5:.6} vectorEffect="non-scaling-stroke" role="button" tabIndex={0} aria-label={language==="my"?township.nameMy:township.name} onClick={()=>onSelectTownship?.(township.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();onSelectTownship?.(township.id);}}}><title>{language==="my"?township.nameMy:township.name}</title></path><circle cx={x} cy={y} r={selected?markerRadius*1.5:markerRadius} fill="#176b4b" pointerEvents="none"/></g>;
+        })}
+      </g>
+      {!focusRegion && REGIONS.map((region) => {
         const point = project([region.lon, region.lat]);
         const selected = region.id === selectedRegionId;
         const label = language === "my" ? region.nameMy : region.name;
@@ -127,7 +159,7 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }
         );
       })}
 
-      {[
+      {!focusRegion && [
         { name: "Naypyidaw", lon: 96.13, lat: 19.75 },
         { name: "Mandalay", lon: 96.08, lat: 21.97 },
         { name: "Yangon", lon: 96.15, lat: 16.8 },
@@ -140,6 +172,6 @@ export function MyanmarMap({ selectedRegionId, onSelectRegion, language = "en" }
           </g>
         );
       })}
-    </svg>
+    </svg>{focusRegion && <div className="map-drilldown-actions"><button className="text-button" onClick={()=>onSelectRegion?.("")}>All regions</button>{selectedTownshipId && <button className="text-button" onClick={()=>onSelectTownship?.("")}>All townships in {region?.name}</button>}<small>MIMU PCode 9.4 · Township boundaries</small></div>}{townshipError && <p role="alert">Township outlines could not load. Use the township selector.</p>}</div>
   );
 }
