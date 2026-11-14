@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowDownRight,
+  ArrowLeft,
   ArrowRight,
   Building2,
   ChartNoAxesCombined,
@@ -307,6 +308,14 @@ export default function Page() {
         </div>
       ) : (
         <div className="page-shell explore-shell">
+          <button type="button" className="explore-back" onClick={() => {
+            if (townshipId) setTownshipId("");
+            else if (mapFocused) setMapFocused(false);
+            else { setChatOpen(false); setView("home"); }
+          }} aria-label={townshipId ? "Back to region" : mapFocused ? "Back to all regions" : "Back to Home"}>
+            <ArrowLeft size={16} aria-hidden="true" />{lang === "my" ? "နောက်သို့" : "Back"}
+            <span>{townshipId ? "To region" : mapFocused ? "All regions" : "Home"}</span>
+          </button>
           <div className="page-heading">
             <div><p className="eyebrow">Explore Myanmar</p><h1>Map &amp; data workspace</h1><p>Choose a topic, then view a connected observation series and its source details.</p></div>
             <button className="button-secondary" onClick={askAI}><MessageCircle size={16} /> Ask AI</button>
