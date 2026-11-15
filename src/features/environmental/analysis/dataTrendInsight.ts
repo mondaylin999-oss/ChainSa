@@ -24,7 +24,7 @@ export function buildDataTrendInsight(series: DataSeries, analysis: AnalysisResu
   const stats = analysis.statistics;
   const firstDate = stats.first?.date ?? series.actualStartDate ?? series.requestedStartDate ?? "not available";
   const lastDate = stats.last?.date ?? series.actualEndDate ?? series.requestedEndDate ?? "not available";
-  const rate = stats.first && stats.last ? endpointRatePerYear(stats.first.date, stats.last.date, stats.absoluteChange ?? 0) : undefined;
+  const rate = stats.trendSlopePerYear;
   const direction = stats.trend === "increasing" ? "Increasing descriptive pattern" : stats.trend === "decreasing" ? "Decreasing descriptive pattern" : stats.trend === "insufficient-data" ? "Insufficient data" : "No clear descriptive direction";
   const valid = stats.observationCount;
   const rejected = series.rejectedObservationCount ?? series.missingObservationCount;
@@ -72,10 +72,10 @@ export function buildDataTrendInsight(series: DataSeries, analysis: AnalysisResu
     ],
     trend: {
       direction,
-      rate: rate === undefined ? "Not available" : `${rate.toFixed(4)} ${series.observations[0]?.unit ?? "units"}/year (endpoint rate; descriptive only)`,
+      rate: rate === undefined ? "Not available" : `${rate.toFixed(4)} ${series.observations[0]?.unit ?? "units"}/year (time-based fit; descriptive only)`,
       period: `${firstDate} to ${lastDate}`,
       validObservations: String(valid),
-      explanation: stats.first && stats.last ? "This is an endpoint change divided by elapsed calendar time. It is descriptive only, does not assume equal observation spacing, is not a statistically significant trend test, and does not establish causation." : "There are not enough valid observations to describe a change.",
+      explanation: rate !== undefined ? "Direction and rate use a least-squares line fitted to all valid observations against elapsed calendar time. No clear change means the fitted change across the period is at most 1% of the observed range, allowing for numerical rounding. First-to-last change is reported separately. This is descriptive only, not a significance test, seasonal adjustment, forecast, or proof of causation." : "There are not enough valid observations to describe a change.",
     },
     evidence,
     variabilityComparison,
@@ -121,7 +121,7 @@ function buildEvidence(series: DataSeries, stats: AnalysisResult["statistics"], 
   return [
     { conclusion: "Observed level and variability", observations: `${valid} valid observation${valid === 1 ? "" : "s"}`, period: `${firstDate} to ${lastDate}`, method: `Mean and sample standard deviation in ${unit}`, limitation: quality },
     { conclusion: "Observed change", observations: `${stats.first && stats.last ? 2 : 0} endpoint observations from the valid series`, period: `${firstDate} to ${lastDate}`, method: "Last valid value minus first valid value; percentage uses the absolute first value when nonzero", limitation: "Endpoint change can miss fluctuations between the endpoints and is descriptive only." },
-    { conclusion: "Directional pattern", observations: `${valid} valid observation${valid === 1 ? "" : "s"}`, period: `${firstDate} to ${lastDate}`, method: "Existing descriptive calculation; annual display uses elapsed calendar time", limitation: "No causal or statistical-significance claim is made." },
+    { conclusion: "Directional pattern", observations: `${valid} valid observation${valid === 1 ? "" : "s"}`, period: `${firstDate} to ${lastDate}`, method: "Least-squares fit against elapsed calendar time; direction and annual rate use the same fitted line", limitation: "No causal or statistical-significance claim is made." },
   ];
 }
 
@@ -154,9 +154,4 @@ function providerLabel(series: DataSeries): string {
   if (series.datasetId?.startsWith("MODIS/")) return "NASA LP DAAC / USGS EROS via Google Earth Engine";
   if (series.datasetId?.startsWith("NASA POWER")) return "NASA Langley Research Center POWER";
   return "Not available";
-}
-
-function endpointRatePerYear(firstDate: string, lastDate: string, absoluteChange: number): number | undefined {
-  const elapsedYears = (Date.parse(lastDate) - Date.parse(firstDate)) / (365.2425 * 24 * 60 * 60 * 1000);
-  return elapsedYears > 0 ? absoluteChange / elapsedYears : undefined;
 }

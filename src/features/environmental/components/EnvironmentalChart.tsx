@@ -67,9 +67,8 @@ export function EnvironmentalChart({ series, locationName, startDate, endDate, l
   const pathFor = (indices: number[]) => indices.map((index, position) => `${position === 0 ? "M" : "L"}${xFor(index).toFixed(2)},${yFor(points[index].value).toFixed(2)}`).join(" ");
   const linePath = segments.map(pathFor).join(" ");
   const meanY = statistics.mean === undefined ? undefined : yFor(statistics.mean);
-  const slope = statistics.trendSlopePerObservation ?? 0;
-  const trendStart = points.length > 1 ? statistics.mean! - slope * (points.length - 1) / 2 : undefined;
-  const trendEnd = points.length > 1 ? statistics.mean! + slope * (points.length - 1) / 2 : undefined;
+  const trendStart = statistics.fittedTrendStart;
+  const trendEnd = statistics.fittedTrendEnd;
   const areaPath = segments.map(indices => `${pathFor(indices)} L${xFor(indices.at(-1)!)},${top + plotHeight} L${xFor(indices[0])},${top + plotHeight} Z`).join(" ");
   const activeIndex = activeDate ? points.findIndex((point) => point.date === activeDate) : -1;
   const activeX = activeFraction !== undefined ? left + Math.max(0, Math.min(1, activeFraction)) * plotWidth : activeIndex >= 0 ? xFor(activeIndex) : undefined;

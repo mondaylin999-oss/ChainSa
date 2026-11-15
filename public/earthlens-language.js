@@ -406,7 +406,12 @@
   "General question": "အထွေထွေမေးခွန်း",
   "No observation period": "တိုင်းတာမှုကာလ မရှိပါ",
   "Evidence-based template": "အထောက်အထားအခြေပြု အဖြေ",
-  "AI-assisted": "ဉာဏ်ရည်တုအကူအညီဖြင့်"
+  "AI-assisted": "ဉာဏ်ရည်တုအကူအညီဖြင့်",
+  "Fitted trend rate": "အချက်အလက်အားလုံးအပေါ် တွက်ထားသော ပြောင်းလဲနှုန်း",
+  "First-to-last change": "ပထမနှင့် နောက်ဆုံးတန်ဖိုး ကွာခြားမှု",
+  "First-to-last percentage change": "ပထမနှင့် နောက်ဆုံးတန်ဖိုး ရာခိုင်နှုန်းကွာခြားမှု",
+  "Direction and rate use a least-squares line fitted to all valid observations against elapsed calendar time. No clear change means the fitted change across the period is at most 1% of the observed range, allowing for numerical rounding. First-to-last change is reported separately. This is descriptive only, not a significance test, seasonal adjustment, forecast, or proof of causation.": "ဦးတည်ချက်နှင့် နှုန်းကို မှန်ကန်သော တိုင်းတာချက်အားလုံးနှင့် ကြာချိန်အပေါ် အံဝင်ခွင်ကျမျဉ်း ဆွဲ၍ တွက်ထားသည်။ ရှင်းလင်းသော ပြောင်းလဲမှုမရှိဟု ဆိုခြင်းမှာ ကာလတစ်လျှောက် မျဉ်းအရ ပြောင်းလဲမှုသည် တွေ့ရှိသော အနိမ့်အမြင့်ကွာဟချက်၏ ၁% ထက် မပိုခြင်းဖြစ်သည်။ ကိန်းဂဏန်းအဝိုင်းချမှုကိုလည်း ထည့်စဉ်းစားသည်။ ပထမနှင့် နောက်ဆုံးတန်ဖိုး ကွာခြားမှုကို သီးခြားပြထားသည်။ ဤတွက်ချက်မှုသည် ဖော်ပြချက်အတွက်သာ ဖြစ်ပြီး ထင်ရှားမှုစမ်းသပ်ချက်၊ ရာသီအလိုက် ပြင်ဆင်ချက်၊ ခန့်မှန်းချက် သို့မဟုတ် အကြောင်းရင်းသက်သေ မဟုတ်ပါ။",
+  "Least-squares fit against elapsed calendar time; direction and annual rate use the same fitted line": "ကြာချိန်အပေါ် အံဝင်ခွင်ကျမျဉ်းဖြင့် တွက်ထားသည်။ ဦးတည်ချက်နှင့် နှစ်စဉ်နှုန်းသည် တူညီသော မျဉ်းကို အသုံးပြုသည်"
 };
   var reverse = Object.create(null);
   Object.keys(translations).forEach(function (english) {

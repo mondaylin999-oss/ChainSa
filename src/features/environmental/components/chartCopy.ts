@@ -79,8 +79,8 @@ export function chartText(lang: ChartLanguage, text: string): string {
   if (coverage) return `ရရှိသော တိုင်းတာချက် ${coverage[2]} ခုအနက် ${coverage[1]} ခု အသုံးပြုနိုင်သည်`;
   const valid = text.match(/^(\d+) valid observations$/);
   if (valid) return `အသုံးပြုနိုင်သော တိုင်းတာချက် ${valid[1]} ခု`;
-  const rate = text.match(/^(.*)\/year \(endpoint rate; descriptive only\)$/);
-  if (rate) return `${rate[1]}/နှစ် (အစနှင့်အဆုံးတန်ဖိုးအရ နှုန်း၊ ဖော်ပြချက်အတွက်သာ)`;
+  const rate = text.match(/^(.*)\/year \((?:endpoint rate|time-based fit); descriptive only\)$/);
+  if (rate) return `${rate[1]}/နှစ် (အချိန်အလိုက် အံဝင်ခွင်ကျမျဉ်းဖြင့် တွက်ထားသော နှုန်း၊ ဖော်ပြချက်အတွက်သာ)`;
   const invalid = text.match(/^(Invalid observation date|Duplicate observation dates) cannot be used for inference: (.*)$/);
   if (invalid) return `${invalid[1].startsWith("Invalid") ? "မမှန်ကန်သော ရက်စွဲ" : "ထပ်နေသော ရက်စွဲများ"} ကို ကောက်ချက်ချရန် အသုံးမပြုနိုင်ပါ: ${invalid[2]}`;
   const significant = text.match(/^The seasonal test indicates a (increasing|decreasing|no clear trend) monotonic pattern at the 0.05 threshold; this describes the observed series and does not establish causation\.$/);
