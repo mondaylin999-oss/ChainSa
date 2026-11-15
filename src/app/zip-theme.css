@@ -14,11 +14,11 @@
 body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app { font-family: Inter, system-ui, sans-serif; }
 .earthlens-app :is(button,a,input,select,summary,[role="button"]):focus-visible { outline: 2px solid var(--et-9fe870); outline-offset: 3px; }
-.earthlens-app .site-header { background: var(--et-050a18); border-color: var(--et-172142); min-height: 80px; height: auto; padding-block: 14px; }
+.earthlens-app .site-header { background: var(--et-050a18); border-color: var(--et-172142); min-height: 80px; height: auto; padding: 14px max(32px, calc((100vw - 1256px) / 2)); }
 .earthlens-app .brand-text strong { color: var(--et-fff); font-size: 17px; letter-spacing: -.02em; }
 .earthlens-app .brand-text small { color: var(--et-a6b3d0); font-size: 9px; letter-spacing: .16em; }
 .earthlens-brand-art { width: 46px; height: 46px; }
-.earthlens-app .main-nav { gap: 12px; }
+.earthlens-app .main-nav { gap: 6px; margin-left: auto; }
 .earthlens-app .nav-link { color: var(--et-e9edfa); font-size: 14px; min-height: 44px; padding: 0 16px; border-radius: 12px; }
 .earthlens-app .nav-link-active { background: var(--et-1b1740); color: var(--et-c3b6ff); }
 .earthlens-app .nav-link-active::after { display: none; }

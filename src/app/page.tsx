@@ -301,7 +301,6 @@ export default function Page() {
               {page === "home" ? "Home" : "Explore Map"}
             </button>
           ))}
-          <button className="nav-link" onClick={askAI}>AI Assistant</button>
         </nav>
         <ThemeToggle />
         <div className="language-switch" role="group" aria-label="Interface language">
