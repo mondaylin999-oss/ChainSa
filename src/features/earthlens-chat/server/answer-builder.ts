@@ -190,7 +190,7 @@ function sourcesSection({ lang, fmt, g, a, outlook }: BuildInput): string[] {
   for (const s of sources) {
     let detail = "";
     if (s.id === POWER_SOURCE.id) {
-      const parts = [g.period ? `${g.period.start} → ${g.period.end}` : "", a.baseline ? L({ en: `history ${a.baseline.firstYear}–${a.baseline.lastYear}`, my: `မှတ်တမ်း ${a.baseline.firstYear}–${a.baseline.lastYear}` }) : ""].filter(Boolean);
+      const parts = [g.period ? `${g.period.start} → ${g.period.end}` : "", a.baseline ? L({ en: `history ${a.baseline.firstYear}–${a.baseline.lastYear} (provisional post-2008 baseline: NASA POWER data for Myanmar before 2009 are not comparable)`, my: `မှတ်တမ်း ${a.baseline.firstYear}–${a.baseline.lastYear} (၂၀၀၈ နောက်ပိုင်း ယာယီ နှိုင်းယှဉ်ကာလ - ၂၀၀၉ မတိုင်မီ NASA POWER အချက်အလက်များကို နှိုင်းယှဉ်၍ မရပါ)` }) : ""].filter(Boolean);
       detail = parts.length ? ` (${parts.join("; ")})` : "";
     } else if (s.id === "nasa-modis-ndvi") {
       const n = g.facts.find((x) => x.id === "ndvi_latest");

@@ -24,5 +24,5 @@ export async function fetchPublicFires(region: Region, townshipId?: string, fetc
   }
   const geometry = await selectionBoundary(region, townshipId);
   const detections = all.filter(d => geometry ? pointInGeometry(d.lon, d.lat, geometry) : Math.abs(d.lon-region.lon) <= 0.1 && Math.abs(d.lat-region.lat) <= 0.1);
-  return { detections, coverage: geometry ? "NOAA-20 VIIRS detections inside the selected boundary." : "NOAA-20 VIIRS detections within 0.1° of the regional reference point; a full boundary is not bundled.", latestFeedDate: all.map(d => d.date).sort().at(-1)! };
+  return { detections, coverage: geometry ? "NOAA-20 VIIRS detections inside the selected boundary." : "NOAA-20 VIIRS detections within 0.1° of the regional reference point; a full boundary is not bundled.", latestFeedDate: all.map(d => d.date).sort().at(-1)!, boundary: Boolean(geometry) };
 }

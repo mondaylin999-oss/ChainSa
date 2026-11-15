@@ -437,7 +437,7 @@ export default function Page() {
                       ))}
                     </select>
                     {selectedDataset && !selectedDataset.available && <p className="field-hint">{selectedDataset.reason}</p>}
-                    {selectedDataset?.coverage && <p className="field-hint">Published archive: {selectedDataset.coverage.start} to {selectedDataset.coverage.end}. {selectedDataset.temporalResolution}. Selecting this dataset opens a suitable historical range.</p>}
+                    {selectedDataset?.coverage && <p className="field-hint">Published archive: {selectedDataset.coverage.start} to {selectedDataset.coverage.ongoing ? `the latest NASA release (${selectedDataset.coverage.end} or later)` : selectedDataset.coverage.end}. {selectedDataset.temporalResolution}. Selecting this dataset opens a suitable historical range.</p>}
                     {!datasets.length && <p className="field-hint">No datasets are listed for this topic.</p>}
                   </div>
                   <div className="field-control">
@@ -499,7 +499,9 @@ export default function Page() {
                   </div>
                 ) : result ? (
                   <dl className="detail-grid">
-                    <div><dt>Area</dt><dd>{result.location?.name ?? result.region.name}, {result.location?.type ?? "region"}</dd></div>
+                    {result.dataWarning && <div className="detail-full detail-warning" role="note"><dt>Data consistency warning</dt><dd>{result.dataWarning}</dd></div>}
+                    <div className="detail-full"><dt>Spatial basis</dt><dd>{result.spatialBasis?.label ?? `${result.location?.type === "township" ? "Township Representative Point" : "Regional Reference Point"} (${(result.location ?? result.region).lat.toFixed(4)}°N, ${(result.location ?? result.region).lon.toFixed(4)}°E)`}</dd></div>
+                    <div><dt>Selected place</dt><dd>{result.location?.name ?? result.region.name}{result.location?.type === "township" ? ` (${result.region.name})` : ""}</dd></div>
                     <div><dt>Topic</dt><dd>{activeTopicData?.label}</dd></div>
                     <div><dt>Dataset</dt><dd>{result.dataset.label}</dd></div>
                     <div><dt>Observation period</dt><dd>{result.period.start} — {result.period.end}</dd></div>
@@ -508,7 +510,7 @@ export default function Page() {
                     <div><dt>Geographic coverage</dt><dd>{result.geographicCoverage}</dd></div>
                     <div><dt>Data received</dt><dd>{new Date(result.observedAt).toLocaleString()}</dd></div>
                     {result.missingCount > 0 && <div><dt>Missing observations</dt><dd>{result.missingCount} shown as gaps, not zeros</dd></div>}
-                    <div className="detail-full"><dt>Plain-language reading</dt><dd>{result.dataset.description}. Summary statistics use only available observations; they do not imply a township-wide condition.</dd></div>
+                    <div className="detail-full"><dt>Plain-language reading</dt><dd>{result.dataset.description}. Summary statistics use only available observations; {result.spatialBasis?.kind?.startsWith("area") ? "values are calculated over the full selected boundary." : result.spatialBasis?.kind === "river-reach" ? "they describe the named SWOT river reach, not a township-wide or region-wide condition." : result.spatialBasis?.kind === "grid-cell" ? "they describe one satellite grid cell, not a township-wide or region-wide condition." : "they describe the sampled point or pixel window, not a township-wide or region-wide condition."}</dd></div>
                     <div className="detail-full"><dt>Limitations</dt><dd>{result.dataset.limitations}</dd></div>
                   </dl>
                 ) : (

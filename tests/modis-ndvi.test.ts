@@ -125,8 +125,8 @@ describe("chatbot uses MODIS NDVI", () => {
 describe("NDVI comparison without the long-term POWER record", () => {
   it("still shows the NDVI past-year comparison when POWER history fails", async () => {
     const { f } = mockFetch({
-      // recent window works, the 1981→ history request fails
-      "https://power.larc.nasa.gov": (url: string) => (url.includes("start=1981") ? new Response("timeout", { status: 504 }) : Response.json(powerFromUrl(url))),
+      // recent window works, the 2009→ consistent-history request fails
+      "https://power.larc.nasa.gov": (url: string) => (url.includes("start=2009") ? new Response("timeout", { status: 504 }) : Response.json(powerFromUrl(url))),
       [BASE]: ornl(),
     });
     await fetchNdviSummary(21.4, 95.95, 1000, f, BASE, "wait");

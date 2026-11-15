@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { TtlCache } from "@/features/earthlens-chat/server/cache";
 import { pointInGeometry, regionGeometry } from "@/features/earthlens-chat/server/nasa/firms";
 import type { Region } from "@/features/earthlens-chat/regions";
-import { EARTH_ENGINE_SETUP_MESSAGE, SATELLITE_PRODUCTS, type SatelliteProduct } from "../satellite-products";
+import { EARTH_ENGINE_SETUP_MESSAGE, SATELLITE_PRODUCTS, URBAN_MASK, type SatelliteProduct } from "../satellite-products";
 
 // The published SDK types omit most server-side image operators. Keep its dynamic
 // API at this boundary; validate all external results before returning chart data.
@@ -68,15 +68,49 @@ export function parseSatelliteRows(value: unknown): Row[] {
   }).sort((a,b) => a.date.localeCompare(b.date));
 }
 
+/**
+ * NASA MCD12Q1 urban/built-up (class 13) mask: the latest published map not after the observation year
+ * (the first map for earlier observations). No hard-coded last year, so new releases are used automatically.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function urbanMask(image: any) {
+  const year = ee.Number(ee.Date(image.get("system:time_start")).get("year")).max(URBAN_MASK.firstYear);
+  const maps = ee.ImageCollection(URBAN_MASK.collection).filter(ee.Filter.calendarRange(URBAN_MASK.firstYear, year, "year")).sort("system:time_start", false);
+  const cover = ee.Image(maps.first()).select(URBAN_MASK.band);
+  return cover.eq(URBAN_MASK.urbanClass).updateMask(cover.gte(1).and(cover.lte(17)));
+}
+
+/** MOD11A2 daytime LST in °C with the same quality rule as the general LST product. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function lstCelsius(image: any) {
+  const raw = image.select("LST_Day_1km");
+  const qa = image.select("QC_Day");
+  return raw.updateMask(raw.gte(7500).and(qa.bitwiseAnd(3).eq(0)).and(qa.rightShift(6).bitwiseAnd(3).eq(0))).multiply(0.02).subtract(273.15);
+}
+
 /** Raster value and validity mask; product fill values never become zeros. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function metricImage(image: any, product: SatelliteProduct, baseline: any) {
   const raw = image.select(product.band);
   switch (product.metric) {
     case "tree-cover": return raw.updateMask(raw.gte(0).and(raw.lte(100)));
-    case "lst": {
-      const qa = image.select("QC_Day");
-      return raw.updateMask(raw.gte(7500).and(qa.bitwiseAnd(3).eq(0)).and(qa.rightShift(6).bitwiseAnd(3).eq(0))).multiply(0.02).subtract(273.15);
+    case "lst": return lstCelsius(image);
+    case "burned": {
+      // MCD64A1 BurnDate: 1–366 burned, 0 unburned, -1 unmapped, -2 water. QA bit 0 = land, bit 1 = valid data.
+      const qa = image.select("QA");
+      return raw.gte(1).and(raw.lte(366)).multiply(100).updateMask(raw.gte(0).and(qa.bitwiseAnd(3).eq(3)));
+    }
+    case "urban-ndvi": {
+      // MOD13Q1 NDVI: valid range -2000..10000, scale 0.0001; SummaryQA 0 = good, 1 = marginal but usable.
+      const ndvi = raw.updateMask(raw.gte(-2000).and(raw.lte(10000)).and(image.select("SummaryQA").lte(1))).multiply(0.0001);
+      // Land cover (500 m) is coarser than NDVI (250 m): each NDVI pixel takes the class of the land-cover pixel it falls in.
+      return ndvi.updateMask(urbanMask(image).eq(1));
+    }
+    case "urban-lst": {
+      const lst = lstCelsius(image);
+      // Aggregate the 500 m urban mask to the 1 km LST grid and keep pixels that are at least half built-up.
+      const urbanShare = urbanMask(image).unmask(0).reduceResolution({ reducer: ee.Reducer.mean(), maxPixels: 64 }).reproject({ crs: raw.projection() });
+      return lst.updateMask(urbanShare.gte(0.5));
     }
     case "et": return raw.updateMask(raw.gte(-32767).and(raw.lte(32700)).and(image.select("ET_QC").bitwiseAnd(1).eq(0))).multiply(0.1);
     case "water": return raw.eq(2).multiply(100).updateMask(raw.gt(0));
@@ -127,6 +161,63 @@ export async function fetchSatelliteObservations(datasetId: string, region: Regi
     observations.push(...parseSatelliteRows(raw));
   }
   const result: Result = { observations, geographicCoverage: `${area.note} Area-weighted mean over valid ${product.scale} m product pixels. ${product.cadence}; values retain their published dates.`, spatialSelection: area.spatialSelection, qaPolicy: product.limitations };
+  cache.set(key, result);
+  return result;
+}
+
+/**
+ * NASA Black Marble VNP46A2 v002 (VIIRS/S-NPP daily BRDF-, lunar- and atmosphere-corrected nighttime lights, 500 m),
+ * aggregated to monthly means in Google Earth Engine (used only as a processing platform for the NASA product).
+ * Quality: Mandatory_Quality_Flag 0–1 (high quality, persistent or ephemeral), cloud confidence "confident" or
+ * "probably clear" (QF_Cloud_Mask bits 6–7 ≤ 1) and no snow. Values in nW·cm⁻²·sr⁻¹.
+ */
+export const BLACK_MARBLE = {
+  collection: "NASA/VIIRS/002/VNP46A2", band: "DNB_BRDF_Corrected_NTL", start: "2012-01-19", scale: 500,
+  /** Lit-pixel threshold on the monthly mean radiance (nW·cm⁻²·sr⁻¹); see catalog limitations for its meaning. */
+  litThreshold: 0.5,
+} as const;
+const MAX_BLACK_MARBLE_MONTHS = 36;
+
+export function blackMarbleMonths(start: string, end: string) {
+  const out: string[] = [];
+  const d = new Date(`${start.slice(0, 7)}-01T00:00:00Z`);
+  while (d.toISOString().slice(0, 10) <= end) { out.push(d.toISOString().slice(0, 10)); d.setUTCMonth(d.getUTCMonth() + 1); }
+  return out;
+}
+
+export async function fetchBlackMarbleMonthly(kind: "radiance" | "lit-area", region: Region, townshipId: string | undefined, start: string, end: string): Promise<Result> {
+  const months = blackMarbleMonths(start, end);
+  if (months.length > MAX_BLACK_MARBLE_MONTHS) throw new Error(`Choose a period of at most ${MAX_BLACK_MARBLE_MONTHS} months.`);
+  const key = `bm:${kind}:${region.id}:${townshipId ?? ""}:${start}:${end}`;
+  const hit = cache.get(key);
+  if (hit) return hit;
+  await initialize();
+  const area = await geometryFor(region, townshipId);
+  const daily = ee.ImageCollection(BLACK_MARBLE.collection).filterBounds(area.geometry);
+  const options = { geometry: area.geometry, scale: BLACK_MARBLE.scale, maxPixels: 2e9, tileScale: 4 };
+  const row = (month: string) => {
+    const s = ee.Date(month), e = s.advance(1, "month");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const filtered = daily.filterDate(s, e).map((img: any) => {
+      const quality = img.select("Mandatory_Quality_Flag").lte(1);
+      const clear = img.select("QF_Cloud_Mask").rightShift(6).bitwiseAnd(3).lte(1);
+      const noSnow = img.select("Snow_Flag").eq(0);
+      return img.select(BLACK_MARBLE.band).updateMask(quality.and(clear).and(noSnow));
+    });
+    const mean = filtered.mean().rename("value");
+    const pixelArea = ee.Image.pixelArea().updateMask(mean.mask());
+    const metric = kind === "radiance" ? mean.multiply(pixelArea) : mean.gte(BLACK_MARBLE.litThreshold).multiply(pixelArea);
+    const totals = metric.rename("value").addBands(pixelArea.rename("area")).reduceRegion({ ...options, reducer: ee.Reducer.sum() });
+    const numerator = totals.get("value"), denominator = totals.get("area");
+    const hasArea = ee.Algorithms.If(denominator, ee.Number(denominator).gt(0), false);
+    const value = kind === "radiance" ? ee.Algorithms.If(hasArea, ee.Number(numerator).divide(denominator), null) : ee.Algorithms.If(hasArea, ee.Number(numerator).divide(1e6), null);
+    return ee.Dictionary({ date: month, value, validAreaKm2: ee.Algorithms.If(hasArea, ee.Number(denominator).divide(1e6), null) });
+  };
+  const raw = await new Promise<unknown>((resolve, reject) => ee.List(months.map(row)).evaluate((result: unknown, error: string) => error ? reject(new Error("Black Marble nighttime lights could not be calculated. Please try a shorter period or another area.")) : resolve(result)));
+  const result: Result = {
+    observations: parseSatelliteRows(raw), spatialSelection: area.spatialSelection, qaPolicy: "Mandatory_Quality_Flag 0–1, cloud confidence clear or probably clear, no snow.",
+    geographicCoverage: `${area.note} ${kind === "radiance" ? "Area-weighted mean of monthly mean radiance" : `Area of 500 m pixels whose monthly mean radiance is at least ${BLACK_MARBLE.litThreshold} nW·cm⁻²·sr⁻¹`} over valid pixels; each value is dated to the first day of its month.`,
+  };
   cache.set(key, result);
   return result;
 }

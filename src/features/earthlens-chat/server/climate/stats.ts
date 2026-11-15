@@ -2,7 +2,7 @@ import "server-only";
 import { addDays } from "../nasa/power";
 
 /**
- * Pure statistics helpers for comparing current NASA POWER values with the 1981–present record.
+ * Pure statistics helpers for comparing current NASA POWER values with the consistent NASA POWER record (2009–present; see nasa/power-homogeneity.ts).
  * Nothing here forecasts anything: every output describes the past.
  */
 
