@@ -5,14 +5,16 @@ import { addDays, fetchPowerDaily } from "@/features/earthlens-chat/server/nasa/
 import { getTownshipPoint } from "@/features/explorer/township-location";
 import { DATASETS } from "@/features/explorer/catalog";
 import { fetchNdviRange } from "@/features/earthlens-chat/server/nasa/modis-ndvi";
-import { earthEngineConfigured, fetchBlackMarbleMonthly, fetchSatelliteObservations } from "@/features/explorer/server/earth-engine";
-import { EARTH_ENGINE_SETUP_MESSAGE } from "@/features/explorer/satellite-products";
+import { fetchBlackMarbleMonthly, fetchSatelliteObservations, selectionBoundary } from "@/features/explorer/server/earth-engine";
+import { blackMarbleState, earthEngineState, sourceStatuses } from "@/features/explorer/server/availability";
+import { BLACK_MARBLE_LAADS, fetchBlackMarbleLaads } from "@/features/explorer/server/black-marble-laads";
+import { BLACK_MARBLE_DATASETS, EARTH_ENGINE_SETUP_MESSAGE } from "@/features/explorer/satellite-products";
 import { PUBLIC_MODIS_DATASETS, fetchLandCoverClasses, fetchPublicModis, subsetWindow, windowCoverageText } from "@/features/explorer/server/modis-products";
 import { SATELLITE_PRODUCTS } from "@/features/explorer/satellite-products";
 import { areaAverageBasis, areaTotalBasis, bufferBasis, gridCellBasis, pointBasis, pointLabel, reachBasis, windowBasis } from "@/features/explorer/spatial-basis";
 import { PACE_AOD_START, fetchPaceAod } from "@/features/explorer/server/pace-aod";
 import { SWOT_DATASETS, SWOT_START, fetchReachSeries, findNearestReach, swotObservations } from "@/features/explorer/server/swot";
-import { WATER_WINDOW, excessWaterKm2, fetchDrySeason, fetchWaterComposites, referenceWater, waterAreaKm2, waterPersistence } from "@/features/explorer/server/modis-water";
+import { MAX_SEASONAL_DATES, WATER_WINDOW, excessWaterKm2, fetchDrySeason, fetchWaterComposites, monthlyWaterShare, referenceWater, waterAreaKm2, waterPersistence, waterSharePct } from "@/features/explorer/server/modis-water";
 import { CLIMATE_PARAMETERS, ClimatePeriodError, fetchClimateIndicator, type ClimateIndicatorId } from "@/features/explorer/server/climate-indicators";
 import { POWER_BREAK_NOTE, crossesPowerBreak } from "@/features/earthlens-chat/server/nasa/power-homogeneity";
 
@@ -137,11 +139,20 @@ export async function POST(request: Request) {
     } catch (cause) { return providerError(cause, "NASA SWOT observations could not be retrieved."); }
   }
 
-  if (dataset.id === "surface-water-area" || dataset.id === "flood-extent") {
+  if (["surface-water-area", "flood-extent", "water-extent", "seasonal-water-change"].includes(dataset.id)) {
+    if (dataset.id === "seasonal-water-change" && days > 366) return error("Choose up to 12 months for monthly water comparisons.", 400);
     try {
-      const { composites } = await fetchWaterComposites(location.lat, location.lon, start, end);
+      const { composites } = await fetchWaterComposites(location.lat, location.lon, start, end, fetch, dataset.id === "seasonal-water-change" ? MAX_SEASONAL_DATES : undefined);
       const windowText = `Calculated from a ${WATER_WINDOW.n} × ${WATER_WINDOW.n} window of 463 m NASA MODIS pixels (${WATER_WINDOW.pixels} pixels, about ${WATER_WINDOW.sideKm} km × ${WATER_WINDOW.sideKm} km ≈ ${WATER_WINDOW.areaKm2} km²) around the ${township ? "township representative point" : "regional reference point"}; this is a window-based sample, not a township or region total. Composites with less than 80% clear sky are left blank, never shown as 0 km².`;
       const basis = windowBasis(location, WATER_WINDOW);
+      if (dataset.id === "water-extent") {
+        return ok({ observations: composites.map(c => ({ date: c.date, value: waterSharePct(c) })), dataset, source: dataset.source, spatialBasis: basis,
+          geographicCoverage: `${windowText} Values are the percentage of clear window pixels mapped as water; each value is an 8-day composite dated to its first day.` });
+      }
+      if (dataset.id === "seasonal-water-change") {
+        return ok({ observations: monthlyWaterShare(composites), dataset, source: dataset.source, spatialBasis: basis,
+          geographicCoverage: `${windowText} Monthly values pool the water and clear pixels of that month's usable composites and are dated to the first day of the month; months without a usable composite are blank.` });
+      }
       if (dataset.id === "surface-water-area") {
         const persistence = waterPersistence(composites);
         return ok({ observations: composites.map(c => ({ date: c.date, value: waterAreaKm2(c) })), dataset, source: dataset.source, spatialBasis: basis,
@@ -158,24 +169,49 @@ export async function POST(request: Request) {
 
   const config = getConfig();
   if (dataset.engine === "earth-engine") {
-    if (!earthEngineConfigured() && !PUBLIC_MODIS_DATASETS.has(dataset.id)) return error(EARTH_ENGINE_SETUP_MESSAGE, 503);
     // Ongoing NASA archives: only the start is enforced; NASA's published date list decides what exists after it.
     if (dataset.coverage && (end < dataset.coverage.start || (!dataset.coverage.ongoing && start > dataset.coverage.end))) {
       return error(dataset.coverage.ongoing ? `Choose dates from ${dataset.coverage.start} onward for this satellite archive.` : `Choose dates between ${dataset.coverage.start} and ${dataset.coverage.end} for this published satellite archive.`, 400);
     }
+    // Verified access (credentials actually accepted), not merely non-empty settings.
+    const { ee, token } = await sourceStatuses();
+    if (BLACK_MARBLE_DATASETS.has(dataset.id)) {
+      const state = blackMarbleState(token, ee);
+      if (!state.available) return error(state.reason ?? EARTH_ENGINE_SETUP_MESSAGE, 503);
+      const lit = dataset.id === "lit-area";
+      try {
+        if (state.access === "nasa-laads") {
+          const boundary = await selectionBoundary(region, townshipId as string | undefined);
+          const d = 0.09; // fallback square of about 20 km × 20 km where no boundary is bundled
+          const geometry = boundary ?? { type: "Polygon" as const, coordinates: [[[location.lon - d, location.lat - d], [location.lon + d, location.lat - d], [location.lon + d, location.lat + d], [location.lon - d, location.lat + d], [location.lon - d, location.lat - d]]] };
+          const { months, stride, tiles } = await fetchBlackMarbleLaads(geometry, `${region.id}:${townshipId ?? ""}`, start, end);
+          const latest = [...months].reverse().find(m => m.litAreaKm2 !== null);
+          const ordinal = (n: number) => `${n}${n % 10 === 2 && n % 100 !== 12 ? "nd" : n % 10 === 3 && n % 100 !== 13 ? "rd" : n % 10 === 1 && n % 100 !== 11 ? "st" : "th"}`;
+          const sampled = stride > 1 ? ` (systematic sample of every ${ordinal(stride)} pixel in each direction)` : "";
+          const spatialBasis = boundary ? (lit ? { ...areaTotalBasis(Boolean(township), "lit area"), label: `${areaTotalBasis(Boolean(township), "lit area").label}${sampled}` } : { ...areaAverageBasis(Boolean(township)), label: `${areaAverageBasis(Boolean(township)).label}${sampled}` })
+            : { kind: "buffer" as const, label: `${pointLabel(location)} · square of about 20 km × 20 km (no boundary bundled)` };
+          const source = { name: "NASA Black Marble VNP46A3 v002 (VIIRS/S-NPP monthly, 15 arc-second ≈ 500 m) via NASA LAADS DAAC OPeNDAP", url: "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A3/" };
+          return ok({ observations: months.map(m => ({ date: m.date, value: lit ? m.litAreaKm2 : m.meanRadiance, ...(lit ? { sensitivityKm2: m.sensitivityKm2 } : {}), validShare: m.validShare, sampledPixels: m.sampledPixels })), dataset: { ...dataset, source }, source, spatialBasis,
+            geographicCoverage: `${boundary ? `Pixels whose centres fall inside the selected ${township ? "MIMU township" : "state/region"} boundary` : "Pixels in a square of about 20 km around the reference point"}${sampled}, from Black Marble tiles ${tiles.join(", ")}. Only AllAngle_Composite_Snow_Free values with quality flag 0 (more than three good observations in the month) are used; fill values, poor-quality and gap-filled pixels are excluded. ${lit ? `Lit area is the area of good-quality pixels with monthly radiance of at least ${BLACK_MARBLE_LAADS.litThreshold} nW·cm⁻²·sr⁻¹.${latest ? ` Sensitivity for ${latest.date.slice(0, 7)}: ${latest.litAreaKm2} km² at ${BLACK_MARBLE_LAADS.litThreshold}, ${latest.sensitivityKm2["1"]} km² at 1 and ${latest.sensitivityKm2["0.5"]} km² at 0.5 nW·cm⁻²·sr⁻¹ (lower cuts are inflated by dry-season haze and background).` : ""}` : "Values are the cos(latitude)-weighted mean radiance of good-quality pixels in nW·cm⁻²·sr⁻¹."} Months with good-quality values for less than half of the sampled pixels, or with a tile not yet published, are left blank. Each value is dated to the first day of its month.` });
+        }
+        const result = await fetchBlackMarbleMonthly(lit ? "lit-area" : "radiance", region, townshipId as string | undefined, start, end);
+        const spatialBasis = result.spatialSelection === "polygon-mean" ? (lit ? areaTotalBasis(Boolean(township), "lit area") : areaAverageBasis(Boolean(township))) : bufferBasis({ ...region, type: "region" }, 10);
+        return ok({ ...result, dataset, source: dataset.source, spatialBasis });
+      } catch (cause) { return providerError(cause, "NASA Black Marble observations could not be retrieved."); }
+    }
+    const state = earthEngineState(ee, PUBLIC_MODIS_DATASETS.has(dataset.id));
+    if (!state.available) return error(state.reason ?? EARTH_ENGINE_SETUP_MESSAGE, 503);
     try {
-      const polygon = earthEngineConfigured();
-      const blackMarble = dataset.id === "nighttime-lights" || dataset.id === "lit-area";
-      const result = blackMarble ? await fetchBlackMarbleMonthly(dataset.id === "lit-area" ? "lit-area" : "radiance", region, townshipId as string | undefined, start, end)
-        : polygon ? await fetchSatelliteObservations(dataset.id, region, townshipId as string | undefined, start, end) : {
+      const polygon = ee === "valid";
+      const result = polygon ? await fetchSatelliteObservations(dataset.id, region, townshipId as string | undefined, start, end) : {
         observations: await fetchPublicModis(dataset.id, location.lat, location.lon, start, end),
         geographicCoverage: windowCoverageText(dataset.id, Boolean(township)),
         spatialSelection: "pixel-window" as const, qaPolicy: dataset.limitations,
       };
       // Earth Engine falls back to a 10 km buffer only where no region boundary is bundled.
       const spatialBasis = !polygon ? windowBasis(location, subsetWindow(SATELLITE_PRODUCTS[dataset.id]?.scale ?? 500))
-        : result.spatialSelection === "polygon-mean" ? (dataset.id === "lit-area" ? areaTotalBasis(Boolean(township), "lit area") : areaAverageBasis(Boolean(township))) : bufferBasis({ ...region, type: "region" }, 10);
-      const actualDataset = polygon ? dataset : { ...dataset, engine: undefined, source: { name: `${dataset.source.name.split(" via ")[0]} via NASA ORNL DAAC point subsets`, url: "https://modis.ornl.gov/data/modis_webservice.html" } };
+        : result.spatialSelection === "polygon-mean" ? areaAverageBasis(Boolean(township)) : bufferBasis({ ...region, type: "region" }, 10);
+      const actualDataset = polygon ? { ...dataset, source: { ...dataset.source, name: `${dataset.source.name.split(" via ")[0]} via Google Earth Engine (processing only)` } } : { ...dataset, engine: undefined, source: { name: `${dataset.source.name.split(" via ")[0]} via NASA ORNL DAAC point subsets`, url: "https://modis.ornl.gov/data/modis_webservice.html" } };
       return Response.json({ ...result, summary: summarize(result.observations.map(d => d.value)), dataset: actualDataset,
         region: regionInfo, location, spatialBasis,
         period: { start, end }, source: actualDataset.source, observedAt: new Date().toISOString(),
@@ -217,7 +253,7 @@ export async function POST(request: Request) {
   if (dataset.id === "vegetation-index" || dataset.id === "agriculture-vegetation-index") {
     if (days > 366) return error("Choose up to one year for vegetation charts.", 400);
     try {
-      const observations = await fetchNdviRange(location.lat, location.lon, start, end, 50000);
+      const observations = await fetchNdviRange(location.lat, location.lon, start, end, 90_000);
       return Response.json({
         observations, summary: summarize(observations.map(d => d.value)), dataset,
         region: regionInfo, location, spatialBasis: windowBasis(location, subsetWindow(250)),

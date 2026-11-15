@@ -1,8 +1,8 @@
 import { REGIONS } from "@/features/earthlens-chat/regions";
 import { DATASETS, TOPICS } from "@/features/explorer/catalog";
-import { earthEngineConfigured } from "@/features/explorer/server/earth-engine";
-import { EARTH_ENGINE_SETUP_MESSAGE } from "@/features/explorer/satellite-products";
 import { PUBLIC_MODIS_DATASETS } from "@/features/explorer/server/modis-products";
+import { BLACK_MARBLE_DATASETS } from "@/features/explorer/satellite-products";
+import { blackMarbleState, earthEngineState, sourceStatuses } from "@/features/explorer/server/availability";
 
 import townshipDirectory from "../../../../../public/townships.json";
 
@@ -10,12 +10,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const datasets = DATASETS.map((dataset) => ({
-    ...dataset,
-    available: dataset.engine === "earth-engine" ? earthEngineConfigured() || PUBLIC_MODIS_DATASETS.has(dataset.id) : dataset.available,
-    setupRequired: dataset.engine === "earth-engine" && !earthEngineConfigured() && !PUBLIC_MODIS_DATASETS.has(dataset.id),
-    reason: dataset.engine === "earth-engine" && !earthEngineConfigured() && !PUBLIC_MODIS_DATASETS.has(dataset.id) ? EARTH_ENGINE_SETUP_MESSAGE : dataset.reason,
-  }));
+  // Availability reflects verified access (credentials actually accepted), not just non-empty settings.
+  const { ee, token } = await sourceStatuses();
+  const datasets = DATASETS.map((dataset) => {
+    if (dataset.engine !== "earth-engine") return dataset;
+    const state = BLACK_MARBLE_DATASETS.has(dataset.id) ? blackMarbleState(token, ee) : earthEngineState(ee, PUBLIC_MODIS_DATASETS.has(dataset.id));
+    return { ...dataset, available: state.available, setupRequired: state.setupRequired, reason: state.reason ?? dataset.reason, access: state.access };
+  });
   return Response.json({
     topics: TOPICS,
     datasets,

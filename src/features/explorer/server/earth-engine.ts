@@ -41,6 +41,32 @@ async function initialize() {
   return initialization;
 }
 
+export type EarthEngineStatus = "missing" | "valid" | "invalid" | "unavailable";
+let statusCheck: { status: EarthEngineStatus; at: number } | undefined;
+const STATUS_TTL_MS = 30 * 60_000;
+/**
+ * Whether Earth Engine can actually be used: "missing" (settings empty), "invalid" (settings present but
+ * malformed or rejected — e.g. bad key, project not registered, missing permissions), "unavailable" (no
+ * answer in time) or "valid" (initialised successfully). Cached for 30 minutes. Never logs credential values.
+ */
+export async function earthEngineStatus(): Promise<EarthEngineStatus> {
+  if (!earthEngineConfigured()) return "missing";
+  if (statusCheck && Date.now() - statusCheck.at < STATUS_TTL_MS) return statusCheck.status;
+  let status: EarthEngineStatus;
+  try {
+    await Promise.race([initialize(), new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 30_000))]);
+    status = "valid";
+  } catch (error) {
+    status = (error as Error).message === "timeout" ? "unavailable" : "invalid";
+  }
+  statusCheck = { status, at: Date.now() };
+  return status;
+}
+export async function earthEngineReady() {
+  return (await earthEngineStatus()) === "valid";
+}
+export function resetEarthEngineStatusForTests() { statusCheck = undefined; initialization = undefined; }
+
 export async function selectionBoundary(region: Region, townshipId?: string): Promise<Geometry | undefined> {
   if (townshipId) {
     boundaries ??= readFile(join(process.cwd(), "public", "township-boundaries.geojson"), "utf8").then(text => {
@@ -113,8 +139,6 @@ function metricImage(image: any, product: SatelliteProduct, baseline: any) {
       return lst.updateMask(urbanShare.gte(0.5));
     }
     case "et": return raw.updateMask(raw.gte(-32767).and(raw.lte(32700)).and(image.select("ET_QC").bitwiseAnd(1).eq(0))).multiply(0.1);
-    case "water": return raw.eq(2).multiply(100).updateMask(raw.gt(0));
-    case "lights": return raw.updateMask(image.select("cf_cvg").gt(0));
     default: {
       const valid = raw.gte(1).and(raw.lte(17));
       if (product.metric === "built-up") return raw.eq(13).multiply(100).updateMask(valid);
@@ -174,7 +198,7 @@ export async function fetchSatelliteObservations(datasetId: string, region: Regi
 export const BLACK_MARBLE = {
   collection: "NASA/VIIRS/002/VNP46A2", band: "DNB_BRDF_Corrected_NTL", start: "2012-01-19", scale: 500,
   /** Lit-pixel threshold on the monthly mean radiance (nW·cm⁻²·sr⁻¹); see catalog limitations for its meaning. */
-  litThreshold: 0.5,
+  litThreshold: 2,
 } as const;
 const MAX_BLACK_MARBLE_MONTHS = 36;
 

@@ -3,7 +3,7 @@ import { resetConfigForTests } from "@/features/earthlens-chat/server/env";
 import { ProviderError, fetchJson } from "@/features/explorer/server/http";
 import { fetchPaceAod, parseAodSamples } from "@/features/explorer/server/pace-aod";
 import { fetchReachSeries, nearestReach, parseHydrocron, reachType, swotObservations, type SwotRow } from "@/features/explorer/server/swot";
-import { PIXEL_KM2, WATER_WINDOW, classifyWater, excessWaterKm2, isClear, referenceWater, waterAreaKm2, waterPersistence, type WaterComposite } from "@/features/explorer/server/modis-water";
+import { PIXEL_KM2, WATER_WINDOW, classifyWater, excessWaterKm2, isClear, monthlyWaterShare, referenceWater, waterAreaKm2, waterPersistence, waterSharePct, type WaterComposite } from "@/features/explorer/server/modis-water";
 import { BLACK_MARBLE, blackMarbleMonths } from "@/features/explorer/server/earth-engine";
 import { DATASETS } from "@/features/explorer/catalog";
 import { SATELLITE_PRODUCTS } from "@/features/explorer/satellite-products";
@@ -125,15 +125,21 @@ describe("NASA MODIS surface water and flood extent", () => {
 
 describe("NASA Black Marble and catalogue integration", () => {
   it("documents the lit-area threshold and lists months", () => {
-    expect(BLACK_MARBLE).toMatchObject({ collection: "NASA/VIIRS/002/VNP46A2", litThreshold: 0.5 });
+    expect(BLACK_MARBLE).toMatchObject({ collection: "NASA/VIIRS/002/VNP46A2", litThreshold: 2 });
     expect(blackMarbleMonths("2024-01-15", "2024-03-02")).toEqual(["2024-01-01", "2024-02-01", "2024-03-01"]);
   });
   it("has no duplicate datasets, replaces NOAA with NASA and labels JRC as non-NASA", () => {
     expect(new Set(DATASETS.map(d => d.id)).size).toBe(DATASETS.length);
     expect(SATELLITE_PRODUCTS["nighttime-lights"]).toBeUndefined();
     expect(JSON.stringify(DATASETS)).not.toMatch(/NOAA\/VIIRS/);
-    expect(DATASETS.find(d => d.id === "nighttime-lights")!.source.name).toContain("NASA Black Marble VNP46A2");
-    expect(DATASETS.find(d => d.id === "water-extent")!.limitations).toContain("Not a NASA dataset");
+    expect(DATASETS.find(d => d.id === "nighttime-lights")!.source.name).toContain("NASA Black Marble VNP46A3");
+    for (const id of ["water-extent", "seasonal-water-change"]) {
+      const d = DATASETS.find(x => x.id === id)!;
+      expect(d.source.name, id).toContain("NASA MODIS Terra MOD09A1 v061");
+      expect(d.engine, id).toBeUndefined();
+      expect(d.limitations, id).toContain("replaces the earlier European Commission JRC");
+    }
+    expect(JSON.stringify(DATASETS.map(d => d.source))).not.toMatch(/JRC|GSW1_4/);
   });
   it("marks live indicators available and Earth Engine ones as needing setup, not as working", async () => {
     vi.stubEnv("EARTH_ENGINE_PROJECT_ID", ""); vi.stubEnv("EARTH_ENGINE_SERVICE_ACCOUNT_JSON", "");
@@ -182,4 +188,38 @@ describe("observation route for the new indicators", () => {
 it("ignores SWOT reaches more than 16 km away even inside the search box", () => {
   const far = { features: [{ properties: { reach_id: "44584200353", river_name: "Zawgyi River" }, geometry: { type: "LineString", coordinates: [[96.43, 21.60]] } }] };
   expect(nearestReach(far, 21.576, 96.2712, "lake-on-river")).toBeNull();
+});
+
+describe("NASA MODIS water share replacing the JRC archive", () => {
+  const c = (date: string, pixels: (0 | 1 | null)[]): WaterComposite => ({ date, pixels, clearShare: pixels.filter(p => p !== null).length / pixels.length });
+  it("reports water as a share of clear pixels, keeping cloudy composites blank and 0% genuine", () => {
+    expect(waterSharePct(c("2024-01-01", [1, 0, 0, 0, 0]))).toBe(20);
+    expect(waterSharePct(c("2024-01-09", [0, 0, 0, 0, 0]))).toBe(0);
+    expect(waterSharePct(c("2024-07-11", [1, null, null, null, 0]))).toBeNull();
+  });
+  it("pools usable composites per month and leaves unobserved months blank", () => {
+    expect(monthlyWaterShare([
+      c("2024-01-01", [1, 0, 0, 0, 0]), c("2024-01-17", [1, 1, 0, 0, 0]), c("2024-01-25", [1, 1, 1, 1, null]),
+      c("2024-07-03", [1, null, null, null, null]),
+    ])).toEqual([{ date: "2024-01-01", value: 50 }, { date: "2024-07-01", value: null }]);
+  });
+  it("serves both indicators from NASA ORNL without Earth Engine", async () => {
+    vi.stubEnv("EARTH_ENGINE_PROJECT_ID", ""); vi.stubEnv("EARTH_ENGINE_SERVICE_ACCOUNT_JSON", "");
+    const pixels = 441;
+    vi.stubGlobal("fetch", vi.fn(async (input: string | URL | Request) => {
+      if (String(input).includes("/dates?")) return Response.json({ dates: [{ calendar_date: "2024-01-01", modis_date: "A2024001" }, { calendar_date: "2024-01-09", modis_date: "A2024009" }] });
+      const band = (d: string, m: string, name: string, v: (i: number) => number) => ({ calendar_date: d, modis_date: m, band: name, data: Array.from({ length: pixels }, (_, i) => v(i)) });
+      return Response.json({ subset: ["2024-01-01|A2024001", "2024-01-09|A2024009"].flatMap(x => { const [d, m] = x.split("|"); return [
+        band(d, m, "sur_refl_b04", i => (i < 44 ? 800 : 300)), band(d, m, "sur_refl_b06", i => (i < 44 ? 200 : 1500)), band(d, m, "sur_refl_state_500m", () => 0),
+      ]; }) });
+    }));
+    const extent = await (await POST(request({ topicId: "water", regionId: "mandalay", datasetId: "water-extent", start: "2024-01-01", end: "2024-01-15" }))).json();
+    expect(extent.observations).toEqual([{ date: "2024-01-01", value: 10 }, { date: "2024-01-09", value: 10 }]);
+    expect(extent.spatialBasis.kind).toBe("pixel-window");
+    expect(extent.source.name).toContain("NASA MODIS");
+    const seasonal = await (await POST(request({ topicId: "water", regionId: "mandalay", datasetId: "seasonal-water-change", start: "2024-01-01", end: "2024-01-31" }))).json();
+    expect(seasonal.observations).toEqual([{ date: "2024-01-01", value: 10 }]);
+    const tooLong = await POST(request({ topicId: "water", regionId: "mandalay", datasetId: "seasonal-water-change", start: "2023-01-01", end: "2024-06-30" }));
+    expect(tooLong.status).toBe(400);
+  });
 });
