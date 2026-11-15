@@ -15,7 +15,8 @@ test("builds descriptive trend and source metadata without significance claims",
   const model = buildDataTrendInsight(series, analyzeSeries(series));
   assert.equal(model.trend.direction, "Increasing descriptive pattern");
   assert.match(model.trend.rate, /NDVI\/year/);
-  assert.equal(model.significance.status, "Statistical significance analysis is not yet available.");
+  assert.match(model.significance.status, /only for NASA POWER temperature/);
+  assert.equal(model.significance.result.available, false);
   assert.equal(model.sources.find((item) => item.label === "Dataset ID")?.value, "MODIS/061/MOD13Q1");
   assert.equal(model.sources.find((item) => item.label === "Valid / rejected")?.value, "2 / 1");
   assert.match(model.keyStatistics.find((item) => item.label === "Variability (SD)")?.value ?? "", /0\.0707/);

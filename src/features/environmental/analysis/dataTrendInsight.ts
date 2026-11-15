@@ -1,3 +1,4 @@
+import { calculateTemperatureSignificance, type SignificanceResult } from "./significance";
 import type { DataSeries } from "../types/environmental";
 import type { AnalysisResult } from "./explainChanges";
 
@@ -5,13 +6,14 @@ export interface DataTrendInsightModel {
   overview: { location: string; coordinates: string; requestedPeriod: string; actualPeriod: string; selection: string };
   keyStatistics: Array<{ label: string; value: string }>;
   trend: { direction: string; rate: string; period: string; validObservations: string; explanation: string };
-  significance: { method: string; status: string; coverage: string };
+  significance: { method: string; status: string; coverage: string; result: SignificanceResult };
   sources: Array<{ label: string; value: string }>;
   limitations: string[];
 }
 
 export function buildDataTrendInsight(series: DataSeries, analysis: AnalysisResult, context: { locationName?: string; latitude?: number; longitude?: number } = {}): DataTrendInsightModel {
   const stats = analysis.statistics;
+  const significance = calculateTemperatureSignificance(series);
   const firstDate = stats.first?.date ?? series.actualStartDate ?? series.requestedStartDate ?? "not available";
   const lastDate = stats.last?.date ?? series.actualEndDate ?? series.requestedEndDate ?? "not available";
   const rate = stats.first && stats.last ? endpointRatePerYear(stats.first.date, stats.last.date, stats.absoluteChange ?? 0) : undefined;
@@ -44,9 +46,10 @@ export function buildDataTrendInsight(series: DataSeries, analysis: AnalysisResu
       explanation: stats.first && stats.last ? "This describes the change between the first and last valid observations. It is not a statistically significant trend test and does not establish causation." : "There are not enough valid observations to describe a change.",
     },
     significance: {
-      method: "Not implemented",
-      status: "Statistical significance analysis is not yet available.",
+      method: significance.method,
+      status: significance.status,
       coverage,
+      result: significance,
     },
     sources: [
       { label: "Dataset", value: series.dataset },
