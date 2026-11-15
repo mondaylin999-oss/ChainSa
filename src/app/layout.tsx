@@ -13,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="stylesheet" href="/earthlens-palette.css" />
         <script src="/theme.js" />
+        <script src="/earthlens-language.js" />
         {/* Same fonts as the EarthLens demo */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

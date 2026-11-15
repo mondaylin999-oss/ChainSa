@@ -107,7 +107,27 @@ export default function Page() {
 
   useEffect(() => {
     document.documentElement.lang = lang;
+    window.dispatchEvent(new CustomEvent("earthlens-language-change", { detail: lang }));
   }, [lang]);
+
+  useEffect(() => {
+    try {
+      const savedLanguage = localStorage.getItem("earthlens-language");
+      if (savedLanguage === "en" || savedLanguage === "my") setLang(savedLanguage);
+    } catch { /* The language can still be selected for this visit. */ }
+    function syncLanguage(event: StorageEvent) {
+      if (event.key !== "earthlens-language" && event.key !== null) return;
+      const savedLanguage = event.newValue === "my" ? "my" : "en";
+      setLang(savedLanguage);
+    }
+    window.addEventListener("storage", syncLanguage);
+    return () => window.removeEventListener("storage", syncLanguage);
+  }, []);
+
+  function selectLanguage(language: Lang) {
+    setLang(language);
+    try { localStorage.setItem("earthlens-language", language); } catch { /* The language still changes for this visit. */ }
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -286,7 +306,7 @@ export default function Page() {
   const selectedTownship = catalog?.townships.find(item=>item.id===townshipId);
   const dateError = observationDateError(draftStart,draftEnd);
 
-  if (view === "home") return <ReferenceHome onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={() => { setView("explore"); setChatOpen(true); }} onRegion={(id) => { chooseRegion(id); setView("explore"); }} />;
+  if (view === "home") return <ReferenceHome lang={lang} onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={() => { setView("explore"); setChatOpen(true); }} onRegion={(id) => { chooseRegion(id); setView("explore"); }} onLanguage={selectLanguage} />;
 
   return (
     <main className={`earthlens-app${view === "explore" ? " is-exploring" : ""}`} lang={lang}>
@@ -298,7 +318,7 @@ export default function Page() {
         <ThemeToggle />
         <div className="language-switch" role="group" aria-label="Interface language">
           {(["en", "my"] as const).map((language) => (
-            <button key={language} aria-pressed={lang === language} className={lang === language ? "language-active" : ""} onClick={() => setLang(language)}>
+            <button key={language} data-earthlens-language={language} aria-pressed={lang === language} className={lang === language ? "language-active" : ""} onClick={() => selectLanguage(language)}>
               {language === "en" ? "EN" : "မြန်မာ"}
             </button>
           ))}

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="/earthlens-palette.css">
 <script src="/theme.js"></script>
+<script src="/earthlens-language.js"></script>
 <title>Earth Trend Detective — Home</title>
 <script src="./vendor/react.js"></script>
 <script src="./vendor/react-dom.js"></script>
@@ -12,11 +13,20 @@
 <body>
 <x-dc>
 <helmet>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Padauk:wght@400;700&amp;display=swap">
 <style>
-body{margin:0;background:var(--et-040816);color:var(--et-e9edfa)}
-.theme-toggle{display:inline-flex;align-items:center;justify-content:center;min-height:40px;margin-left:auto;padding:8px 12px;border:1px solid var(--et-303e6b);border-radius:12px;background:var(--et-0c1532);color:var(--et-e9edfa);font:600 12px Inter,system-ui,sans-serif;cursor:pointer}
+body{margin:0;background:var(--et-040816);color:var(--et-e9edfa);font-family:Inter,Padauk,system-ui,sans-serif}
+.header-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
+.language-switch{display:flex;align-items:center;gap:3px;padding:3px;border:1px solid var(--et-303e6b);border-radius:10px;background:var(--et-0c1532)}
+.language-switch button{min-height:32px;padding:5px 8px;border:0;border-radius:7px;background:transparent;color:var(--et-a6b3d0);font:600 11px Inter,Padauk,system-ui,sans-serif;cursor:pointer}
+.language-switch button.language-active{background:var(--et-29204e);color:var(--et-fff)}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 12px;border:1px solid var(--et-303e6b);border-radius:12px;background:var(--et-0c1532);color:var(--et-e9edfa);font:600 12px Inter,Padauk,system-ui,sans-serif;cursor:pointer}
 .theme-toggle:hover{background:var(--et-211b46)}
+:root[data-theme=light] .language-switch{background:#fff;border-color:#ccd5e4}
+:root[data-theme=light] .language-switch button{color:#59647a}
+:root[data-theme=light] .language-switch button.language-active{background:#e8e0fb;color:#4d347d}
+:root[lang=my] #top h1{font-size:clamp(1.8rem,3.1vw,3rem)!important}
+:root[lang=my] #top h1>span{white-space:normal!important}
 :root[data-theme=light] #top{background:radial-gradient(900px 560px at 80% 45%,#e1e8ff 0%,transparent 70%),#f5f6fc!important}
 :root[data-theme=light] [style*="background: rgba("],:root[data-theme=light] [style*="background:rgba("]{background:#fff!important;box-shadow:0 8px 24px #24385a14!important}
 :root[data-theme=light] a[aria-current=page]{color:#fff!important}
@@ -48,7 +58,13 @@ a:focus-visible,button:focus-visible{outline:2px solid #9fe870;outline-offset:3p
 <span style="font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em; color: var(--et-a9b6d8)">MYANMAR EARTH INTELLIGENCE</span>
 </span>
 </a>
+<div class="header-actions">
+<div class="language-switch" role="group" aria-label="Interface language">
+<button type="button" data-earthlens-language="en" aria-pressed="true">EN</button>
+<button type="button" data-earthlens-language="my" aria-pressed="false">မြန်မာ</button>
+</div>
 <button type="button" class="theme-toggle" data-home-theme-toggle role="switch" aria-label="Dark mode" aria-checked="true">☾ Dark mode</button>
+</div>
 </div>
 </header>
 
@@ -415,7 +431,7 @@ regions: ['Yangon', 'Mandalay', 'Ayeyarwady', 'Sagaing', 'Bago', 'Magway', 'Shan
 document.addEventListener('click', function(event) {
   const link = event.target.closest('a');
   if (!link) return;
-  const label = link.textContent.trim();
+  const label = link.getAttribute('data-earthlens-english-label') || link.textContent.trim();
   const href = link.getAttribute('href');
   const action = href === '#assistant' ? 'assistant' : href === '#systems' ? 'explore' : null;
   if (!action) return;
