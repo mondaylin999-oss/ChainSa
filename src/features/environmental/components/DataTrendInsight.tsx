@@ -1,3 +1,4 @@
+import { chartText, type ChartLanguage } from "./chartCopy";
 import { memo, useMemo } from "react";
 import type { SignificanceResult } from "../analysis/significance";
 import "./data-trend-insight.css";
@@ -5,7 +6,8 @@ import type { AnalysisResult } from "../analysis/explainChanges";
 import type { DataSeries } from "../types/environmental";
 import { buildDataTrendInsight } from "../analysis/dataTrendInsight";
 
-function DataTrendInsightView({ series, analysis, locationName, latitude, longitude, loading = false, error }: { series?: DataSeries; analysis?: AnalysisResult; locationName?: string; latitude?: number; longitude?: number; loading?: boolean; error?: string }) {
+function DataTrendInsightView({ series, analysis, locationName, latitude, longitude, loading = false, error, lang = "en" }: { series?: DataSeries; analysis?: AnalysisResult; locationName?: string; latitude?: number; longitude?: number; loading?: boolean; error?: string; lang?: ChartLanguage }) {
+  const t = (text: string) => chartText(lang, text);
   const model = useMemo(() => series && analysis ? buildDataTrendInsight(series, analysis, { locationName, latitude, longitude }) : undefined, [series, analysis, locationName, latitude, longitude]);
   if (loading) return <section className="data-insight data-insight--state" aria-live="polite">Loading Data and Trend Insightâ€¦</section>;
   if (error) return <section className="data-insight data-insight--state" role="alert">Unable to load insight: {error}</section>;

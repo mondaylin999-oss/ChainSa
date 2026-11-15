@@ -1,0 +1,23 @@
+.revealWindow {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  animation: reveal-series 2.4s linear both;
+  animation-play-state: paused;
+}
+
+.canvas[data-revealed="true"] .revealWindow {
+  animation-play-state: running;
+}
+
+/* Reveal the existing curve without moving or changing any measured value. */
+@keyframes reveal-series {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealWindow {
+    animation: none;
+    transform: none;
+  }
+}

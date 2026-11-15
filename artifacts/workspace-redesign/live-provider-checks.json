@@ -1,0 +1,118 @@
+{
+  "checkedAt": "2026-11-15T06:51:08.398Z",
+  "baseUrl": "http://localhost:3000",
+  "catalog": {
+    "httpStatus": 200,
+    "topicCount": 6,
+    "datasetCount": 36,
+    "topicIndicatorEntryCount": 37,
+    "expectedDatasetCount": 38,
+    "countRequirementMet": false,
+    "availableCount": 34,
+    "unavailable": [
+      {
+        "id": "nighttime-lights",
+        "setupRequired": true,
+        "reason": "Needs a free NASA Earthdata Login token on the server (EARTHDATA_TOKEN) to read NASA Black Marble directly from LAADS DAAC, or a working Google Earth Engine connection."
+      },
+      {
+        "id": "lit-area",
+        "setupRequired": true,
+        "reason": "Needs a free NASA Earthdata Login token on the server (EARTHDATA_TOKEN) to read NASA Black Marble directly from LAADS DAAC, or a working Google Earth Engine connection."
+      }
+    ],
+    "regionCount": 15,
+    "townshipCount": 330
+  },
+  "probes": [
+    {
+      "kind": "region",
+      "path": "earthlens-live-region.json",
+      "httpStatus": 200,
+      "location": {
+        "id": "yangon",
+        "iso": "MM-06",
+        "name": "Yangon",
+        "nameMy": "ရန်ကုန်တိုင်းဒေသကြီး",
+        "type": "region",
+        "lat": 17.11,
+        "lon": 96.11,
+        "coastal": true
+      },
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-01-03"
+      },
+      "source": {
+        "name": "NASA POWER Daily API",
+        "url": "https://power.larc.nasa.gov/docs/services/api/temporal/daily/"
+      },
+      "validObservationCount": 3,
+      "missingCount": 0,
+      "spatialBasis": {
+        "kind": "point",
+        "label": "Regional Reference Point (17.1100°N, 96.1100°E)"
+      },
+      "geographicCoverage": "One NASA POWER grid point at the regional reference coordinates; not a state/region-wide or township-wide average.",
+      "claim": "Backend returned successful observations; this alone does not verify every catalog provider."
+    },
+    {
+      "kind": "township",
+      "path": "earthlens-live-township.json",
+      "httpStatus": 200,
+      "location": {
+        "id": "MMR013040",
+        "regionId": "yangon",
+        "name": "Hlaing",
+        "nameMy": "လှိုင်",
+        "lat": 16.846912,
+        "lon": 96.120896,
+        "type": "township"
+      },
+      "period": {
+        "start": "2025-01-01",
+        "end": "2025-01-03"
+      },
+      "source": {
+        "name": "NASA POWER Daily API",
+        "url": "https://power.larc.nasa.gov/docs/services/api/temporal/daily/"
+      },
+      "validObservationCount": 3,
+      "missingCount": 0,
+      "spatialBasis": {
+        "kind": "point",
+        "label": "Township Representative Point (16.8469°N, 96.1209°E)"
+      },
+      "geographicCoverage": "One NASA POWER grid point at a representative point inside the selected township boundary; not a township-wide average or local sensor measurement.",
+      "claim": "Backend returned successful observations; this alone does not verify every catalog provider."
+    }
+  ],
+  "publicPower": {
+    "httpStatus": 200,
+    "path": "earthlens-live-power-public.json",
+    "parameters": [
+      "PRECTOTCORR"
+    ],
+    "latitude": 16.8661,
+    "longitude": 96.1561,
+    "start": "2025-01-01",
+    "end": "2025-01-03",
+    "returnedDates": [
+      "20250101",
+      "20250102",
+      "20250103"
+    ],
+    "claim": "Public NASA endpoint independently reachable; coordinates differ from backend region and township probes."
+  },
+  "failures": [
+    {
+      "kind": "catalog-count",
+      "message": "Backend has 36 distinct datasets and 37 topic indicator entries, not requested 38."
+    },
+    {
+      "kind": "availability",
+      "message": "Nighttime lights and lit area report setup required; no Black Marble observations were attempted."
+    }
+  ],
+  "scope": "No environment files read or modified; no page or UI code edited by this audit."
+}

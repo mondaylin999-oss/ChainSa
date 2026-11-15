@@ -1,0 +1,59 @@
+.experience:lang(my) {
+  line-height: 1.8;
+}
+
+.experience:lang(my) :global(.earthbeat-chart__eyebrow),
+.experience:lang(my) :global(.data-insight__eyebrow) {
+  letter-spacing: normal;
+}
+
+.experience:lang(my) :global(.earthbeat-chart__badge) {
+  white-space: normal;
+}
+
+.experience :global(.earthbeat-chart__tooltip) {
+  max-width: min(80%, 24rem);
+  pointer-events: none;
+  overflow-wrap: anywhere;
+}
+
+.experience :global(.earthbeat-chart svg:focus-visible) {
+  outline: 3px solid #15946a;
+  outline-offset: -3px;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0 0;
+  padding: 20px 0;
+  border-block: 1px solid var(--et-1f2b52, #26324c);
+}
+
+.summary dt {
+  margin-bottom: 8px;
+  color: var(--et-a6b3d0, #acb9cf);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.summary dd {
+  margin: 0;
+  color: var(--et-e9edfa, #e9edfa);
+  font-size: 16px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.summary small {
+  color: var(--et-a6b3d0, #acb9cf);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+@media (max-width: 600px) {
+  .summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

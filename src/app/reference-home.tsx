@@ -42,5 +42,5 @@ export function ReferenceHome({ lang, onExplore, onAsk, onRegion, onLanguage, hi
   useEffect(() => {
     frame.current?.contentWindow?.postMessage({ type: "earthlens-home-language", lang }, window.location.origin);
   }, [lang]);
-  return <iframe ref={frame} onLoad={sendHistory} src="/home-exact/Main.dc.html" title="Earth Trend Detective home" style={{ display: "block", width: "100%", height: "100dvh", border: 0, background: "var(--et-040816)" }} />;
+  return <iframe ref={frame} onLoad={sendHistory} src="/home-exact/Main.dc.html" title="ChainSa home" style={{ display: "block", width: "100%", height: "100dvh", border: 0, background: "var(--et-040816)" }} />;
 }

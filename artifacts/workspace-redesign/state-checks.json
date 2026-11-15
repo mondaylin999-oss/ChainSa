@@ -1,0 +1,13 @@
+{
+  "scope": "Test-only simulated failure, all-missing and delayed responses; not live provider verification",
+  "checks": [
+    "Loading state prevents duplicate Apply",
+    "Source failure exposes Retry",
+    "All-missing response displays empty state without a zero chart",
+    "No horizontal overflow at 320px",
+    "No horizontal overflow at 768px",
+    "No horizontal overflow at 1024px",
+    "No horizontal overflow at 1280px",
+    "In-flight response cannot populate changed-location results"
+  ]
+}

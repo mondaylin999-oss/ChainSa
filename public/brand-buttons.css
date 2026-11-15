@@ -1,0 +1,9 @@
+/* Button accents shared by the home page and workspace. */
+:root {--chainsa-button-blue:#0879a6;--chainsa-button-blue-hover:#06668e;--chainsa-button-yellow:#ffc42a}
+.earthlens-app :is(button.button-primary,.chat-compose button,.workspace-apply-button) {background:var(--chainsa-button-blue);border-color:var(--chainsa-button-blue);color:#fff;box-shadow:none}
+.earthlens-app :is(button.button-primary,.chat-compose button,.workspace-apply-button):hover:not(:disabled) {background:var(--chainsa-button-blue-hover);border-color:var(--chainsa-button-blue-hover)}
+.earthlens-app :is(.button-secondary,.explore-back,.suggested-questions button) {border-color:#0879a680;color:var(--et-e9edfa,#e9edfa)}
+.earthlens-app :is(.button-secondary,.explore-back,.suggested-questions button):hover:not(:disabled) {background:var(--chainsa-button-yellow);border-color:var(--chainsa-button-yellow);color:#142335}
+.earthlens-app .workspace-location-modes button[aria-pressed=true],.earthlens-app .language-switch button.language-active {background:#0879a62b;border-color:var(--chainsa-button-blue);color:var(--et-ffffff,#fff)}
+.earthlens-app :is(button,a,input,select):focus-visible {outline-color:var(--chainsa-button-yellow)}
+a[style*="--chainsa-button-blue"]:hover {background:var(--chainsa-button-blue-hover)!important}

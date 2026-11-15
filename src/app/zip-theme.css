@@ -18,6 +18,7 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .brand-text strong { color: var(--et-fff); font-size: 17px; letter-spacing: -.02em; }
 .earthlens-app .brand-text small { color: var(--et-a6b3d0); font-size: 9px; letter-spacing: .16em; }
 .earthlens-brand-art { width: 36px; height: 36px; }
+.earthlens-brand-art { width: 46px; height: 46px; object-fit: contain; flex-shrink: 0; }
 .earthlens-app .main-nav { gap: 6px; margin-left: auto; }
 .earthlens-app .nav-link { color: var(--et-e9edfa); font-size: 14px; min-height: 44px; padding: 0 16px; border-radius: 12px; }
 .earthlens-app .nav-link-active { background: var(--et-1b1740); color: var(--et-c3b6ff); }
@@ -246,3 +247,11 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .workspace-notices-content{position:absolute;z-index:30;top:74px;left:16px;right:16px;max-height:55vh;overflow-y:auto;box-shadow:0 12px 30px #0004}
 .earthlens-app .workspace-status .live-tag{margin:0;white-space:nowrap}
 .earthlens-app .floating-ai-close{display:grid;place-items:center;width:32px;height:32px;min-height:32px;padding:0;margin:8px 10px 6px auto;font-size:24px;font-weight:400;line-height:1;border-radius:9px}
+.brand-letter-yellow {color:#ffc42a}
+.brand-letter-blue {color:#159bd3}
+
+.earthlens-app .brand-text strong.chainsa-wordmark {font-size:30px;line-height:1.2}
+@media(max-width:760px){.earthlens-app .brand-text strong.chainsa-wordmark{font-size:24px}}
+
+.earthlens-app .site-header .earthlens-brand-art {width:64px;height:64px;object-fit:contain}
+@media(max-width:760px){.earthlens-app .site-header .earthlens-brand-art{width:54px;height:54px}}

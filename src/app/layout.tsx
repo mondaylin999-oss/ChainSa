@@ -3,7 +3,8 @@ import "./globals.css";
 import "./zip-theme.css";
 
 export const metadata: Metadata = {
-  title: "Myanmar EarthLens — Understand Myanmar. Discover Change.",
+  icons: { icon: "/brand/chainsa-icon.png", apple: "/brand/chainsa-icon.png" },
+  title: "ChainSa — Understand Myanmar. Discover Change.",
   description: "Explore Myanmar with locally bundled state and region boundaries, NASA observations, interactive charts, and evidence-grounded AI assistance.",
 };
 
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="/earthlens-palette.css" />
+        <link rel="stylesheet" href="/brand-buttons.css" />
         <link rel="stylesheet" href="/history.css" />
         <link rel="stylesheet" href="/sound-settings.css" />
         <script src="/theme.js" />
