@@ -96,6 +96,9 @@ export function MyanmarMap({
   const [townshipError, setTownshipError] = useState(false);
   const mapSurface = useRef<SVGSVGElement>(null);
   const [manualZoom, setManualZoom] = useState({ key: "", factor: 1 });
+  const [pan, setPan] = useState({ key: "", x: 0, y: 0 });
+  const drag = useRef<{ pointerId: number; startX: number; startY: number; panX: number; panY: number; moved: boolean } | null>(null);
+  const suppressClick = useRef(false);
   const selectionKey = `${selectedRegionId ?? ""}:${selectedTownshipId ?? ""}:${focusRegion}`;
   const zoomFactor = manualZoom.key === selectionKey ? manualZoom.factor : 1;
   function changeZoom(multiplier: number) {
@@ -177,9 +180,12 @@ export function MyanmarMap({
     ? `${focusedBounds.minX - padding} ${focusedBounds.minY - padding} ${Math.max(padding * 2, focusedBounds.maxX - focusedBounds.minX + padding * 2)} ${Math.max(padding * 2, focusedBounds.maxY - focusedBounds.minY + padding * 2)}`
     : COUNTRY_VIEWBOX;
   const [viewX, viewY, viewWidth, viewHeight] = viewBox.split(" ").map(Number);
+  const panKey = `${selectionKey}:${zoomFactor}`;
+  const panX = pan.key === panKey ? pan.x : 0;
+  const panY = pan.key === panKey ? pan.y : 0;
   const manualViewBox = [
-    viewX + (viewWidth - viewWidth / zoomFactor) / 2,
-    viewY + (viewHeight - viewHeight / zoomFactor) / 2,
+    viewX + (viewWidth - viewWidth / zoomFactor) / 2 + panX,
+    viewY + (viewHeight - viewHeight / zoomFactor) / 2 + panY,
     viewWidth / zoomFactor,
     viewHeight / zoomFactor,
   ].join(" ");
@@ -219,6 +225,35 @@ export function MyanmarMap({
         style={{ "--map-zoom": zoom } as CSSProperties}
         role="img"
         aria-labelledby="myanmar-map-title myanmar-map-desc"
+        onPointerDown={event => {
+          if (event.button !== 0 || event.isPrimary === false) return;
+          drag.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, panX, panY, moved: false };
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerMove={event => {
+          const active = drag.current;
+          if (!active || active.pointerId !== event.pointerId) return;
+          const dx = event.clientX - active.startX;
+          const dy = event.clientY - active.startY;
+          if (!active.moved && Math.hypot(dx, dy) < 4) return;
+          active.moved = true;
+          const rect = event.currentTarget.getBoundingClientRect();
+          setPan({ key: panKey, x: active.panX - dx * (viewWidth / zoomFactor) / rect.width, y: active.panY - dy * (viewHeight / zoomFactor) / rect.height });
+        }}
+        onPointerUp={event => {
+          const active = drag.current;
+          if (!active || active.pointerId !== event.pointerId) return;
+          suppressClick.current = active.moved;
+          drag.current = null;
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+        }}
+        onPointerCancel={() => { drag.current = null; }}
+        onClickCapture={event => {
+          if (!suppressClick.current) return;
+          event.preventDefault();
+          event.stopPropagation();
+          suppressClick.current = false;
+        }}
       >
         <title id="myanmar-map-title">Myanmar — States and Regions</title>
         <desc id="myanmar-map-desc">

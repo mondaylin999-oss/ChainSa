@@ -307,7 +307,13 @@ export default function Page() {
   const selectedTownship = catalog?.townships.find(item=>item.id===townshipId);
   const dateError = observationDateError(draftStart,draftEnd);
 
-  if (view === "home") return <ReferenceHome lang={lang} onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={() => { setView("explore"); setChatOpen(true); }} onRegion={(id) => { chooseRegion(id); setView("explore"); }} onLanguage={selectLanguage} />;
+  if (view === "home") return (
+    <main className="earthlens-app" lang={lang}>
+      <ReferenceHome lang={lang} onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={() => setChatOpen(true)} onRegion={(id) => { chooseRegion(id); setView("explore"); }} onLanguage={selectLanguage} />
+      <button className="floating-ai-launcher button-primary" aria-expanded={chatOpen} aria-controls="floating-ai-panel" onClick={() => setChatOpen(open => !open)}><MessageCircle size={18} /> {lang === "my" ? "AI စကားပြော" : "AI chat"}</button>
+      {chatOpen && <section id="floating-ai-panel" className="floating-ai-panel" role="dialog" aria-label="EarthLens AI chat" onKeyDown={event => { if (event.key === "Escape") setChatOpen(false); }}><button className="floating-ai-close button-secondary" onClick={() => setChatOpen(false)}>Close chat</button><ChatPanel lang={lang} selectedRegionId={regionId} inputRef={chatInputRef} /></section>}
+    </main>
+  );
 
   return (
     <main className={`earthlens-app${view === "explore" ? " is-exploring" : ""}`} lang={lang}>
@@ -334,7 +340,7 @@ export default function Page() {
                   <div key={topic.id} className={open ? "rail-item rail-item-open" : "rail-item"}>
                     <button
                       type="button"
-                      className={active ? "rail-topic-button rail-topic-button-active" : "rail-topic-button"}
+                      className={`rail-topic-button${active ? " rail-topic-button-active" : ""}${open ? " rail-topic-button-open" : ""}`}
                       aria-pressed={active}
                       aria-expanded={open}
                       aria-controls={`rail-indicators-${topic.id}`}
@@ -343,7 +349,7 @@ export default function Page() {
                       onClick={() => chooseTopic(topic.id)}
                     >
                       <span className="topic-icon-tile"><Icon size={20} aria-hidden="true" /></span>
-                      {!regionId && <span className="rail-topic-name">{topic.label}</span>}
+                      <span className="rail-topic-name" aria-hidden={open}>{topic.label}</span>
                     </button>
                     {open && (
                       <div id={`rail-indicators-${topic.id}`} className="rail-indicators" aria-label={`${topic.label} indicators`}>

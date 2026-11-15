@@ -185,6 +185,19 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .map-zoom-controls button { width: 38px; height: 38px; border: 1px solid var(--et-303e6b); border-radius: 10px; background: var(--et-0c1532); color: var(--et-e9edfa); font-size: 23px; cursor: pointer; }
 .earthlens-app .map-zoom-controls button:hover { background: var(--et-332461); }
 .earthlens-app .map-zoom-controls button:disabled { opacity: .4; cursor: default; }
-.earthlens-app .topic-rail[data-area-selected="true"] .rail-topic-button { width: fit-content; min-width: 48px; min-height: 48px; padding: 6px; justify-content: center; gap: 0; }
+/* Collapse only the selected category to its icon, then reveal its indicators. */
+.earthlens-app .rail-topic-button { transition: width .24s ease, min-width .24s ease, padding .24s ease, gap .24s ease, background .16s ease, color .16s ease, border-color .16s ease; }
+.earthlens-app .rail-topic-name { display: block; max-width: 180px; opacity: 1; overflow: hidden; white-space: nowrap; transition: max-width .24s ease, opacity .18s ease, margin .24s ease; }
+.earthlens-app .rail-topic-button-open { width: fit-content; min-width: 48px; min-height: 48px; padding: 6px; justify-content: center; gap: 0; }
+.earthlens-app .rail-topic-button-open .rail-topic-name { max-width: 0; opacity: 0; }
+.earthlens-app .rail-indicator-title { display: block; width: max-content; max-width: none; overflow: visible; white-space: nowrap; overflow-wrap: normal; word-break: keep-all; }
+.earthlens-app .rail-indicator-tag { display: table; margin-top: 4px; }
+@media (min-width: 761px) {
+  .earthlens-app .rail-indicator { grid-template-columns: minmax(0,1fr); }
+  .earthlens-app .see-more-link { grid-column: 1; }
+}
 
 .earthlens-app .myanmar-map { touch-action: none; }
+
+.earthlens-app .myanmar-map { cursor: grab; }
+.earthlens-app .myanmar-map:active { cursor: grabbing; }
