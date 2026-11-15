@@ -337,10 +337,11 @@ export default function Page() {
                       aria-pressed={active}
                       aria-expanded={open}
                       aria-controls={`rail-indicators-${topic.id}`}
+                      aria-label={topic.label}
+                      title={topic.label}
                       onClick={() => chooseTopic(topic.id)}
                     >
                       <span className="topic-icon-tile"><Icon size={20} aria-hidden="true" /></span>
-                      <span className="rail-topic-name">{topic.label}</span>
                     </button>
                     {open && (
                       <div id={`rail-indicators-${topic.id}`} className="rail-indicators" aria-label={`${topic.label} indicators`}>

@@ -166,3 +166,6 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .detail-warning dd { color: #f1e6c8; }
 
 .earthlens-app .map-township-label { fill: #243b32; stroke: #fff; stroke-width: .22em; paint-order: stroke; stroke-linejoin: round; font-family: var(--font-sans); font-weight: 650; }
+
+/* Category names are available as tooltips; the rail buttons show icons only. */
+.earthlens-app .topic-rail .rail-topic-button { width: fit-content; min-width: 48px; min-height: 48px; padding: 6px; justify-content: center; gap: 0; }
