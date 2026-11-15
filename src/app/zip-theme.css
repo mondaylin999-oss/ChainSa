@@ -2,29 +2,29 @@
 :root {
   color-scheme: dark;
   --font-display: "Inter", system-ui, sans-serif;
-  --ink: #e9edfa;
-  --muted: #a6b3d0;
-  --line: #1f2b52;
-  --green: #6d4aff;
-  --green-deep: #c3b6ff;
-  --green-soft: #211b46;
-  --paper: #040816;
-  --white: #0a1228;
+  --ink: var(--et-e9edfa);
+  --muted: var(--et-a6b3d0);
+  --line: var(--et-1f2b52);
+  --green: var(--et-6d4aff);
+  --green-deep: var(--et-c3b6ff);
+  --green-soft: var(--et-211b46);
+  --paper: var(--et-040816);
+  --white: var(--et-0a1228);
 }
-body, .earthlens-app { background: #040816; color: #e9edfa; }
+body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app { font-family: Inter, system-ui, sans-serif; }
-.earthlens-app :is(button,a,input,select,summary,[role="button"]):focus-visible { outline: 2px solid #9fe870; outline-offset: 3px; }
-.earthlens-app .site-header { background: #050a18; border-color: #172142; min-height: 80px; height: auto; padding-block: 14px; }
-.earthlens-app .brand-text strong { color: #fff; font-size: 17px; letter-spacing: -.02em; }
-.earthlens-app .brand-text small { color: #a6b3d0; font-size: 9px; letter-spacing: .16em; }
+.earthlens-app :is(button,a,input,select,summary,[role="button"]):focus-visible { outline: 2px solid var(--et-9fe870); outline-offset: 3px; }
+.earthlens-app .site-header { background: var(--et-050a18); border-color: var(--et-172142); min-height: 80px; height: auto; padding-block: 14px; }
+.earthlens-app .brand-text strong { color: var(--et-fff); font-size: 17px; letter-spacing: -.02em; }
+.earthlens-app .brand-text small { color: var(--et-a6b3d0); font-size: 9px; letter-spacing: .16em; }
 .earthlens-brand-art { width: 46px; height: 46px; }
 .earthlens-app .main-nav { gap: 12px; }
-.earthlens-app .nav-link { color: #e9edfa; font-size: 14px; min-height: 44px; padding: 0 16px; border-radius: 12px; }
-.earthlens-app .nav-link-active { background: #1b1740; color: #c3b6ff; }
+.earthlens-app .nav-link { color: var(--et-e9edfa); font-size: 14px; min-height: 44px; padding: 0 16px; border-radius: 12px; }
+.earthlens-app .nav-link-active { background: var(--et-1b1740); color: var(--et-c3b6ff); }
 .earthlens-app .nav-link-active::after { display: none; }
-.earthlens-app .language-switch { background: #0c1532; border-color: #303e6b; }
-.earthlens-app .language-active { background: #29204e; color: #fff; }
-.earthlens-app :is(.panel,.topic-rail,.topic-list,.floating-ai-panel) { background: #0a1228; border: 1px solid #1f2b52; border-radius: 20px; box-shadow: 0 18px 40px #0003; }
+.earthlens-app .language-switch { background: var(--et-0c1532); border-color: var(--et-303e6b); }
+.earthlens-app .language-active { background: var(--et-29204e); color: var(--et-fff); }
+.earthlens-app :is(.panel,.topic-rail,.topic-list,.floating-ai-panel) { background: var(--et-0a1228); border: 1px solid var(--et-1f2b52); border-radius: 20px; box-shadow: 0 18px 40px var(--et-0003); }
 /* The explore map sits straight on the page, not in a card. */
 .earthlens-app .map-stage { background: none; border: 0; box-shadow: none; padding: 0; }
 /* Explore is a fixed-height workspace: keep the heading short so the map row gets the height. */
@@ -34,79 +34,86 @@ body, .earthlens-app { background: #040816; color: #e9edfa; }
 .earthlens-app.is-exploring .page-heading h1 { font-size: 28px; }
 .earthlens-app.is-exploring .page-heading p:not(.eyebrow) { display: none; }
 .earthlens-app .map-stage .myanmar-map { background: none; border: 0; box-shadow: none; }
-.earthlens-app :is(h1,h2,h3,.chart-stats strong,.detail-grid dd,.rail-indicator-title) { color: #e9edfa; }
-.earthlens-app :is(.eyebrow,.see-more-link,.text-button,.earthbeat-controls>strong) { color: #c3b6ff; }
-.earthlens-app :is(.page-heading p,.map-stage-note,.field-hint,.field-meta,.chart-heading p,.chart-state,.chart-legend,.chart-stats span,.chart-stats small,.detail-grid dt,.map-drilldown-actions,.chat-context,.loading-message,.message-evidence,.topic-info,.indicator-detail>p) { color: #a6b3d0; }
+.earthlens-app :is(h1,h2,h3,.chart-stats strong,.detail-grid dd,.rail-indicator-title) { color: var(--et-e9edfa); }
+.earthlens-app :is(.eyebrow,.see-more-link,.text-button,.earthbeat-controls>strong) { color: var(--et-c3b6ff); }
+.earthlens-app :is(.page-heading p,.map-stage-note,.field-hint,.field-meta,.chart-heading p,.chart-state,.chart-legend,.chart-stats span,.chart-stats small,.detail-grid dt,.map-drilldown-actions,.chat-context,.loading-message,.message-evidence,.topic-info,.indicator-detail>p) { color: var(--et-a6b3d0); }
 .earthlens-app :is(.field-hint,.field-meta,.chart-stats span,.detail-grid dt,.chat-context) { font-size: 11px; line-height: 1.6; }
 .earthlens-app .page-heading h1 { font-size: 32px; font-weight: 700; }
 .earthlens-app .panel-title-row h2 { font-size: 18px; font-weight: 650; }
-.earthlens-app .rail-topic-button { min-height: 62px; color: #e9edfa; font-size: 13px; padding: 8px; border-radius: 14px; }
-.earthlens-app :is(.rail-topic-button:hover,.rail-topic-button-active,.rail-indicator-active) { background: #191630; border-color: #5a488c; }
-.earthlens-app :is(.topic-icon-tile,.topic-icon,.map-heading-icon) { background: #211b46; border-color: #34285d; color: #b9a5ff; }
-.earthlens-app .rail-topic-button-active .topic-icon-tile { background: #332461; color: #d6c9ff; border-color: #6d4aff; box-shadow: 0 0 0 3px #6d4aff22; }
-.earthlens-app .rail-indicators { border-color: #303e6b; width: calc(100% - 22px); min-width: 0; }
-.earthlens-app .rail-indicator { min-width: 0; border-color: #1f2b52; transition: background-color .16s ease, border-color .16s ease; }
-.earthlens-app .rail-indicator:is(:hover,:focus-within) { background: #191630; border-color: #6953a4; }
-.earthlens-app .rail-indicator-active { background: #211b46; border-color: #8872db; }
-.earthlens-app .rail-indicator-active:is(:hover,:focus-within) { background: #2a214e; border-color: #a88cff; }
+.earthlens-app .rail-topic-button { min-height: 62px; color: var(--et-e9edfa); font-size: 13px; padding: 8px; border-radius: 14px; }
+.earthlens-app :is(.rail-topic-button:hover,.rail-topic-button-active,.rail-indicator-active) { background: var(--et-191630); border-color: var(--et-5a488c); }
+.earthlens-app :is(.topic-icon-tile,.topic-icon,.map-heading-icon) { background: var(--et-211b46); border-color: var(--et-34285d); color: var(--et-b9a5ff); }
+.earthlens-app .rail-topic-button-active .topic-icon-tile { background: var(--et-332461); color: var(--et-d6c9ff); border-color: var(--et-6d4aff); box-shadow: 0 0 0 3px var(--et-6d4aff22); }
+.earthlens-app .rail-indicators { border-color: var(--et-303e6b); width: calc(100% - 22px); min-width: 0; }
+.earthlens-app .rail-indicator { min-width: 0; border-color: var(--et-1f2b52); transition: background-color .16s ease, border-color .16s ease; }
+.earthlens-app .rail-indicator:is(:hover,:focus-within) { background: var(--et-191630); border-color: var(--et-6953a4); }
+.earthlens-app .rail-indicator-active { background: var(--et-211b46); border-color: var(--et-8872db); }
+.earthlens-app .rail-indicator-active:is(:hover,:focus-within) { background: var(--et-2a214e); border-color: var(--et-a88cff); }
 .earthlens-app .rail-indicator-title { font-size: 12px; line-height: 1.5; }
 .earthlens-app .rail-indicator-title:is(:hover,:focus-visible),
-.earthlens-app .rail-indicator-active .rail-indicator-title { color: #fff; }
-.earthlens-app .see-more-link:is(:hover,:focus-visible) { color: #e1d7ff; }
-.earthlens-app .rail-topic-button:hover .topic-icon-tile { background: #332461; color: #d6c9ff; border-color: #6d4aff; }
-.earthlens-app .rail-indicator-tag { background: #27243b; color: #c9c0a5; }
-.earthlens-app :is(.button-primary,.chat-compose button) { background: #6d4aff; color: #fff; border-color: #6d4aff; box-shadow: 0 10px 30px #6d4aff30; }
-.earthlens-app :is(.button-primary:hover,.chat-compose button:hover:not(:disabled)) { background: #7c5dff; }
-.earthlens-app :is(.button-secondary,.explore-back,.suggested-questions button) { background: #0c1532; border-color: #3a4a86; color: #e9edfa; border-radius: 12px; }
-.earthlens-app :is(.button-secondary:hover,.explore-back:hover,.suggested-questions button:hover:not(:disabled)) { background: #191d42; border-color: #8872db; }
+.earthlens-app .rail-indicator-active .rail-indicator-title { color: var(--et-fff); }
+.earthlens-app .see-more-link:is(:hover,:focus-visible) { color: var(--et-e1d7ff); }
+.earthlens-app .rail-topic-button:hover .topic-icon-tile { background: var(--et-332461); color: var(--et-d6c9ff); border-color: var(--et-6d4aff); }
+.earthlens-app .rail-indicator-tag { background: var(--et-27243b); color: var(--et-c9c0a5); }
+.earthlens-app :is(.button-primary,.chat-compose button) { background: var(--et-6d4aff); color: var(--et-fff); border-color: var(--et-6d4aff); box-shadow: 0 10px 30px var(--et-6d4aff30); }
+.earthlens-app :is(.button-primary:hover,.chat-compose button:hover:not(:disabled)) { background: var(--et-7c5dff); }
+.earthlens-app :is(.button-secondary,.explore-back,.suggested-questions button) { background: var(--et-0c1532); border-color: var(--et-3a4a86); color: var(--et-e9edfa); border-radius: 12px; }
+.earthlens-app :is(.button-secondary:hover,.explore-back:hover,.suggested-questions button:hover:not(:disabled)) { background: var(--et-191d42); border-color: var(--et-8872db); }
 .earthlens-app .explore-back { min-height: 44px; margin: 12px 0 0; }
-.earthlens-app .field-control label { color: #c5cee6; font-size: 12px; }
-.earthlens-app :is(.field-control input,.field-control select,.chat-compose input,.earthbeat-settings select) { background: #0c1532; color: #e9edfa; border: 1px solid #303e6b; border-radius: 12px; font-size: 12px; min-height: 44px; }
-.earthlens-app input::placeholder { color: #8291b6; }
-.earthlens-app :is(input,select):disabled { background: #10182b; color: #8390ad; }
-.earthlens-app :is(.live-tag,.earthbeat-chart__badge) { background: #143027; color: #9fe870; border-color: #2c503b; }
-.earthlens-app .status-dot { background: #9fe870; }
-.earthlens-app :is(.chat-compose,.chart-stats,.site-footer,.message-evidence) { border-color: #263254; }
-.earthlens-app :is(.message,.detail-placeholder) { background: #121c38; color: #d7def0; }
-.earthlens-app .message-user { background: #5535c0; color: #fff; }
-.earthlens-app :is(.inline-notice,.coverage-card) { background: #292337; border-color: #5b4962; color: #ead5a5; }
-.earthlens-app :is(.notice-error,.message-error) { background: #321c30; border-color: #73415e; color: #ffb8bc; }
-.earthlens-app :is(.chart-error,.field-error) { color: #ffb8bc; }
-.earthlens-app :is(.chart-unavailable,.coverage-heading) { color: #ead5a5; }
-.earthlens-app .myanmar-map { background: #091329; border-color: #26375b; border-radius: 16px; }
-.earthlens-app .map-neighbor-label { fill: #7182ab; }
-.earthlens-app :is(.map-region-label,.map-city-label) { fill: #e9edfa; paint-order: stroke; stroke: #091329; stroke-width: 2px; }
-.earthlens-app .map-region-selectable { stroke: #7e8cc1; }
-.earthlens-app .map-region-selectable:hover { fill: #6951a4; }
-.earthlens-app .map-region-selectable:focus-visible { stroke: #9fe870; }
-.earthlens-app .chart-gridline { stroke: #243152; }
-.earthlens-app .chart-axis { stroke: #526185; }
-.earthlens-app :is(.chart-tick,.chart-axis-label) { fill: #a6b3d0; }
-.earthlens-app .chart-series { stroke: #a88cff; }
-.earthlens-app .chart-point { fill: #0a1228; stroke: #bda6ff; }
-.earthlens-app .legend-line { background: #a88cff; }
-.earthlens-app .earthbeat-chart { background: #0c1532; border-color: #26375b; color: #e9edfa; box-shadow: none; }
-.earthlens-app .earthbeat-chart :is(p,.earthbeat-chart__footer) { color: #a6b3d0; }
-.earthlens-app .earthbeat-chart__eyebrow { color: #c3b6ff; }
-.earthlens-app .data-insight { background: #0c1532; color: #e9edfa; border-color: #26375b; }
-.earthlens-app .data-insight :is(p,dt,li) { color: #a6b3d0; }
-.earthlens-app .data-insight :is(article,section,dl) { background: #101b35; border-color: #26375b; }
-.earthlens-app .earthbeat-controls { color: #c5cee6; }
-.earthlens-app .earthbeat-settings input { accent-color: #a88cff; }
+.earthlens-app .field-control label { color: var(--et-c5cee6); font-size: 12px; }
+.earthlens-app :is(.field-control input,.field-control select,.chat-compose input,.earthbeat-settings select) { background: var(--et-0c1532); color: var(--et-e9edfa); border: 1px solid var(--et-303e6b); border-radius: 12px; font-size: 12px; min-height: 44px; }
+.earthlens-app input::placeholder { color: var(--et-8291b6); }
+.earthlens-app :is(input,select):disabled { background: var(--et-10182b); color: var(--et-8390ad); }
+.earthlens-app :is(.live-tag,.earthbeat-chart__badge) { background: var(--et-143027); color: var(--et-9fe870); border-color: var(--et-2c503b); }
+.earthlens-app .status-dot { background: var(--et-9fe870); }
+.earthlens-app :is(.chat-compose,.chart-stats,.site-footer,.message-evidence) { border-color: var(--et-263254); }
+.earthlens-app :is(.message,.detail-placeholder) { background: var(--et-121c38); color: var(--et-d7def0); }
+.earthlens-app .message-user { background: var(--et-5535c0); color: var(--et-fff); }
+.earthlens-app :is(.inline-notice,.coverage-card) { background: var(--et-292337); border-color: var(--et-5b4962); color: var(--et-ead5a5); }
+.earthlens-app :is(.notice-error,.message-error) { background: var(--et-321c30); border-color: var(--et-73415e); color: var(--et-ffb8bc); }
+.earthlens-app :is(.chart-error,.field-error) { color: var(--et-ffb8bc); }
+.earthlens-app :is(.chart-unavailable,.coverage-heading) { color: var(--et-ead5a5); }
+.earthlens-app .myanmar-map { background: var(--et-091329); border-color: var(--et-26375b); border-radius: 16px; }
+.earthlens-app .map-neighbor-label { fill: var(--et-7182ab); }
+.earthlens-app :is(.map-region-label,.map-city-label) { fill: var(--et-e9edfa); paint-order: stroke; stroke: var(--et-091329); stroke-width: 2px; }
+.earthlens-app .map-region-selectable { stroke: var(--et-7e8cc1); }
+.earthlens-app .map-region-selectable:hover { fill: var(--et-6951a4); }
+.earthlens-app .map-region-selectable:focus-visible { stroke: var(--et-9fe870); }
+.earthlens-app .chart-gridline { stroke: var(--et-243152); }
+.earthlens-app .chart-axis { stroke: var(--et-526185); }
+.earthlens-app :is(.chart-tick,.chart-axis-label) { fill: var(--et-a6b3d0); }
+.earthlens-app .chart-series { stroke: var(--et-a88cff); }
+.earthlens-app .chart-point { fill: var(--et-0a1228); stroke: var(--et-bda6ff); }
+.earthlens-app .legend-line { background: var(--et-a88cff); }
+.earthlens-app .earthbeat-chart { background: var(--et-0c1532); border-color: var(--et-26375b); color: var(--et-e9edfa); box-shadow: none; }
+.earthlens-app .earthbeat-chart :is(p,.earthbeat-chart__footer) { color: var(--et-a6b3d0); }
+.earthlens-app .earthbeat-chart__eyebrow { color: var(--et-c3b6ff); }
+.earthlens-app .data-insight { background: var(--et-0c1532); color: var(--et-e9edfa); border-color: var(--et-26375b); }
+.earthlens-app .data-insight :is(p,dt,li) { color: var(--et-a6b3d0); }
+.earthlens-app .data-insight :is(article,section,dl) { background: var(--et-101b35); border-color: var(--et-26375b); }
+.earthlens-app .earthbeat-controls { color: var(--et-c5cee6); }
+.earthlens-app .earthbeat-settings input { accent-color: var(--et-a88cff); }
 @media(max-width:760px) { .earthlens-app .site-header { padding: 12px 16px; gap: 12px; }.earthlens-app .brand-text strong { font-size: 14px; }.earthlens-app .main-nav { gap: 4px; }.earthlens-app .nav-link { padding: 0 9px; font-size: 12px; }.earthlens-brand-art { width: 36px; height: 36px; } }
 @media(prefers-reduced-motion:reduce) { .earthlens-app * { animation: none !important; transition: none !important; } }
 
 .earthlens-app .rail-topic-name { overflow-wrap: normal; word-break: normal; }
 .earthlens-app .rail-topic-button { align-items: flex-start; }
-.earthlens-app .language-switch button.language-active { background: #332461; color: #fff; }
-.earthlens-app .earthbeat-chart svg text { fill: #a6b3d0; }
-.earthlens-app .earthbeat-chart svg line[stroke="#dce8e3"] { stroke: #26375b; }
-.earthlens-app .earthbeat-chart__tooltip { background: #211b46; border: 1px solid #5a488c; }
+.earthlens-app .language-switch button.language-active { background: var(--et-332461); color: var(--et-fff); }
+.earthlens-app .earthbeat-chart svg text { fill: var(--et-a6b3d0); }
+.earthlens-app .earthbeat-chart svg line[stroke="#dce8e3"] { stroke: var(--et-26375b); }
+.earthlens-app .earthbeat-chart__tooltip { background: var(--et-211b46); border: 1px solid var(--et-5a488c); }
 @media(min-width:761px) and (max-width:1100px) {
  .earthlens-app .explore-grid { grid-template-columns: 175px minmax(240px,1.1fr) minmax(320px,1fr); gap: 12px; }
  .earthlens-app .rail-topic-button { flex-direction: column; gap: 9px; padding: 12px; }
  .earthlens-app .selection-grid { grid-template-columns: 1fr; }
  .earthlens-app .page-shell { width: calc(100% - 32px); }
 }
-.earthlens-app :is(.data-insight__overview,.data-insight__stats)>div{background:#18213e}.earthlens-app :is(.data-insight__overview,.data-insight__stats) span{color:#a6b3d0}.earthlens-app :is(.data-insight__overview,.data-insight__stats) strong{color:#e9edfa}.earthlens-app :is(.data-insight__eyebrow,.data-insight__direction){color:#c3b6ff}
-.earthlens-app :is(.section-icon,.assistant-avatar){background:#211b46;color:#c3b6ff}.earthlens-app .service-ready{background:#143027;border-color:#2c503b;color:#b3ea98}.earthlens-app .assistant-intro{color:#a6b3d0}.earthlens-app .chat-panel-heading{border-color:#263254}.earthlens-app .conversation{scrollbar-color:#3a456c transparent}.earthlens-app :is(.detail-grid a,.message-evidence a){color:#c3b6ff}
+.earthlens-app :is(.data-insight__overview,.data-insight__stats)>div{background:var(--et-18213e)}.earthlens-app :is(.data-insight__overview,.data-insight__stats) span{color:var(--et-a6b3d0)}.earthlens-app :is(.data-insight__overview,.data-insight__stats) strong{color:var(--et-e9edfa)}.earthlens-app :is(.data-insight__eyebrow,.data-insight__direction){color:var(--et-c3b6ff)}
+.earthlens-app :is(.section-icon,.assistant-avatar){background:var(--et-211b46);color:var(--et-c3b6ff)}.earthlens-app .service-ready{background:var(--et-143027);border-color:var(--et-2c503b);color:var(--et-b3ea98)}.earthlens-app .assistant-intro{color:var(--et-a6b3d0)}.earthlens-app .chat-panel-heading{border-color:var(--et-263254)}.earthlens-app .conversation{scrollbar-color:var(--et-3a456c) transparent}.earthlens-app :is(.detail-grid a,.message-evidence a){color:var(--et-c3b6ff)}
+
+:root[data-theme="light"] { color-scheme: light; }
+.theme-toggle { display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:8px 12px;border:1px solid var(--et-303e6b);border-radius:12px;background:var(--et-0c1532);color:var(--et-e9edfa);font:600 12px Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap; }
+.theme-toggle:hover { background:var(--et-211b46);border-color:var(--et-8872db); }
+:root[data-theme="light"] .earthlens-app :is(.button-primary,.chat-compose button,.floating-ai-launcher) { color:#fff; }
+:root[data-theme="light"] .earthlens-app .map-region-label { fill:#273651;stroke:#fff; }
+@media(max-width:760px){.earthlens-app .site-header{flex-wrap:wrap}.theme-toggle{font-size:11px;padding:7px 10px}.earthlens-app .main-nav{flex-wrap:wrap}}

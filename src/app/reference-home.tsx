@@ -24,5 +24,5 @@ export function ReferenceHome({ onExplore, onAsk, onRegion }: ReferenceHomeProps
     window.addEventListener("message", navigate);
     return () => window.removeEventListener("message", navigate);
   }, [onExplore, onAsk, onRegion]);
-  return <iframe ref={frame} src="/home-exact/Main.dc.html" title="Earth Trend Detective home" style={{ display: "block", width: "100%", height: "100dvh", border: 0, background: "#040816" }} />;
+  return <iframe ref={frame} src="/home-exact/Main.dc.html" title="Earth Trend Detective home" style={{ display: "block", width: "100%", height: "100dvh", border: 0, background: "var(--et-040816)" }} />;
 }

@@ -28,6 +28,7 @@ import { fetchExploreCatalog, fetchObservations, type ExploreCatalog, type Obser
 import { TOPICS, type TopicId, type TopicIndicator } from "@/features/explorer/catalog";
 
 import { ReferenceHome } from "./reference-home";
+import { ThemeToggle } from "./theme-toggle";
 
 type View = "home" | "explore";
 type Lang = "en" | "my";
@@ -302,6 +303,7 @@ export default function Page() {
           ))}
           <button className="nav-link" onClick={askAI}>AI Assistant</button>
         </nav>
+        <ThemeToggle />
         <div className="language-switch" role="group" aria-label="Interface language">
           {(["en", "my"] as const).map((language) => (
             <button key={language} aria-pressed={lang === language} className={lang === language ? "language-active" : ""} onClick={() => setLang(language)}>
