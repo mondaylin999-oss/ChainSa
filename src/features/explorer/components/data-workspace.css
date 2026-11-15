@@ -237,3 +237,13 @@
  .workspace-body>.workspace-center {display:flex;order:1;flex-direction:column;width:100%;max-height:78dvh;min-height:0;overflow-y:auto;overflow-x:hidden;border-radius:16px}
  .workspace-body>.workspace-navigation,.workspace-body>.workspace-controls {max-height:78dvh}
 }
+
+/* Collapsed indicator navigation keeps the category shortcuts available. */
+.workspace-body[data-navigation-open="false"] {--navigation-width:70px}
+.workspace-icon-rail {position:absolute;left:0;top:0;z-index:11;width:54px;max-height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;padding:7px;border:1px solid var(--et-1f2b52,#26324c);border-radius:14px;background:var(--et-0a1228,#0a1228);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.workspace-icon-rail[hidden] {display:none}
+.workspace-icon-rail button {display:grid;place-items:center;flex-shrink:0;width:38px;height:42px;padding:0;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--et-c5cee8,#c5cee8)}
+.workspace-icon-rail button:first-child {height:34px;margin-bottom:2px;border-bottom-color:var(--et-1f2b52,#26324c)}
+.workspace-icon-rail button:hover,.workspace-icon-rail button[aria-pressed="true"] {background:var(--et-0c1532,#0c1532);border-color:var(--chainsa-button-blue,#159bd3);color:var(--et-ffffff,#fff)}
+.workspace-body[data-navigation-open="false"] .workspace-map-card>header {padding-left:18px}
+@media(max-width:760px){.workspace-body[data-navigation-open="false"]{padding-left:64px}.workspace-icon-rail{max-height:78dvh}.workspace-body[data-navigation-open="false"]>.workspace-center{width:100%}}
