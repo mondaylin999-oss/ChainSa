@@ -228,7 +228,6 @@ export function MyanmarMap({
         onPointerDown={event => {
           if (event.button !== 0 || event.isPrimary === false) return;
           drag.current = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, panX, panY, moved: false };
-          event.currentTarget.setPointerCapture(event.pointerId);
         }}
         onPointerMove={event => {
           const active = drag.current;
@@ -236,6 +235,7 @@ export function MyanmarMap({
           const dx = event.clientX - active.startX;
           const dy = event.clientY - active.startY;
           if (!active.moved && Math.hypot(dx, dy) < 4) return;
+          if (!active.moved) event.currentTarget.setPointerCapture(event.pointerId);
           active.moved = true;
           const rect = event.currentTarget.getBoundingClientRect();
           setPan({ key: panKey, x: active.panX - dx * (viewWidth / zoomFactor) / rect.width, y: active.panY - dy * (viewHeight / zoomFactor) / rect.height });
