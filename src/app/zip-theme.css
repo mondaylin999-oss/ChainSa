@@ -66,7 +66,14 @@ body, .earthlens-app { background: #040816; color: #e9edfa; }
 .earthlens-app :is(.notice-error,.message-error) { background: #321c30; border-color: #73415e; color: #ffb8bc; }
 .earthlens-app :is(.chart-error,.field-error) { color: #ffb8bc; }
 .earthlens-app :is(.chart-unavailable,.coverage-heading) { color: #ead5a5; }
-.earthlens-app .myanmar-map { background: #091329; border-color: #26375b; border-radius: 16px; }
+.earthlens-app .myanmar-map { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+/* SVG focus outlines scale into large rectangles at township zoom levels. */
+.earthlens-app .myanmar-map [role="button"]:focus,
+.earthlens-app .myanmar-map [role="button"]:focus-visible { outline: none; }
+.earthlens-app .myanmar-map [role="button"]:focus-visible { stroke: #8a6d00; stroke-width: 2; }
+.earthlens-app .map-stage,
+.earthlens-app .map-interactive-wrapper,
+.earthlens-app .map-stage-figure { border: 0; border-radius: 0; box-shadow: none; }
 .earthlens-app .map-neighbor-label { fill: #7182ab; }
 .earthlens-app :is(.map-region-label,.map-city-label) { fill: #e9edfa; paint-order: stroke; stroke: #091329; stroke-width: 2px; }
 .earthlens-app .map-region-selectable { stroke: #7e8cc1; }
