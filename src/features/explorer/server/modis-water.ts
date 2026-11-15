@@ -17,7 +17,9 @@ export const PIXEL_KM2 = Number(((463.313 * 463.313) / 1e6).toFixed(4)); // 0.21
 export const MIN_CLEAR_SHARE = 0.8;
 /** Water in at least this share of a pixel's clear observations = persistent water; any less (but >0) = seasonal/temporary. */
 export const PERSISTENT_SHARE = 0.9;
-const MAX_DATES = 30;
+export const MAX_DATES = 30;
+/** Seasonal comparison allows a full year of 8-day composites (46). */
+export const MAX_SEASONAL_DATES = 46;
 const FILL = -28672;
 const cache = new TtlCache<WaterResult>(6 * 3600_000, 200);
 
@@ -56,17 +58,42 @@ function composites(dates: { calendar_date: string }[], rasters: Raster[]): Wate
   });
 }
 
-export async function fetchWaterComposites(lat: number, lon: number, start: string, end: string, fetchImpl: typeof fetch = fetch): Promise<WaterResult> {
+export async function fetchWaterComposites(lat: number, lon: number, start: string, end: string, fetchImpl: typeof fetch = fetch, maxDates = MAX_DATES): Promise<WaterResult> {
   const key = `${lat.toFixed(3)},${lon.toFixed(3)}:${start}:${end}`;
   const hit = cache.get(key);
   if (hit) return hit;
-  const { dates, rasters } = await fetchSubsets(WATER_PRODUCT, lat, lon, start, end, fetchImpl, WATER_KM, MAX_DATES);
+  const { dates, rasters } = await fetchSubsets(WATER_PRODUCT, lat, lon, start, end, fetchImpl, WATER_KM, maxDates);
   for (const name of ["sur_refl_b04", "sur_refl_b06", "sur_refl_state_500m"]) {
     if (dates.length && !rasters.some(r => r.band === name)) throw new Error(`NASA did not include the expected ${name} band in its MOD09A1 response.`);
   }
   const result = { composites: composites(dates, rasters) };
   cache.set(key, result);
   return result;
+}
+
+/**
+ * Share (%) of the clear window pixels that are water, or null when less than 80% of the window is clear.
+ * Same quantity as a "water share of observed pixels", measured from NASA MODIS rather than Landsat.
+ */
+export function waterSharePct(c: WaterComposite) {
+  if (!c.pixels.length || c.clearShare < MIN_CLEAR_SHARE) return null;
+  const clear = c.pixels.filter(p => p !== null);
+  return Number((clear.filter(p => p === 1).length / clear.length * 100).toFixed(1));
+}
+
+/**
+ * Monthly water share (%): water pixels / clear pixels pooled over the month's composites that pass the 80% clear-sky
+ * rule. Months with no qualifying composite are null (unobserved), never 0%. Dated to the first day of the month.
+ */
+export function monthlyWaterShare(list: WaterComposite[]) {
+  const months = new Map<string, { clear: number; wet: number }>();
+  for (const c of list) {
+    const key = `${c.date.slice(0, 7)}-01`;
+    const m = months.get(key) ?? { clear: 0, wet: 0 };
+    if (c.pixels.length && c.clearShare >= MIN_CLEAR_SHARE) for (const p of c.pixels) { if (p === null) continue; m.clear++; if (p === 1) m.wet++; }
+    months.set(key, m);
+  }
+  return [...months].sort(([a], [b]) => a.localeCompare(b)).map(([date, m]) => ({ date, value: m.clear ? Number((m.wet / m.clear * 100).toFixed(1)) : null }));
 }
 
 /** Water area (km²) of a composite, or null when less than 80% of the window is clear. */

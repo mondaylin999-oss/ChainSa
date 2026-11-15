@@ -22,7 +22,9 @@ describe("contributor frontend and EARTHBEAT integration",()=>{
     expect(markup).toContain("NASA POWER");
     expect(markup).not.toContain("NASA LP DAAC / USGS EROS");
     expect(markup).not.toContain("NaN");
-    expect(markup).toContain("Play repeats until Stop");
+    expect(markup).toContain("repeats every 24 seconds until stopped");
+    expect(markup).toContain('aria-label="Play EARTHBEAT sound"');
+    expect(markup).not.toContain(">Restart</button>");
   });
   it("labels the graph and details with the selected township coordinates",()=>{
     const markup=renderToStaticMarkup(createElement(EarthbeatExperience,{result:{...result,location:{id:"MMR013040",name:"Hlaing",nameMy:"လှိုင်",lat:16.8469,lon:96.119,type:"township"}}}));

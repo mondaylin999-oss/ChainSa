@@ -210,7 +210,7 @@ describe("NASA MODIS windows, land cover and burned area", () => {
 
   it("accepts newly published NASA observations after the previously hard-coded end date", async () => {
     expect(DATASETS.find(d => d.id === "burned-area")!.coverage).toMatchObject({ end: "2026-08-31", ongoing: true });
-    expect(DATASETS.find(d => d.id === "water-extent")!.coverage!.ongoing).toBe(false);
+    expect(DATASETS.find(d => d.id === "water-extent")!.coverage!.ongoing).toBe(true);
     vi.stubEnv("EARTH_ENGINE_PROJECT_ID", ""); vi.stubEnv("EARTH_ENGINE_SERVICE_ACCOUNT_JSON", "");
     vi.stubGlobal("fetch", vi.fn(async (input: string | URL | Request) => {
       if (String(input).includes("/dates?")) return Response.json({ dates: [{ calendar_date: "2026-09-01", modis_date: "A2026244" }] });

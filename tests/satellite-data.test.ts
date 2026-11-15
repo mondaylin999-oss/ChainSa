@@ -19,7 +19,8 @@ describe("satellite data coverage", () => {
       expect(product.defaultStart >= product.start && product.defaultEnd <= product.end).toBe(true);
     }
     expect(SATELLITE_PRODUCTS["evapotranspiration"].band).toBe("ET");
-    expect(SATELLITE_PRODUCTS["water-extent"].end).toBe("2021-12-31");
+    // The JRC water archive (non-NASA) was replaced by NASA MODIS water mapping.
+    expect(SATELLITE_PRODUCTS["water-extent"]).toBeUndefined();
   });
   it("keeps missing and unobserved pixels separate from genuine zero values", () => {
     expect(parseSatelliteRows([{date:"2020-01-01",value:0,validAreaKm2:20},{date:"2021-01-01",value:null,validAreaKm2:null}])).toEqual([

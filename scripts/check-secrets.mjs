@@ -10,7 +10,7 @@ if (!existsSync(staticDir)) {
   process.exit(2);
 }
 
-const secretNames = ["OPENROUTER_API_KEY", "GROQ_API_KEY", "NASA_FIRMS_MAP_KEY", "FIRMS_MAP_KEY", "EARTH_ENGINE_SERVICE_ACCOUNT_JSON"];
+const secretNames = ["OPENROUTER_API_KEY", "GROQ_API_KEY", "NASA_FIRMS_MAP_KEY", "FIRMS_MAP_KEY", "EARTH_ENGINE_SERVICE_ACCOUNT_JSON", "EARTHDATA_TOKEN"];
 const values = [];
 for (const f of [".env.local", ".env"]) {
   const p = join(root, f);
@@ -20,7 +20,7 @@ for (const f of [".env.local", ".env"]) {
     if (m && secretNames.includes(m[1]) && m[2].length >= 8) values.push({ name: m[1], value: m[2] });
   }
 }
-const patterns = [/sk-or-v1-[A-Za-z0-9]{20,}/, /gsk_[A-Za-z0-9]{20,}/, /OPENROUTER_API_KEY|GROQ_API_KEY|FIRMS_MAP_KEY|EARTH_ENGINE_SERVICE_ACCOUNT_JSON/, /-----BEGIN (?:RSA )?PRIVATE KEY-----/];
+const patterns = [/sk-or-v1-[A-Za-z0-9]{20,}/, /gsk_[A-Za-z0-9]{20,}/, /OPENROUTER_API_KEY|GROQ_API_KEY|FIRMS_MAP_KEY|EARTH_ENGINE_SERVICE_ACCOUNT_JSON|EARTHDATA_TOKEN/, /-----BEGIN (?:RSA )?PRIVATE KEY-----/];
 
 const files = [];
 (function walk(d) {
