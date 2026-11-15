@@ -117,6 +117,8 @@ export function MyanmarMap({
       factor: Math.min(4, Math.max(0.5, (previous.key === selectionKey ? previous.factor : 1) * multiplier)),
     }));
     const wheel = (event: WheelEvent) => {
+      // Ordinary wheel motion scrolls the workspace column; modified motion zooms the map.
+      if (!event.ctrlKey && !event.metaKey) return;
       event.preventDefault();
       const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? surface.clientHeight : 1);
       applyZoom(Math.exp(-Math.max(-100, Math.min(100, delta)) * .002));

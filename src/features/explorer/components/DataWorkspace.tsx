@@ -47,7 +47,7 @@ export function DataWorkspace(p:DataWorkspaceProps) {
   <div className="workspace-body" data-navigation-open={navigationOpen} data-controls-open={controlsOpen}>
    <button type="button" className="workspace-edge-toggle workspace-edge-left" hidden={navigationOpen} onClick={()=>setNavigationOpen(true)} aria-expanded={navigationOpen} aria-controls="workspace-navigation" aria-label={t("Show indicators","ညွှန်ကိန်းများ ပြရန်")} title={t("Show indicators","ညွှန်ကိန်းများ ပြရန်")}><ChevronRight size={20}/></button>
    <button type="button" className="workspace-edge-toggle workspace-edge-right" hidden={controlsOpen} onClick={()=>setControlsOpen(true)} aria-expanded={controlsOpen} aria-controls="workspace-controls" aria-label={t("Show view controls","ရွေးချယ်မှုများ ပြရန်")} title={t("Show view controls","ရွေးချယ်မှုများ ပြရန်")}><ChevronLeft size={20}/></button>
-   <aside id="workspace-navigation" className="workspace-navigation" inert={!navigationOpen} aria-hidden={!navigationOpen} aria-label={t("Environmental indicators","ပတ်ဝန်းကျင် ညွှန်ကိန်းများ")}>
+   <aside id="workspace-navigation" className="workspace-navigation" tabIndex={0} inert={!navigationOpen} aria-hidden={!navigationOpen} aria-label={t("Environmental indicators","ပတ်ဝန်းကျင် ညွှန်ကိန်းများ")}>
     <button className="workspace-panel-toggle" aria-expanded={navigationOpen} aria-controls="workspace-navigation" aria-label={t("Hide indicators","ညွှန်ကိန်းများ ဖျောက်ရန်")} title={t("Hide indicators","ညွှန်ကိန်းများ ဖျောက်ရန်")} onClick={()=>setNavigationOpen(!navigationOpen)}><span>{t("Indicators","ညွှန်ကိန်းများ")} <small>{count}</small></span><ChevronLeft size={17}/></button>
     <div id="workspace-indicators">
      <label className="workspace-search"><Search size={17}/><span className="sr-only">{t("Search indicators","ညွှန်ကိန်းရှာရန်")}</span><input type="search" value={query} onChange={e=>{setQuery(e.target.value);setNavigationOpen(true);}} placeholder={t("Search indicators…","ညွှန်ကိန်း ရှာရန်…")}/></label>
@@ -68,10 +68,10 @@ export function DataWorkspace(p:DataWorkspaceProps) {
      {query&&!TOPICS.some(topic=>topic.indicators.some(i=>`${i.label} ${label(i.datasetId??"",i.label)} ${categoryName(topic.id,lang)} ${i.summary}`.toLowerCase().includes(query.toLowerCase())))&&<p role="status">{t("No matching indicators. Try another term.","ကိုက်ညီသော ညွှန်ကိန်းမရှိပါ။ အခြားစကားလုံးဖြင့် ရှာပါ။")}</p>}
     </div>
    </aside>
-   <div className="workspace-center">
+   <div className="workspace-center" role="region" aria-label={t("Map and observation results","မြေပုံနှင့် တိုင်းတာချက်ရလဒ်များ")} tabIndex={0}>
    <section className="workspace-map-card" aria-label={t("Interactive Myanmar map","မြန်မာနိုင်ငံ အပြန်အလှန်မြေပုံ")}>
     <header><div><p className="workspace-eyebrow">{t("MAP","မြေပုံ")}</p><h2>{place||t("Choose a location","တည်နေရာ ရွေးပါ")}</h2></div><p className="workspace-map-guide"><MapPin size={15} aria-hidden="true"/><span>{region?t("Click a township on the map to select it. Click the selected area again to go back.","ရွေးချယ်ရန် မြေပုံပေါ်ရှိ မြို့နယ်ကို နှိပ်ပါ။ ပြန်ထွက်ရန် ရွေးထားသည့်နေရာကို ထပ်နှိပ်ပါ။"):t("Select a region to see townships.","မြို့နယ်များကို ကြည့်ရန် တိုင်းဒေသကြီး သို့မဟုတ် ပြည်နယ်ကို ရွေးပါ။")}</span></p></header>
-    <div className="workspace-map-surface"><MyanmarMap selectedRegionId={p.regionId} onSelectRegion={p.onRegion} language={lang} focusRegion={p.mapFocused} townships={catalog?.townships} selectedTownshipId={p.townshipId} onSelectTownship={p.onTownship}/></div>
+    <p className="workspace-scroll-hint">{t("Scroll this panel to see results. Ctrl / ⌘ + scroll zooms the map.","ရလဒ်များကို ကြည့်ရန် ဤအကန့်ကို အပေါ်အောက် ရွှေ့ပါ။ မြေပုံချဲ့ရန် Ctrl / ⌘ နှင့် မောက်စ်ဘီးကို တွဲသုံးပါ။")}</p><div className="workspace-map-surface"><MyanmarMap selectedRegionId={p.regionId} onSelectRegion={p.onRegion} language={lang} focusRegion={p.mapFocused} townships={catalog?.townships} selectedTownshipId={p.townshipId} onSelectTownship={p.onTownship}/></div>
     <footer><span><i className="workspace-map-key"/>{t("Selected boundary","ရွေးထားသော နယ်နိမိတ်")}</span><span>{t("Boundary highlight, not a data heatmap","နယ်နိမိတ်ကိုသာ အသားပေးပြထားပြီး ဒေတာပြင်းအားမြေပုံ မဟုတ်ပါ")}</span></footer>
     {region&&<div className="workspace-map-selection"><MapPin size={15}/><span>{place} · {p.locationMode==="township"&&p.townshipId?t("Township","မြို့နယ်"):t("Regional reference point","ဒေသကိုယ်စားပြု တည်နေရာ")}</span><button onClick={()=>p.onRegion("")}>{t("Clear","ရှင်းရန်")}</button></div>}
    </section>
@@ -86,7 +86,7 @@ export function DataWorkspace(p:DataWorkspaceProps) {
     {result?p.details:<p className="workspace-source-placeholder">{t("After you apply a selection, the NASA source, observation period, spatial basis and limitations appear here.","ရွေးချယ်မှုကို အသုံးပြုပြီးပါက NASA ရင်းမြစ်၊ တိုင်းတာထားသော ကာလ၊ နေရာအခြေခံနှင့် ကန့်သတ်ချက်များကို ဤနေရာတွင် ပြမည်။")}</p>}
    </section>
    </div>
-   <aside id="workspace-controls" className="workspace-controls" inert={!controlsOpen} aria-hidden={!controlsOpen} aria-label={t("Guided data selection","အဆင့်လိုက် ဒေတာရွေးချယ်ရန်")}>
+   <aside id="workspace-controls" className="workspace-controls" tabIndex={0} inert={!controlsOpen} aria-hidden={!controlsOpen} aria-label={t("Guided data selection","အဆင့်လိုက် ဒေတာရွေးချယ်ရန်")}>
     <button className="workspace-panel-toggle" aria-expanded={controlsOpen} aria-controls="workspace-controls" aria-label={t("Hide view controls","ရွေးချယ်မှုများ ဖျောက်ရန်")} title={t("Hide view controls","ရွေးချယ်မှုများ ဖျောက်ရန်")} onClick={()=>setControlsOpen(!controlsOpen)}><span>{t("Build your view","လေ့လာရန် ရွေးချယ်ပါ")}</span><ChevronRight size={17}/></button>
     <form id="workspace-control-content" onSubmit={e=>{e.preventDefault();if(!validation&&!p.loading)p.onApply();}}>
      <fieldset className="workspace-step"><legend><b>1</b>{t("Choose a location","တည်နေရာ ရွေးပါ")}</legend>
