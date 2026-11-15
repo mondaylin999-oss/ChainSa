@@ -286,13 +286,13 @@ export default function Page() {
 
   if (view === "history" || view === "saved") return (
     <main className="earthlens-app" lang={lang}>
-      <header className="site-header"><a className="brand-lockup" href="#home" onClick={event => { event.preventDefault(); setView("home"); }}><img className="earthlens-brand-art" src="/brand/chainsa-icon.png" alt="" /><span className="brand-text"><strong className="chainsa-wordmark" aria-label="ChainSa">Ch<span className="brand-letter-yellow">a</span><span className="brand-letter-blue">i</span>nSa</strong><small>MYANMAR EARTH INTELLIGENCE</small></span></a><SettingsMenu lang={lang} onLanguage={selectLanguage} /></header>
+      <header className="site-header"><a className="brand-lockup" href="#home" onClick={event => { event.preventDefault(); setView("home"); }}><img className="earthlens-brand-art" src="/brand/chainsa-icon.png" alt="" /><span className="brand-text"><strong className="chainsa-wordmark" aria-label="ChainSa">Ch<span className="brand-letter-yellow">a</span><span className="brand-letter-blue">i</span>nSa</strong><small>{t("MYANMAR EARTH INTELLIGENCE", "မြန်မာ့ပတ်ဝန်းကျင်ဆိုင်ရာ အချက်အလက်များ")}</small></span></a><SettingsMenu lang={lang} onLanguage={selectLanguage} /></header>
       <div className="history-page">
         <button className="button-secondary" onClick={() => setView(view === "saved" ? "history" : "home")}><ArrowLeft size={16} />{lang === "my" ? "နောက်သို့" : "Back"}</button>
         <h1>{view === "saved" ? (lang === "my" ? "သိမ်းထားသော ရှာဖွေမှု" : "Saved discovery") : (lang === "my" ? "ရှာဖွေမှုမှတ်တမ်း" : "Search history")}</h1>
         <p className="history-device-note">{lang === "my" ? "ဤစက်ပေါ်တွင်သာ သိမ်းထားသည်။ ဘရောက်ဇာအချက်အလက်များကို ရှင်းပါက မှတ်တမ်းများ ပျောက်ပါမည်။ မိတ္တူအဖြစ် PDF ဒေါင်းလုဒ်လုပ်ထားပါ။" : "Saved on this device. Clearing browser data removes this history. Download PDFs to keep a copy."}</p>
         {view === "saved" && savedSearch ? <>
-          <div className="history-snapshot-header"><div><h2>{lang === "my" ? savedSearch.card.locationMy : savedSearch.card.location}</h2><p>{lang === "my" ? "သိမ်းထားသည့်ရက်" : "Saved"}: {new Date(savedSearch.card.savedAt).toLocaleString()} · {lang === "my" ? "သိမ်းထားသော အချက်အလက်" : "Saved snapshot"}</p></div><div className="history-actions"><button className="button-primary" disabled={!!history.busyId} onClick={() => void history.download(savedSearch.card.id)}>{history.busyId ? "Preparing…" : "Download PDF"}</button><button className="button-secondary" onClick={exploreSaved}>{lang === "my" ? "အချက်အလက်အသစ် ပြန်ရှာရန်" : "Explore current data"}</button></div></div>
+          <div className="history-snapshot-header"><div><h2>{lang === "my" ? savedSearch.card.locationMy : savedSearch.card.location}</h2><p>{lang === "my" ? "သိမ်းထားသည့်ရက်" : "Saved"}: {new Date(savedSearch.card.savedAt).toLocaleString()} · {lang === "my" ? "သိမ်းထားသော အချက်အလက်" : "Saved snapshot"}</p></div><div className="history-actions"><button className="button-primary" disabled={!!history.busyId} onClick={() => void history.download(savedSearch.card.id)}>{history.busyId ? t("Preparing…", "ပြင်ဆင်နေသည်…") : t("Download PDF", "PDF ဖိုင် ဒေါင်းလုဒ်ရန်")}</button><button className="button-secondary" onClick={exploreSaved}>{lang === "my" ? "အချက်အလက်အသစ် ပြန်ရှာရန်" : "Explore current data"}</button></div></div>
           {history.error && <p className="history-notice" role="alert">{history.error}</p>}
           <DataChart lang={lang} state="ready" result={savedSearch.result} error="" onRetry={exploreSaved} />
         </> : <HistoryCards cards={history.cards} loading={history.loading} error={history.error} busyId={history.busyId} lang={lang} onOpen={id => void openSaved(id)} onDownload={id => void history.download(id)} onDelete={id => void history.remove(id)} onClear={() => void history.clear()} />}
@@ -309,11 +309,11 @@ export default function Page() {
             else { setChatOpen(false); setView("home"); }
           }} aria-label={townshipId ? "Back to region" : mapFocused ? "Back to all regions" : "Back to Home"}>
             <ArrowLeft size={16} aria-hidden="true" />{lang === "my" ? "နောက်သို့" : "Back"}
-            <span>{townshipId ? "To region" : mapFocused ? "All regions" : "Home"}</span>
+            <span>{townshipId ? t("To region", "ဒေသသို့") : mapFocused ? t("All regions", "ဒေသအားလုံး") : t("Home", "ပင်မစာမျက်နှာ")}</span>
           </button>
-        <a className="brand-lockup" href="#home" onClick={(event) => { event.preventDefault(); setView("home"); }} aria-label="Myanmar EarthLens home">
+        <a className="brand-lockup" href="#home" onClick={(event) => { event.preventDefault(); setView("home"); }} aria-label={lang === "my" ? "ChainSa ပင်မစာမျက်နှာ" : "ChainSa home"}>
           <img className="earthlens-brand-art" src="/brand/chainsa-icon.png" alt="" />
-          <span className="brand-text"><strong className="chainsa-wordmark" aria-label="ChainSa">Ch<span className="brand-letter-yellow">a</span><span className="brand-letter-blue">i</span>nSa</strong><small>MYANMAR EARTH INTELLIGENCE</small></span>
+          <span className="brand-text"><strong className="chainsa-wordmark" aria-label="ChainSa">Ch<span className="brand-letter-yellow">a</span><span className="brand-letter-blue">i</span>nSa</strong><small>{t("MYANMAR EARTH INTELLIGENCE", "မြန်မာ့ပတ်ဝန်းကျင်ဆိုင်ရာ အချက်အလက်များ")}</small></span>
         </a>
         <SettingsMenu lang={lang} onLanguage={selectLanguage} />
       </header>

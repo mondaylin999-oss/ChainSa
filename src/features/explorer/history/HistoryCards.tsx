@@ -1,4 +1,6 @@
 "use client";
+import { chartText } from "@/features/environmental/components/chartCopy";
+import { indicatorName } from "../workspace-copy";
 
 import { useState } from "react";
 import { Download, Trash2, ArrowUpRight } from "lucide-react";
@@ -20,13 +22,13 @@ export function HistoryCards({ cards, lang, loading, error, busyId, onOpen, onDo
       {cards.length > 0 && <button className="button-secondary" onClick={() => setConfirmClear(true)}><Trash2 size={16} />{my ? "မှတ်တမ်းအားလုံး ဖျက်ရန်" : "Clear history"}</button>}
     </div>
     {confirmClear && <div className="history-notice" role="alert"><p>{my ? "ဤစက်ပေါ်ရှိ သိမ်းထားသော ရှာဖွေမှုအားလုံးကို ဖျက်မလား။ ဒေါင်းလုဒ်လုပ်ထားသော PDF များကို မဖျက်ပါ။" : "Delete all saved searches on this device? Downloaded PDFs will remain."}</p><button className="button-secondary" onClick={() => { onClear(); setConfirmClear(false); }}>{my ? "အားလုံးဖျက်ရန်" : "Delete all"}</button> <button className="text-button" onClick={() => setConfirmClear(false)}>{my ? "မဖျက်တော့ပါ" : "Cancel"}</button></div>}
-    {error && <p className="history-notice" role="alert">{error}</p>}
+    {error && <p className="history-notice" role="alert">{chartText(lang,error)}</p>}
     {loading ? <p role="status">{my ? "မှတ်တမ်းများ ဖွင့်နေသည်…" : "Opening saved searches…"}</p>
-      : !cards.length ? <div className="history-empty"><h2>{my ? "သိမ်းထားသော ရှာဖွေမှု မရှိသေးပါ" : "Your discoveries start here"}</h2><p>{my ? "Explore တွင် နေရာ၊ အချက်အလက်နှင့် ကာလကို ရွေးပါ။ အချက်အလက် အောင်မြင်စွာရရှိပါက ဤနေရာတွင် အလိုအလျောက် သိမ်းပေးပါမည်။" : "Choose a location, dataset, and period in Explore. Successful searches with observations are saved here automatically."}</p></div>
+      : !cards.length ? <div className="history-empty"><h2>{my ? "သိမ်းထားသော ရှာဖွေမှု မရှိသေးပါ" : "Your discoveries start here"}</h2><p>{my ? "လေ့လာရေးစာမျက်နှာတွင် နေရာ၊ အချက်အလက်နှင့် ကာလကို ရွေးပါ။ အချက်အလက် အောင်မြင်စွာရရှိပါက ဤနေရာတွင် အလိုအလျောက် သိမ်းပေးပါမည်။" : "Choose a location, dataset, and period in Explore. Successful searches with observations are saved here automatically."}</p></div>
       : !shown.length ? <p>{my ? "ကိုက်ညီသော မှတ်တမ်း မတွေ့ပါ" : "No saved searches match your search."}</p>
         : <div className="history-grid">{shown.map(card => <article className="history-card" key={card.id}>
           <div className="history-card-heading"><span className="history-badge">{card.locationType === "township" ? (my ? "မြို့နယ်" : "Township") : (my ? "တိုင်း / ပြည်နယ်" : "State / region")}</span><time dateTime={card.savedAt}>{new Date(card.savedAt).toLocaleString(my ? "my-MM" : "en-GB")}</time></div>
-          <button className="history-open" onClick={() => onOpen(card.id)}><h2>{my ? card.locationMy || card.location : card.location}</h2><span>{card.dataset} <ArrowUpRight size={15} /></span></button>
+          <button className="history-open" onClick={() => onOpen(card.id)}><h2>{my ? card.locationMy || card.location : card.location}</h2><span>{indicatorName(card.selection.datasetId,card.dataset,lang)} <ArrowUpRight size={15} /></span></button>
           <p>{card.selection.start} — {card.selection.end} <small>UTC</small></p>
           <HistorySparkline card={card} />
           <div className="history-stats"><span>{my ? "ပျမ်းမျှ" : "Mean"}<strong>{historyValue(card.summary.mean)} <small>{card.unit}</small></strong></span><span>{my ? "အချက်အလက်အရေအတွက်" : "Observations"}<strong>{card.summary.count}</strong></span></div>

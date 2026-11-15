@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent, type RefObject } from "rea
 import { ArrowUp, Bot, ExternalLink, LoaderCircle, Sparkles } from "lucide-react";
 import { useEarthLensChat } from "../../earthlens-chat/client/useEarthLensChat";
 import { StructuredAnswer } from "../../earthlens-chat/components/AnswerView";
+import { chartText } from "@/features/environmental/components/chartCopy";
 import { REGIONS } from "../../earthlens-chat/regions";
 
 const questions = [
@@ -41,18 +42,19 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
     void send(message);
   }
 
+  const t = (text: string) => chartText(lang,text);
   const enabled = provider === "available";
   return (
     <section id="ask-ai" className="chat-panel panel" aria-labelledby="chat-title" lang={lang}>
       <div className="chat-panel-heading">
         <div className="section-icon"><Bot size={21} aria-hidden="true" /></div>
         <div>
-          <p className="eyebrow">Evidence-grounded assistance</p>
-          <h2 id="chat-title">Ask Myanmar EarthLens</h2>
+          <p className="eyebrow">{t("Evidence-grounded assistance")}</p>
+          <h2 id="chat-title">{t("Ask Myanmar EarthLens")}</h2>
         </div>
         <span className={`service-pill ${enabled ? "service-ready" : "service-muted"}`}>
           <span className="status-dot" />
-          {provider === "checking" ? "Checking AI" : provider === "available" ? "Evidence ready" : provider === "error" ? "Status unavailable" : "AI unavailable"}
+          {t(provider === "checking" ? "Checking AI" : provider === "available" ? "Evidence ready" : provider === "error" ? "Status unavailable" : "AI unavailable")}
         </span>
       </div>
 
@@ -72,12 +74,12 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
           <div className="chat-empty">
             <div className="assistant-intro">
               <span className="assistant-avatar"><Sparkles size={16} aria-hidden="true" /></span>
-              <p>Ask a question in English or Myanmar. Answers use retrieved evidence and include its dates, sources and limitations.</p>
+              <p>{t("Ask a question in English or Myanmar. Answers use retrieved evidence and include its dates, sources and limitations.")}</p>
             </div>
             <div className="suggested-questions">
               {questions.map((question) => (
-                <button key={question} type="button" disabled={!enabled || busy} onClick={() => void send(question)}>
-                  {question}
+                <button key={t(question)} type="button" disabled={!enabled || busy} onClick={() => void send(t(question))}>
+                  {t(question)}
                 </button>
               ))}
             </div>
@@ -91,8 +93,8 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
                 {response && (
                   <div className="message-evidence">
                     <p>
-                      {response.region?.name ?? "General question"} · {response.period ? `${response.period.start} — ${response.period.end}` : "No observation period"}
-                      {response.generator === "template" ? " · Evidence-based template" : response.model ? ` · ${response.model}` : " · AI-assisted"}
+                      {(lang === "my" ? response.region?.nameMy : response.region?.name) ?? t("General question")} · {response.period ? `${response.period.start} — ${response.period.end}` : t("No observation period")}
+                      {response.generator === "template" ? ` · ${t("Evidence-based template")}` : response.model ? ` · ${response.model}` : ` · ${t("AI-assisted")}`}
                     </p>
                     {response.sources.map((source) => (
                       <a key={source.url} href={source.url} target="_blank" rel="noreferrer">
@@ -115,24 +117,24 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
       </div>
 
       <form className="chat-compose" onSubmit={submit}>
-        <label className="sr-only" htmlFor="earthlens-chat-input">Message Myanmar EarthLens</label>
+        <label className="sr-only" htmlFor="earthlens-chat-input">{t("Message Myanmar EarthLens")}</label>
         <input
           id="earthlens-chat-input"
           ref={inputRef}
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder="Ask about a township, rainfall, agriculture, water, or environmental change…"
+          placeholder={t("Ask about a township, rainfall, agriculture, water, or environmental change…")}
           maxLength={1000}
           disabled={!enabled || busy}
           lang={lang}
         />
         <button type="submit" disabled={!enabled || busy || !input.trim()} aria-label="Send message">
           {busy ? <LoaderCircle className="spin" size={18} /> : <ArrowUp size={19} />}
-          <span>Send</span>
+          <span>{t("Send")}</span>
         </button>
       </form>
       <p className="chat-context">
-        Context: {region ? `${region.name} regional reference point` : "Myanmar"} · Uses retrieved NASA evidence when available
+        {lang === "my" ? `အကြောင်းအရာ — ${region ? region.nameMy + " ကိုယ်စားပြု တည်နေရာ" : "မြန်မာနိုင်ငံ"} · ရရှိနိုင်ပါက NASA အထောက်အထားများကို အသုံးပြုသည်` : `Context: ${region ? region.name + " regional reference point" : "Myanmar"} · Uses retrieved NASA evidence when available`}
       </p>
     </section>
   );

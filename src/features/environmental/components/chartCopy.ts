@@ -1,3 +1,4 @@
+import sharedCopy from "../../../../public/myanmar-copy.json";
 import { DATASETS } from "../../explorer/catalog";
 import { indicatorName } from "../../explorer/workspace-copy";
 
@@ -68,6 +69,7 @@ const my: Record<string, string> = {
 export function chartText(lang: ChartLanguage, text: string): string {
   if (lang === "en") return text;
   if (my[text]) return my[text];
+  if (Object.hasOwn(sharedCopy, text)) return sharedCopy[text as keyof typeof sharedCopy];
   const dataset = DATASETS.find(item => item.label === text);
   if (dataset) return indicatorName(dataset.id,text,lang);
   // Only format known model phrases; never translate or round scientific numbers.
@@ -83,5 +85,21 @@ export function chartText(lang: ChartLanguage, text: string): string {
   if (invalid) return `${invalid[1].startsWith("Invalid") ? "မမှန်ကန်သော ရက်စွဲ" : "ထပ်နေသော ရက်စွဲများ"} ကို ကောက်ချက်ချရန် အသုံးမပြုနိုင်ပါ: ${invalid[2]}`;
   const significant = text.match(/^The seasonal test indicates a (increasing|decreasing|no clear trend) monotonic pattern at the 0.05 threshold; this describes the observed series and does not establish causation\.$/);
   if (significant) return `ရာသီအလိုက် စမ်းသပ်ချက်သည် 0.05 သတ်မှတ်ချက်အရ ${chartText(lang, significant[1])} တစ်ဖက်တည်းပြောင်းလဲမှုကို ဖော်ပြသည်။ တိုင်းတာထားသော စီးရီးကိုသာ ဖော်ပြပြီး အကြောင်းရင်းကို အတည်မပြုပါ။`;
+  const rules: Array<[RegExp, (...values: string[]) => string]> = [
+    [/^(.*) recorded (\d+) valid (.*) observations?\. Values changed by (.*) \((.*)\) from (.*) to (.*); this is a descriptive summary, not proof of causation or statistical significance\.$/, (name,n,unit,change,percent,start,end) => `${chartText(lang,name)} တွင် အသုံးပြုနိုင်သော ${unit} တိုင်းတာချက် ${n} ခု ရရှိသည်။ ${start} မှ ${end} အထိ ${change} (${percent}) ပြောင်းလဲသည်။ ဤအကျဉ်းချုပ်သည် အကြောင်းရင်း သို့မဟုတ် စာရင်းအင်းထင်ရှားမှုကို အတည်မပြုပါ။`],
+    [/^Values are reported in (.*)\. Monthly summaries describe available observations; they are not accumulated totals or forecasts\.$/, unit => `တန်ဖိုးများ၏ ယူနစ်မှာ ${unit} ဖြစ်သည်။ လစဉ်အကျဉ်းချုပ်များသည် ရရှိသော တိုင်းတာချက်များကိုသာ ဖော်ပြသည်။ စုစုပေါင်းပမာဏ သို့မဟုတ် အနာဂတ်ခန့်မှန်းချက် မဟုတ်ပါ။`],
+    [/^(\d+) of (\d+) requested days$/, (n,total) => `တောင်းဆိုထားသော ${total} ရက်အနက် ${n} ရက်`],
+    [/^(.*) pooled mean from (\d+) supported years\.$/, (mean,n) => `အချက်အလက်လုံလောက်သော ${n} နှစ်မှ စုပေါင်းပျမ်းမျှ ${mean}`],
+    [/^(.*) from (\d+) months and (\d+) observations\.$/, (mean,months,n) => `${months} လနှင့် တိုင်းတာချက် ${n} ခုမှ ပျမ်းမျှ ${mean}`],
+    [/^Insufficient coverage \((\d+) months\)\.$/, n => `အချက်အလက် မလုံလောက်ပါ (${n} လ)`],
+    [/^Months without returned observations: (.*)\.$/, months => `တိုင်းတာချက် မရရှိသော လများ — ${months}`],
+    [/^(\d+) valid observations?$/, n => `အသုံးပြုနိုင်သော တိုင်းတာချက် ${n} ခု`],
+    [/^(\d+) rejected or missing observations?\.$/, n => `ဖယ်ထုတ်ထားသော သို့မဟုတ် ပျောက်နေသော တိုင်းတာချက် ${n} ခု။`],
+    [/^(\d+) endpoint observations from the valid series$/, n => `မှန်ကန်သော စီးရီး၏ အစနှင့်အဆုံး တိုင်းတာချက် ${n} ခု`],
+    [/^Mean and sample standard deviation in (.*)$/, unit => `${unit} ဖြင့် ပျမ်းမျှနှင့် နမူနာစံသွေဖည်ချက်`],
+    [/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4})$/, (month,year) => `${chartText(lang,month)} ${year}`],
+    [/^Descriptive sample standard deviation comparison: early period (.*) to (.*) \((\d+) observations\) versus late period (.*) to (.*) \((\d+) observations\)\. It is not a significance test\.$/, (start,end,n,lstart,lend,ln) => `နမူနာစံသွေဖည်ချက်ကို နှိုင်းယှဉ်ထားသည်။ ကာလအစ ${start} မှ ${end} (တိုင်းတာချက် ${n} ခု) နှင့် ကာလအဆုံး ${lstart} မှ ${lend} (တိုင်းတာချက် ${ln} ခု) ဖြစ်သည်။ စာရင်းအင်းထင်ရှားမှု စမ်းသပ်ချက် မဟုတ်ပါ။`],
+  ];
+  for (const [pattern, format] of rules) { const match = text.match(pattern); if (match) return format(...match.slice(1)); }
   return text;
 }
