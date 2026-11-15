@@ -1,10 +1,20 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { answerChat, handleChatPost, resetRateLimiterForTests } from "@/features/earthlens-chat/server/handler";
+import { answerChat, chatStatus, handleChatPost, resetRateLimiterForTests } from "@/features/earthlens-chat/server/handler";
 import { clearPowerCacheForTests } from "@/features/earthlens-chat/server/nasa/power";
 import { answerFormat } from "@/features/earthlens-chat/config/answer-format";
 import { baseConfig, completion, mockFetch, powerFromUrl, type SyntheticOpts } from "./fixtures";
 
 const TODAY = "2026-11-13";
+it("never exposes credentials misplaced in model settings through public status", () => {
+  const cfg = keys();
+  cfg.openrouter.rejectedModels = ["misplaced-private-key"];
+  cfg.groq.models = ["misplaced-private-key:free"];
+  const status = chatStatus(cfg);
+  expect(JSON.stringify(status)).not.toContain("misplaced-private-key");
+  expect(JSON.stringify(status)).not.toContain(cfg.openrouter.apiKey);
+  expect(status.openrouter.rejectedModelCount).toBe(1);
+  expect(status.groq.modelCount).toBe(1);
+});
 const nasa = (o: SyntheticOpts = {}) => (url: string) => Response.json(powerFromUrl(url, o));
 const keys = (over = {}) =>
   baseConfig({

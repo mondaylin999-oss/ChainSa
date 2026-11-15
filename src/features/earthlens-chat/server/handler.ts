@@ -319,8 +319,8 @@ export function resetRateLimiterForTests() {
 /** Public status: which providers are configured. Never returns keys. */
 export function chatStatus(cfg: ServerConfig = getConfig()) {
   return {
-    openrouter: { configured: !!cfg.openrouter.apiKey, models: cfg.openrouter.models, ignoredNonFreeModels: cfg.openrouter.rejectedModels },
-    groq: { configured: !!cfg.groq.apiKey, models: cfg.groq.models, ignoredNonAllowlistedModels: cfg.groq.rejectedModels },
+    openrouter: { configured: !!cfg.openrouter.apiKey, modelCount: cfg.openrouter.models.length, rejectedModelCount: cfg.openrouter.rejectedModels.length },
+    groq: { configured: !!cfg.groq.apiKey, modelCount: cfg.groq.models.length, rejectedModelCount: cfg.groq.rejectedModels.length },
     firms: { configured: !!cfg.firmsMapKey },
     nasaPower: { configured: true, note: "NASA POWER needs no key." },
     verifyMode: cfg.verifyMode,

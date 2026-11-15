@@ -118,7 +118,7 @@ export function getConfig(): ServerConfig {
 
   for (const p of [cached.openrouter, cached.groq]) {
     if (p.rejectedModels.length)
-      console.warn(`[earthlens-chat] Ignoring non-free ${p.name} models: ${p.rejectedModels.join(", ")}`);
+      console.warn(`[earthlens-chat] Ignoring ${p.rejectedModels.length} unsupported ${p.name} model setting(s). Check the model names in your environment settings.`);
   }
   return cached;
 }
