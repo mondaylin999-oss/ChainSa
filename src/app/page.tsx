@@ -28,10 +28,14 @@ import { MyanmarMap } from "@/features/explorer/components/MyanmarMap";
 import { fetchExploreCatalog, fetchObservations, type ExploreCatalog, type ObservationResponse } from "@/features/explorer/client/data-service";
 import { TOPICS, type TopicId, type TopicIndicator } from "@/features/explorer/catalog";
 
+import { selectionKey, responseMatchesSelection, type ObservationSelection } from "@/features/explorer/client/data-service";
+import { saveSearch, type HistoryCard } from "@/features/explorer/history/store";
+import { useSearchHistory } from "@/features/explorer/history/useSearchHistory";
+import { HistoryCards } from "@/features/explorer/history/HistoryCards";
 import { ReferenceHome } from "./reference-home";
 import { SettingsMenu } from "./settings-menu";
 
-type View = "home" | "explore";
+type View = "home" | "explore" | "history" | "saved";
 type Lang = "en" | "my";
 type ChartState = "initial" | "loading" | "ready" | "empty" | "unavailable" | "error";
 
@@ -100,11 +104,18 @@ export default function Page() {
   const [draftStart,setDraftStart] = useState(questionDate(36));
   const [draftEnd,setDraftEnd] = useState(questionDate(7));
   const [chartState, setChartState] = useState<ChartState>("initial");
-  const [result, setResult] = useState<ObservationResponse | null>(null);
+  const [receivedResult, setResult] = useState<ObservationResponse | null>(null);
+  const [resultKey, setResultKey] = useState("");
+  const history = useSearchHistory();
+  const [savedSearch, setSavedSearch] = useState<{ card: HistoryCard; result: ObservationResponse } | null>(null);
   const [chartError, setChartError] = useState("");
   const [reloadToken, setReloadToken] = useState(0);
   const [focusChatOnHome, setFocusChatOnHome] = useState(false);
   const chatInputRef = useRef<HTMLInputElement>(null);
+  const selection: ObservationSelection = { topicId: activeTopic, regionId, datasetId, start, end, townshipId: townshipId || undefined };
+  const currentSelectionKey = selectionKey(selection);
+  // A changed location must never render the previous graph, even before the next effect runs.
+  const result = resultKey === currentSelectionKey ? receivedResult : null;
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -215,8 +226,11 @@ export default function Page() {
       try {
         const data = await fetchObservations({ topicId: activeTopic, regionId, datasetId, start, end, townshipId:townshipId || undefined }, controller.signal);
         if (controller.signal.aborted) return;
+        if (!responseMatchesSelection(data, selection)) throw new Error("The data source returned a different location or period. Please try this search again.");
+        setResultKey(currentSelectionKey);
         setResult(data);
         setChartState(data.summary.count === 0 ? "empty" : "ready");
+        if (data.summary.count > 0) void saveSearch(selection, data).catch(cause => history.setError(cause instanceof Error ? cause.message : "This search could not be saved on this device."));
       } catch (cause) {
         if (controller.signal.aborted) return;
         setResult(null);
@@ -296,6 +310,29 @@ export default function Page() {
     setMapFocused(true);
   }
 
+  async function openSaved(id: string) {
+    const saved = await history.load(id);
+    setChatOpen(false);
+    if (saved) { setSavedSearch(saved); setView("saved"); }
+    else setView("history");
+  }
+  function historyAction(action: string, id?: string) {
+    if (action === "history-all") { setChatOpen(false); setView("history"); }
+    else if (id && action === "history-open") void openSaved(id);
+    else if (id && action === "history-download") void history.download(id);
+    else if (id && action === "history-delete") void history.remove(id);
+  }
+  function exploreSaved() {
+    if (!savedSearch) return;
+    const saved = savedSearch.card.selection;
+    setActiveTopic(saved.topicId); setOpenTopic(saved.topicId); setDatasetId(saved.datasetId);
+    setRegionId(saved.regionId); setTownshipId(saved.townshipId || "");
+    const region = REGIONS.find(item => item.id === saved.regionId);
+    setRegionSearch(region ? `${region.name} — ${region.type}` : "");
+    setMapFocused(true); setStart(saved.start); setEnd(saved.end); setDraftStart(saved.start); setDraftEnd(saved.end);
+    setIndicatorLabel(""); setDetailIndicator(null); setReloadToken(token => token + 1); setView("explore");
+  }
+
   function askAI() {
     if (view === "explore") {setChatOpen(true);return;}
     setFocusChatOnHome(true);
@@ -309,9 +346,25 @@ export default function Page() {
 
   if (view === "home") return (
     <main className="earthlens-app" lang={lang}>
-      <ReferenceHome lang={lang} onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={() => setChatOpen(true)} onRegion={(id) => { chooseRegion(id); setView("explore"); }} onLanguage={selectLanguage} />
+      <ReferenceHome historyPreview={{ cards: history.cards, loading: history.loading, error: history.error, busyId: history.busyId }} onHistory={historyAction} lang={lang} onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={() => setChatOpen(true)} onRegion={(id) => { chooseRegion(id); setView("explore"); }} onLanguage={selectLanguage} />
       <button className="floating-ai-launcher button-primary" aria-expanded={chatOpen} aria-controls="floating-ai-panel" onClick={() => setChatOpen(open => !open)}><MessageCircle size={18} /> {lang === "my" ? "AI စကားပြော" : "AI chat"}</button>
       {chatOpen && <section id="floating-ai-panel" className="floating-ai-panel" role="dialog" aria-label="EarthLens AI chat" onKeyDown={event => { if (event.key === "Escape") setChatOpen(false); }}><button className="floating-ai-close button-secondary" onClick={() => setChatOpen(false)}>Close chat</button><ChatPanel lang={lang} selectedRegionId={regionId} inputRef={chatInputRef} /></section>}
+    </main>
+  );
+
+  if (view === "history" || view === "saved") return (
+    <main className="earthlens-app" lang={lang}>
+      <header className="site-header"><a className="brand-lockup" href="#home" onClick={event => { event.preventDefault(); setView("home"); }}><img className="earthlens-brand-art" src="/home-exact/brand.svg" alt="" /><span className="brand-text"><strong>Earth Trend Detective</strong><small>MYANMAR EARTH INTELLIGENCE</small></span></a><SettingsMenu lang={lang} onLanguage={selectLanguage} /></header>
+      <div className="history-page">
+        <button className="button-secondary" onClick={() => setView(view === "saved" ? "history" : "home")}><ArrowLeft size={16} />{lang === "my" ? "နောက်သို့" : "Back"}</button>
+        <h1>{view === "saved" ? (lang === "my" ? "သိမ်းထားသော ရှာဖွေမှု" : "Saved discovery") : (lang === "my" ? "ရှာဖွေမှုမှတ်တမ်း" : "Search history")}</h1>
+        <p className="history-device-note">{lang === "my" ? "ဤစက်ပေါ်တွင်သာ သိမ်းထားသည်။ ဘရောက်ဇာအချက်အလက်များကို ရှင်းပါက မှတ်တမ်းများ ပျောက်ပါမည်။ မိတ္တူအဖြစ် PDF ဒေါင်းလုဒ်လုပ်ထားပါ။" : "Saved on this device. Clearing browser data removes this history. Download PDFs to keep a copy."}</p>
+        {view === "saved" && savedSearch ? <>
+          <div className="history-snapshot-header"><div><h2>{lang === "my" ? savedSearch.card.locationMy : savedSearch.card.location}</h2><p>{lang === "my" ? "သိမ်းထားသည့်ရက်" : "Saved"}: {new Date(savedSearch.card.savedAt).toLocaleString()} · {lang === "my" ? "သိမ်းထားသော အချက်အလက်" : "Saved snapshot"}</p></div><div className="history-actions"><button className="button-primary" disabled={!!history.busyId} onClick={() => void history.download(savedSearch.card.id)}>{history.busyId ? "Preparing…" : "Download PDF"}</button><button className="button-secondary" onClick={exploreSaved}>{lang === "my" ? "အချက်အလက်အသစ် ပြန်ရှာရန်" : "Explore current data"}</button></div></div>
+          {history.error && <p className="history-notice" role="alert">{history.error}</p>}
+          <DataChart state="ready" result={savedSearch.result} error="" onRetry={exploreSaved} />
+        </> : <HistoryCards cards={history.cards} loading={history.loading} error={history.error} busyId={history.busyId} lang={lang} onOpen={id => void openSaved(id)} onDownload={id => void history.download(id)} onDelete={id => void history.remove(id)} onClear={() => void history.clear()} />}
+      </div>
     </main>
   );
 
@@ -470,9 +523,9 @@ export default function Page() {
                     <label>Date range <span className="field-meta">(UTC)</span></label>
                     <div className="field-control-body">
                       <div className="date-range">
-                        <div><label className="sr-only" htmlFor="start-date">Start date</label><input id="start-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftStart} onChange={(event) => setDraftStart(event.target.value)} /></div>
+                        <div><label className="sr-only" htmlFor="start-date">Start date</label><input id="start-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftStart} onInput={(event) => setDraftStart(event.currentTarget.value)} onChange={(event) => setDraftStart(event.target.value)} /></div>
                         <span aria-hidden="true">to</span>
-                        <div><label className="sr-only" htmlFor="end-date">End date</label><input id="end-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftEnd} onChange={(event) => setDraftEnd(event.target.value)} /></div>
+                        <div><label className="sr-only" htmlFor="end-date">End date</label><input id="end-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftEnd} onInput={(event) => setDraftEnd(event.currentTarget.value)} onChange={(event) => setDraftEnd(event.target.value)} /></div>
                       </div>
                       <div className="date-actions"><button type="button" className="button-primary" disabled={Boolean(dateError)} onClick={()=>{if(!dateError){setStart(draftStart);setEnd(draftEnd);setReloadToken(token=>token+1);}}}>Apply dates</button>{datasetId !== "fire-detections" && <button type="button" className="text-button" onClick={()=>{setDraftStart("1989-01-01");setDraftEnd(questionDate(0));}}>1989–today</button>}</div>
                       {dateError && <p className="field-error" role="status">{dateError}</p>}
@@ -480,6 +533,7 @@ export default function Page() {
                   </div>
                 </div>
                 {catalogError && <div className="inline-notice notice-error" role="alert">{catalogError}</div>}
+                {history.error && <p className="history-notice" role="status">{history.error}</p>}
               </div>
 
               <section className="chart-card panel" aria-labelledby="chart-title">
@@ -487,7 +541,7 @@ export default function Page() {
                   <div><p className="eyebrow">Observation series</p><h2 id="chart-title">{selectedDataset?.label ?? "Dataset chart"}</h2><p>{selectedTownship?.name ?? selectedRegion?.name ?? "Select a location"} · {start} — {end}</p></div>
                   <ChartNoAxesCombined className="chart-heading-icon" size={21} />
                 </div>
-                <DataChart state={chartState} result={result} error={chartError} onRetry={() => setReloadToken((token) => token + 1)} />
+                <DataChart state={chartState === "ready" && !result ? "loading" : chartState} result={result} error={chartError} onRetry={() => setReloadToken((token) => token + 1)} />
                 {result && result.summary.count > 0 && (
                   <div className="chart-stats">
                     <div><span>Mean</span><strong>{formatValue(result.summary.mean)} <small>{result.dataset.unit}</small></strong></div>

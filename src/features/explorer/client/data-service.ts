@@ -3,6 +3,19 @@ import type { Region } from "../../earthlens-chat/regions";
 
 export interface Township { id: string; regionId: string; name: string; nameMy: string }
 
+export interface ObservationSelection { topicId: TopicId; regionId: string; datasetId: string; start: string; end: string; townshipId?: string }
+
+export function selectionKey(selection: ObservationSelection): string {
+  return JSON.stringify([selection.topicId, selection.regionId, selection.townshipId || "", selection.datasetId, selection.start, selection.end]);
+}
+
+export function responseMatchesSelection(result: ObservationResponse, selection: ObservationSelection): boolean {
+  return result.region.id === selection.regionId && result.dataset.id === selection.datasetId
+    && result.period.start === selection.start && result.period.end === selection.end
+    && (selection.townshipId ? result.location?.type === "township" && result.location.id === selection.townshipId
+      : !result.location || result.location.type === "region" && result.location.id === selection.regionId);
+}
+
 export interface ExploreCatalog {
   topics: typeof import("../catalog").TOPICS;
   datasets: DatasetDefinition[];
@@ -43,7 +56,7 @@ export async function fetchExploreCatalog(signal?: AbortSignal): Promise<Explore
 }
 
 export async function fetchObservations(
-  selection: { topicId: TopicId; regionId: string; datasetId: string; start: string; end: string; townshipId?: string },
+  selection: ObservationSelection,
   signal?: AbortSignal,
 ): Promise<ObservationResponse> {
   const response = await fetch("/api/explore/observations", {

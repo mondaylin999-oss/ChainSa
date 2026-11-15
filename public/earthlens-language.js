@@ -1,5 +1,7 @@
 (function () {
   var translations = {
+    "Recent Discoveries": "မကြာသေးမီက ရှာဖွေမှုများ",
+    "Saved on this device. Clearing browser data removes this history. Download PDFs to keep a copy.": "ဤစက်ပေါ်တွင် သိမ်းထားသည်။ ဘရောက်ဇာအချက်အလက်များကို ရှင်းပါက မှတ်တမ်းများ ပျောက်ပါမည်။ မိတ္တူအဖြစ် PDF ဒေါင်းလုဒ်လုပ်ထားပါ။",
     "Play videos": "ဗီဒီယိုများ ဖွင့်ရန်",
     "Pause videos": "ဗီဒီယိုများ ခေတ္တရပ်ရန်",
     "Powered by NASA data": "NASA အချက်အလက်များကို အသုံးပြုထားသည်",

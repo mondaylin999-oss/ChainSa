@@ -12,6 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="/earthlens-palette.css" />
+        <link rel="stylesheet" href="/history.css" />
         <script src="/theme.js" />
         <script src="/earthlens-language.js" />
         {/* Same fonts as the EarthLens demo */}
