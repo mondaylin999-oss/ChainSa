@@ -295,13 +295,6 @@ export default function Page() {
           <img className="earthlens-brand-art" src="/home-exact/brand.svg" alt="" />
           <span className="brand-text"><strong>Earth Trend Detective</strong><small>MYANMAR EARTH INTELLIGENCE</small></span>
         </a>
-        <nav className="main-nav" aria-label="Main navigation">
-          {(["home", "explore"] as const).map((page) => (
-            <button key={page} className={view === page ? "nav-link nav-link-active" : "nav-link"} aria-current={view === page ? "page" : undefined} onClick={() => setView(page)}>
-              {page === "home" ? "Home" : "Explore Map"}
-            </button>
-          ))}
-        </nav>
         <ThemeToggle />
         <div className="language-switch" role="group" aria-label="Interface language">
           {(["en", "my"] as const).map((language) => (
