@@ -1,0 +1,18 @@
+.earthlens-app .data-insight{container-type:inline-size;font-family:Inter,Padauk,system-ui,sans-serif;background:var(--et-0c1532);color:var(--et-e9edfa);border:1px solid var(--et-26375b);border-radius:24px;padding:24px;margin-top:20px}
+.data-insight--state{min-height:120px;display:grid;place-items:center}
+.earthlens-app .data-insight__eyebrow{color:var(--et-c3b6ff);font-size:11px;font-weight:700;letter-spacing:.14em;margin:0 0 8px}
+.data-insight h2{margin:0 0 6px;font-size:24px}.earthlens-app .data-insight h3{margin:0 0 14px;color:var(--et-c3b6ff);font-size:17px}.data-insight h4{margin:0 0 8px;font-size:17px}
+.earthlens-app .data-insight article{background:var(--et-101b35);border:1px solid var(--et-26375b);border-radius:16px;padding:20px;margin-top:16px;min-width:0}
+.data-insight p,.data-insight li{font-size:13px;line-height:1.7;overflow-wrap:anywhere}.data-insight__summary{font-size:15px!important}
+.data-insight__overview-grid,.data-insight__stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
+.earthlens-app .data-insight__overview-grid>div,.earthlens-app .data-insight__stats>div,.earthlens-app .data-insight__months>div{background:var(--et-18213e);border:1px solid var(--et-26375b);border-radius:12px;padding:14px;min-width:0}
+.data-insight__overview-grid span,.data-insight__stats span{display:block;font-size:12px;margin-bottom:6px;color:var(--et-a6b3d0)}.data-insight__overview-grid strong,.data-insight__stats strong{display:block;font-size:13px;overflow-wrap:anywhere}
+.earthlens-app .data-insight dl{display:grid;grid-template-columns:minmax(130px,1fr) minmax(0,2fr);gap:10px 16px;margin:0;background:transparent}.data-insight dl>div{display:grid;grid-template-columns:subgrid;grid-column:1/-1;gap:10px 16px;padding:9px 0;border-bottom:1px solid var(--et-26375b)}
+.data-insight dt{font-size:12px}.data-insight dd{margin:0;font-size:13px;overflow-wrap:anywhere}.data-insight dd small{display:block;color:var(--et-a6b3d0);font-size:12px;line-height:1.6;margin-top:5px}
+.earthlens-app .data-insight__direction{display:block;color:var(--et-c3b6ff);font-size:19px;margin-bottom:14px}
+.data-insight__months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.data-insight__months span{display:block;color:var(--et-a6b3d0);font-size:12px;margin-top:6px;overflow-wrap:anywhere}
+.data-insight__warning{color:var(--et-c3b6ff)!important}.data-insight details{margin-top:16px;font-size:13px}.earthlens-app .data-insight summary{cursor:pointer;color:var(--et-c3b6ff);padding:8px 0;font-weight:600}.data-insight summary:focus-visible{outline:2px solid var(--et-c3b6ff);outline-offset:4px;border-radius:4px}.data-insight ul{padding-left:20px;margin:0}
+@media(max-width:1000px){.data-insight__overview-grid,.data-insight__stats{grid-template-columns:repeat(2,minmax(0,1fr))}.data-insight__months{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.earthlens-app .data-insight{padding:16px;border-radius:18px}.earthlens-app .data-insight article{padding:16px}.data-insight__overview-grid,.data-insight__stats,.data-insight__months{grid-template-columns:1fr}.earthlens-app .data-insight dl{grid-template-columns:1fr}.data-insight dl>div{grid-template-columns:1fr;gap:5px}.data-insight dd{margin-bottom:8px}}
+@container(max-width:600px){.data-insight__overview-grid,.data-insight__stats{grid-template-columns:repeat(2,minmax(0,1fr))}.data-insight__months{grid-template-columns:1fr}}
+@container(max-width:420px){.data-insight__overview-grid,.data-insight__stats{grid-template-columns:1fr}.earthlens-app .data-insight dl,.data-insight dl>div{grid-template-columns:1fr}.data-insight dd{margin-bottom:8px}}

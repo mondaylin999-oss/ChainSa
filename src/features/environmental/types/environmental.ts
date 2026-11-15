@@ -49,4 +49,5 @@ export interface DataSeries {
   datasetId?: string;
   satellite?: string;
   instrument?: string;
+  measurement?: { name: string; code: string; what: string; unit: string; meaning: string; caution: string };
 }
