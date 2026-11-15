@@ -3,19 +3,25 @@ import type { Fact } from "../../types";
 import type { Region } from "../../regions";
 import { POWER_SOURCE, addDays, fetchPowerDaily } from "../nasa/power";
 import { latestCompleteDate } from "../grounding";
+import { POWER_CONSISTENT_FIRST_YEAR, POWER_CONSISTENT_FROM } from "../nasa/power-homogeneity";
 import {
   allValues, historicalWindowSums, percentileRank, quantile, sameDateInYear, seasonalSample, toDailyMap, windowMax, windowSum, type DailyMap,
 } from "./stats";
 
 /**
- * Drought / wet / heat context from the NASA POWER record (1981 – latest available day).
+ * Drought / wet / heat context from the NASA POWER record (2009 – latest available day).
+ * NASA POWER (MERRA-2) data for Myanmar change abruptly during 2008 (see nasa/power-homogeneity.ts), so the
+ * comparison record starts in 2009: a provisional post-break baseline, not a standard 30-year climate normal.
  * Everything here describes the past. The "historical pattern" for the next 30 days is the
  * distribution of what happened on the same calendar dates in earlier years — NOT a forecast.
  *
  * The status rules below are EarthLens indicators, not official drought or flood declarations.
  */
 
-export const FIRST_YEAR = 1981; // MERRA-2 start in NASA POWER
+/** First year of the consistent NASA POWER record for Myanmar (data before 2009 are not comparable). */
+export const FIRST_YEAR = POWER_CONSISTENT_FIRST_YEAR;
+/** Minimum past years for a rainfall comparison (the post-2008 record has about 17). */
+export const MIN_PAST_YEARS = 15;
 export const OUTLOOK_DAYS = 30;
 /** Below this median 30-day rainfall the season is too dry for rainfall percentiles to mean much. */
 export const DRY_SEASON_MEDIAN_MM = 10;
@@ -49,7 +55,10 @@ const my = (n: number) => String(n).replace(/[0-9]/g, (d) => "၀၁၂၃၄၅
 interface Ctx { rain: DailyMap; soil: DailyMap; tmax: DailyMap; latest: string; today: string }
 
 export function computeAssessment(ctx: Ctx): Assessment {
-  const { rain, soil, tmax, latest, today } = ctx;
+  // Never mix pre-2009 values into any comparison, even if a caller passes them.
+  const consistent = (m: DailyMap): DailyMap => new Map([...m].filter(([d]) => d >= POWER_CONSISTENT_FROM));
+  const rain = consistent(ctx.rain), soil = consistent(ctx.soil), tmax = consistent(ctx.tmax);
+  const { latest, today } = ctx;
   const facts: Fact[] = [];
   const src = POWER_SOURCE.id;
   const add = (f: Omit<Fact, "source">) => facts.push({ ...f, value: r(f.value, f.decimals), source: src });
@@ -69,14 +78,14 @@ export function computeAssessment(ctx: Ctx): Assessment {
     track(past);
     add({ id: `rain_${days}d`, param: "rainfall", kind: "observation", label: `Rainfall, last ${days} days`, labelMy: `ပြီးခဲ့သော ${my(days)} ရက် မိုးရေချိန်`, value: now, unit: "mm", decimals: 1, period: { start, end: latest } });
     const median = quantile(past.map((p) => p.value), 0.5);
-    if (median !== undefined && past.length >= 20)
+    if (median !== undefined && past.length >= MIN_PAST_YEARS)
       add({ id: `rain_${days}d_ref`, param: "rainfall", kind: "comparison", label: `Typical rainfall for the same ${days} days in past years (median)`, labelMy: `ယခင်နှစ်များ၏ တူညီသော ${my(days)} ရက် ပုံမှန် မိုးရေချိန် (အလယ်ကိန်း)`, value: median, unit: "mm", decimals: 1, period: { start, end: latest } });
     if (median !== undefined && median < DRY_SEASON_MEDIAN_MM) {
       if (days === 30) drySeasonNow = true;
       continue; // dry season: a percentile of near-zero totals is not meaningful
     }
     const p = percentileRank(now, past.map((x) => x.value));
-    if (p === undefined || past.length < 20) continue;
+    if (p === undefined || past.length < MIN_PAST_YEARS) continue;
     pct[`rain_${days}d_pct`] = p;
     add({ id: `rain_${days}d_pct`, param: "rainfall", kind: "comparison", label: `Rank of last-${days}-day rainfall among ${past.length} past years (percentile)`, labelMy: `ပြီးခဲ့သော ${my(days)} ရက် မိုးရေချိန်၏ ယခင်နှစ် ${my(past.length)} နှစ်နှင့် နှိုင်းယှဉ် အဆင့် (ရာခိုင်နှုန်းအဆင့်)`, value: p, unit: "percentile", decimals: 0, period: { start, end: latest } });
   }
@@ -107,7 +116,7 @@ export function computeAssessment(ctx: Ctx): Assessment {
       if (m !== undefined) pastMax.push(m);
     }
     const tRef = quantile(pastMax, 0.5);
-    if (tRef !== undefined && pastMax.length >= 20)
+    if (tRef !== undefined && pastMax.length >= MIN_PAST_YEARS)
       add({ id: "tmax_7d_ref", param: "temperature", kind: "comparison", label: "Typical hottest day for the same 7 days in past years (median)", labelMy: "ယခင်နှစ်များ၏ တူညီသော ၇ ရက် ပုံမှန် အပူဆုံးနေ့ (အလယ်ကိန်း)", value: tRef, unit: "°C", decimals: 1, period: { start: addDays(latest, -6), end: latest } });
     const sample = seasonalSample(tmax, latest, 7, FIRST_YEAR, addDays(latest, -7));
     const p = percentileRank(t7, sample);
@@ -117,10 +126,10 @@ export function computeAssessment(ctx: Ctx): Assessment {
     }
   }
 
-  // ---- Very heavy rain threshold: top 1% of all days since 1981 ----
+  // ---- Very heavy rain threshold: top 1% of all days since 2009 ----
   const heavy = quantile(allValues(rain, addDays(latest, -365)), 0.99);
   if (heavy !== undefined && heavy > 0) {
-    add({ id: "heavy_threshold", param: "rainfall", kind: "historical", label: "Very heavy rain day threshold (wettest 1% of days since 1981)", labelMy: "အလွန်ပြင်းထန်သော မိုးရက် သတ်မှတ်ချက် (၁၉၈၁ ခုနှစ်မှစ၍ မိုးအများဆုံး ၁ ရာခိုင်နှုန်းရှိသော ရက်များ)", value: heavy, unit: "mm/day", decimals: 1 });
+    add({ id: "heavy_threshold", param: "rainfall", kind: "historical", label: "Very heavy rain day threshold (wettest 1% of days since 2009)", labelMy: "အလွန်ပြင်းထန်သော မိုးရက် သတ်မှတ်ချက် (၂၀၀၉ ခုနှစ်မှစ၍ မိုးအများဆုံး ၁ ရာခိုင်နှုန်းရှိသော ရက်များ)", value: heavy, unit: "mm/day", decimals: 1 });
     const recentMax = windowMax(rain, addDays(latest, -6), latest);
     if (recentMax !== undefined && recentMax >= heavy) triggers.wet.push("heavy_threshold");
   }
@@ -129,7 +138,7 @@ export function computeAssessment(ctx: Ctx): Assessment {
   const past30 = historicalWindowSums(rain, outlookWindow.end, OUTLOOK_DAYS, FIRST_YEAR, latest);
   track(past30);
   let drySeasonAhead = false;
-  if (past30.length >= 20) {
+  if (past30.length >= MIN_PAST_YEARS) {
     const vals = past30.map((p) => p.value);
     const hp = { start: outlookWindow.start, end: outlookWindow.end };
     add({ id: "hist_years", param: "rainfall", kind: "historical", label: "Past years compared", labelMy: "နှိုင်းယှဉ်ထားသော ယခင်နှစ်များ", value: past30.length, unit: "years", decimals: 0, period: hp });

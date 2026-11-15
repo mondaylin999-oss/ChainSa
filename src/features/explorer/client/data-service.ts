@@ -23,6 +23,10 @@ export interface ObservationResponse {
   dataset: DatasetDefinition;
   region: { id: string; name: string; nameMy: string; lat: number; lon: number };
   location?: { id: string; name: string; nameMy: string; lat: number; lon: number; type: "township" | "region" };
+  /** Point, pixel window, buffer or genuine full-boundary calculation. */
+  spatialBasis?: { kind: "point" | "pixel-window" | "grid-cell" | "river-reach" | "buffer" | "area-average" | "area-total"; label: string };
+  /** Shown prominently when the selected range crosses a known data discontinuity. */
+  dataWarning?: string;
   period: { start: string; end: string };
   source: DatasetDefinition["source"];
   geographicCoverage: string;

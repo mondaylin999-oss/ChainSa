@@ -51,7 +51,7 @@ const en = {
   noResultsYet: "Select a region and parameters, then press Analyze to see results here.",
   about: "About this site",
   aboutBody:
-    "Myanmar EarthLens turns NASA Earth observation data into location-specific information for farmers, fishers and communities. The dashboard retrieves daily NASA POWER values for a representative grid point in each state or region and, when configured, NASA FIRMS satellite fire detections. The EarthLens Assistant compares current conditions with the NASA record since 1981 and explains possible conditions for the next 30 days.",
+    "Myanmar EarthLens turns NASA Earth observation data into location-specific information for farmers, fishers and communities. The dashboard retrieves daily NASA POWER values for a representative grid point in each state or region and, when configured, NASA FIRMS satellite fire detections. The EarthLens Assistant compares current conditions with the NASA POWER record since 2009 (earlier NASA POWER data for Myanmar are not comparable) and explains possible conditions for the next 30 days.",
   boundaries: "Boundaries: Natural Earth 1:10m Admin-1 States/Provinces (public domain).",
   back: "Back to overview",
   clickHint: "Click any state or region on the map to see its environmental data.",
@@ -127,7 +127,7 @@ const my: Strings = {
   noResultsYet: "ဒေသနှင့် အချက်အလက်များ ရွေးပြီး စစ်ဆေးမည် ကို နှိပ်ပါ။",
   about: "ဤဝက်ဘ်ဆိုက် အကြောင်း",
   aboutBody:
-    "Myanmar EarthLens သည် နာဆာ ကမ္ဘာမြေစောင့်ကြည့်ရေး အချက်အလက်များကို လယ်သမား၊ ရေလုပ်သားနှင့် ရပ်ရွာများအတွက် နေရာအလိုက် သတင်းအချက်အလက်အဖြစ် ပြောင်းပေးသည်။ ပင်မစာမျက်နှာသည် ပြည်နယ်/တိုင်းဒေသကြီးတစ်ခုစီ၏ ကိုယ်စားပြု ဂရစ်အမှတ်အတွက် NASA POWER နေ့စဉ် တန်ဖိုးများနှင့် (သတ်မှတ်ထားပါက) NASA FIRMS ဂြိုဟ်တု မီးတွေ့ရှိချက်များကို ရယူသည်။ EarthLens လက်ထောက်သည် လက်ရှိအခြေအနေကို ၁၉၈၁ ခုနှစ်မှစ၍ နာဆာ မှတ်တမ်းနှင့် နှိုင်းယှဉ်ပြီး လာမည့် ရက် ၃၀ အလားအလာကို ရှင်းပြသည်။",
+    "Myanmar EarthLens သည် နာဆာ ကမ္ဘာမြေစောင့်ကြည့်ရေး အချက်အလက်များကို လယ်သမား၊ ရေလုပ်သားနှင့် ရပ်ရွာများအတွက် နေရာအလိုက် သတင်းအချက်အလက်အဖြစ် ပြောင်းပေးသည်။ ပင်မစာမျက်နှာသည် ပြည်နယ်/တိုင်းဒေသကြီးတစ်ခုစီ၏ ကိုယ်စားပြု ဂရစ်အမှတ်အတွက် NASA POWER နေ့စဉ် တန်ဖိုးများနှင့် (သတ်မှတ်ထားပါက) NASA FIRMS ဂြိုဟ်တု မီးတွေ့ရှိချက်များကို ရယူသည်။ EarthLens လက်ထောက်သည် လက်ရှိအခြေအနေကို ၂၀၀၉ ခုနှစ်မှစ၍ နာဆာ မှတ်တမ်းနှင့် နှိုင်းယှဉ်ပြီး လာမည့် ရက် ၃၀ အလားအလာကို ရှင်းပြသည်။",
   boundaries: "နယ်နိမိတ် - Natural Earth 1:10m Admin-1 (public domain)။",
   back: "ခြုံငုံကြည့်ရှုမှုသို့ ပြန်သွားမည်",
   clickHint: "ပတ်ဝန်းကျင် အချက်အလက်ကြည့်ရန် မြေပုံပေါ်ရှိ ပြည်နယ် သို့မဟုတ် တိုင်းဒေသကြီးကို နှိပ်ပါ။",

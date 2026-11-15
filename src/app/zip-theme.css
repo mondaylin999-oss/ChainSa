@@ -94,3 +94,33 @@ body, .earthlens-app { background: #040816; color: #e9edfa; }
 }
 .earthlens-app :is(.data-insight__overview,.data-insight__stats)>div{background:#18213e}.earthlens-app :is(.data-insight__overview,.data-insight__stats) span{color:#a6b3d0}.earthlens-app :is(.data-insight__overview,.data-insight__stats) strong{color:#e9edfa}.earthlens-app :is(.data-insight__eyebrow,.data-insight__direction){color:#c3b6ff}
 .earthlens-app :is(.section-icon,.assistant-avatar){background:#211b46;color:#c3b6ff}.earthlens-app .service-ready{background:#143027;border-color:#2c503b;color:#b3ea98}.earthlens-app .assistant-intro{color:#a6b3d0}.earthlens-app .chat-panel-heading{border-color:#263254}.earthlens-app .conversation{scrollbar-color:#3a456c transparent}.earthlens-app :is(.detail-grid a,.message-evidence a){color:#c3b6ff}
+
+/* ---- Topic rail: one layout for every category and its indicators ----
+   Fixes: indicator list overflowing its parent (width:100% + margin-left), light-theme hover
+   card turning near-white behind white text, topic titles pinned to the top of a taller row,
+   tiny badges, and cramped indicator rows. Applies to every topic because all share this markup. */
+.earthlens-app .rail-item { justify-items: stretch; gap: 6px; min-width: 0; }
+.earthlens-app .rail-topic-button { align-items: center; gap: 12px; min-height: 62px; padding: 8px 10px 8px 8px; }
+.earthlens-app .rail-topic-button:hover { color: #fff; }
+.earthlens-app .rail-topic-name { flex: 1 1 auto; min-width: 0; font-size: 13px; line-height: 1.35; overflow-wrap: break-word; hyphens: auto; }
+.earthlens-app .topic-icon-tile { width: 44px; height: 44px; }
+.earthlens-app .rail-indicators { box-sizing: border-box; width: auto; min-width: 0; margin: 0 0 6px 29px; padding: 4px 0 4px 12px; gap: 8px; border-left: 2px solid #303e6b; }
+.earthlens-app .rail-indicator { box-sizing: border-box; display: grid; gap: 6px; min-width: 0; padding: 10px 12px; border: 1px solid #1f2b52; border-radius: 12px; background: transparent; }
+.earthlens-app .rail-indicator:hover { background: #121a36; border-color: #34285d; }
+.earthlens-app .rail-indicator-active { background: #191630; border-color: #5a488c; }
+.earthlens-app .rail-indicator-title { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; width: 100%; min-width: 0; font-size: 12.5px; line-height: 1.4; overflow-wrap: anywhere; }
+.earthlens-app .rail-indicator-title:hover, .earthlens-app .rail-indicator-active .rail-indicator-title { color: #fff; }
+.earthlens-app .rail-indicator-tag { flex: 0 0 auto; padding: 2px 8px; font-size: 10px; line-height: 1.4; letter-spacing: .02em; white-space: nowrap; }
+.earthlens-app .see-more-link { min-height: 24px; font-size: 11px; }
+.earthlens-app .see-more-link:hover { color: #e0d8ff; }
+@media (min-width: 761px) and (max-width: 1100px) {
+  .earthlens-app .rail-topic-button { flex-direction: column; align-items: flex-start; gap: 9px; padding: 12px; }
+  .earthlens-app .rail-indicators { margin-left: 12px; padding-left: 8px; }
+  .earthlens-app .rail-indicator { padding: 9px 10px; }
+}
+@media (max-width: 760px) {
+  .earthlens-app .rail-indicators { margin-left: 20px; }
+}
+.earthlens-app .detail-warning { padding: 10px 12px; border: 1px solid #6b5a2a; border-radius: 10px; background: #2a2414; }
+.earthlens-app .detail-warning dt { color: #f3d58a; }
+.earthlens-app .detail-warning dd { color: #f1e6c8; }

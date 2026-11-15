@@ -41,7 +41,7 @@ describe("seven-section concise answer format", () => {
     expect(r.answer.endsWith(DISCLAIMER_EN)).toBe(true);
     expect(r.answer.startsWith("Executive Summary\nRegion: Ayeyarwady Region (named in your question)\n\nKey findings: For Ayeyarwady: ")).toBe(true);
     expect(r.summary).toBe(r.sections.summary);
-    expect(r.sections.history).toMatch(/Compared with the same dates in past years \(1981–20\d\d\)/);
+    expect(r.sections.history).toMatch(/Compared with the same dates in past years \(2009–20\d\d\)/);
     expect(r.sections.current).toContain("Ayeyarwady — NASA grid point 16.75°N, 95.11°E");
     expect(r.sections.current).toContain("| Parameter | Latest value | Typical in past years | Difference |");
     expect(r.answer).toContain("A reliable 30-day forecast cannot be calculated yet");
@@ -53,7 +53,7 @@ describe("seven-section concise answer format", () => {
     expect(r.outlook.historical.every((x) => x.kind === "historical")).toBe(true);
     expect(r.outlook.window).toEqual({ start: "2026-11-14", end: "2026-12-13" });
     expect(r.sections.sources).toContain("https://power.larc.nasa.gov/");
-    expect(r.sections.sources).toMatch(/1981–20\d\d/);
+    expect(r.sections.sources).toMatch(/history 2009–20\d\d \(provisional post-2008 baseline/);
     expect(r.sections.sources).toContain("Forecasting model: none");
   });
 
