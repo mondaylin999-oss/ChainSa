@@ -213,3 +213,25 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .field-control-body { min-width: 0; }
 .earthlens-app .field-control-body input,
 .earthlens-app .field-control-body select { height: 44px; box-sizing: border-box; }
+
+/* Supplied photographs belong to the category buttons, not their indicators. */
+.earthlens-app .rail-topic-button[data-topic="agriculture"] { --topic-photo: url('/explore/category-backgrounds/agriculture.jpg'); }
+.earthlens-app .topic-rail .rail-topic-button[data-topic="agriculture"] { padding: 0; }
+.earthlens-app .topic-rail .rail-topic-button[data-topic="infrastructure-urban-change"] { padding: 0; }
+.earthlens-app .topic-rail .rail-topic-button:is([data-topic="disaster-intelligence"],[data-topic="energy"]) { padding: 0; }
+.earthlens-app .rail-topic-button[data-topic="water"] { --topic-photo: url('/explore/category-backgrounds/water.jpg'); }
+.earthlens-app .rail-topic-button[data-topic="infrastructure-urban-change"] { --topic-photo: url('/explore/category-backgrounds/infrastructure.jpg'); }
+.earthlens-app .rail-topic-button[data-topic="disaster-intelligence"] { --topic-photo: url('/explore/category-backgrounds/disaster.jpg'); }
+.earthlens-app .rail-topic-button[data-topic="energy"] { --topic-photo: url('/explore/category-backgrounds/energy.jpg'); }
+.earthlens-app .rail-topic-button[data-topic="environmental-change"] { --topic-photo: url('/explore/category-backgrounds/environment.jpg'); }
+.earthlens-app .topic-rail .rail-topic-button:is([data-topic="agriculture"],[data-topic="water"],[data-topic="infrastructure-urban-change"],[data-topic="disaster-intelligence"],[data-topic="energy"],[data-topic="environmental-change"]) {
+  background-image: linear-gradient(90deg,rgba(4,8,22,.68),rgba(4,8,22,.45)),var(--topic-photo);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+  border-color: rgba(255,255,255,.2);
+}
+.earthlens-app .topic-rail .rail-topic-button:is([data-topic="agriculture"],[data-topic="water"],[data-topic="infrastructure-urban-change"],[data-topic="disaster-intelligence"],[data-topic="energy"],[data-topic="environmental-change"]) .rail-topic-name { color: #fff; text-shadow: 0 1px 4px #0009; }
+.earthlens-app .topic-rail .rail-topic-button:is([data-topic="agriculture"],[data-topic="water"],[data-topic="infrastructure-urban-change"],[data-topic="disaster-intelligence"],[data-topic="energy"],[data-topic="environmental-change"]) .topic-icon-tile { background: rgba(20,16,48,.65); color: #fff; border-color: rgba(255,255,255,.3); }
+.earthlens-app .topic-rail .rail-topic-button-active:is([data-topic="agriculture"],[data-topic="water"],[data-topic="infrastructure-urban-change"],[data-topic="disaster-intelligence"],[data-topic="energy"],[data-topic="environmental-change"]) { border-color: #a88cff; box-shadow: inset 0 0 0 1px #a88cff; }
