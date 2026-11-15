@@ -25,7 +25,7 @@
 .hero-scene{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.85;-webkit-mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent),linear-gradient(to bottom,transparent,#000 10%,#000 76%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent),linear-gradient(to bottom,transparent,#000 10%,#000 76%,transparent);mask-composite:intersect}
 .hero-scene{background:url("./assets/farming-scene-poster.jpg") center 58%/cover no-repeat}
 .hero-scene-media{display:block;width:100%;height:100%;object-fit:cover;object-position:center 58%}
-.hero-scene::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,8,22,.88),rgba(4,8,22,.64) 48%,rgba(4,8,22,.38));}
+.hero-scene::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,8,22,.88),rgba(4,8,22,.40) 48%,rgba(4,8,22,.04));}
 #top>.hero-content{position:relative;z-index:1}
 :root[data-theme=light] .hero-scene{opacity:.65}
 :root[data-theme=light] .hero-scene::after{background:linear-gradient(90deg,rgba(245,246,252,.92),rgba(245,246,252,.75) 48%,rgba(245,246,252,.42))}
@@ -193,9 +193,9 @@ a:focus-visible,button:focus-visible{outline:2px solid #9fe870;outline-offset:3p
 <span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: var(--et-9fe870); animation: etd-pulse 1.8s ease-in-out infinite"></span>
 Satellite intelligence for every township</span>
 <h1 style="margin: 0; font-size: clamp(2rem, 4.4vw, 4rem); font-weight: 800; line-height: 1.06; letter-spacing: -0.03em; color: var(--et-ffffff)">
-<span style="display: block; white-space: nowrap">Detect the Change.</span>
+<span style="display: block; white-space: nowrap"><span style="color:#ffc42a">Detect</span> the Change.</span>
 <span style="display: block; white-space: nowrap"><span style="color: var(--et-9fe870)">Understand</span> the Trend.</span>
-<span style="display: block; white-space: nowrap">Make Better <span style="color: var(--et-b79bff)">Decisions.</span></span>
+<span style="display: block; white-space: nowrap">Make Better <span style="color: #159bd3">Decisions.</span></span>
 </h1>
 <p style="margin: 0; font-size: 1.1875rem; color: var(--et-c5cee8); max-width: 540px">NASA Earth observation data for Myanmar, turned into clear trends and AI guidance you can act on.</p>
 
@@ -519,5 +519,5 @@ document.addEventListener('click', function(event) {
 <script src="./category-videos.js"></script>
 <script src="./howto-runner.js"></script>
 <script src="./sound-settings.js"></script>
-</body>
+<script src="./finding-previews.js"></script></body>
 </html>

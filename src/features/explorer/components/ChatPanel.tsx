@@ -76,13 +76,6 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
               <span className="assistant-avatar"><Sparkles size={16} aria-hidden="true" /></span>
               <p>{t("Ask a question in English or Myanmar. Answers use retrieved evidence and include its dates, sources and limitations.")}</p>
             </div>
-            <div className="suggested-questions">
-              {questions.map((question) => (
-                <button key={t(question)} type="button" disabled={!enabled || busy} onClick={() => void send(t(question))}>
-                  {t(question)}
-                </button>
-              ))}
-            </div>
           </div>
         ) : (
           messages.map((message, index) => {
@@ -116,6 +109,7 @@ export function ChatPanel({ lang, selectedRegionId, inputRef }: ChatPanelProps) 
         <div ref={bottomRef} />
       </div>
 
+      <div className="suggested-questions">{questions.map(question=><button key={question} type="button" disabled={!enabled||busy} onClick={()=>void send(t(question))}>{t(question)}</button>)}</div>
       <form className="chat-compose" onSubmit={submit}>
         <label className="sr-only" htmlFor="earthlens-chat-input">{t("Message Myanmar EarthLens")}</label>
         <input

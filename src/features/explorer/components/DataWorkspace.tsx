@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { ArrowRight, Check, ChevronLeft, ChevronRight, ChevronDown, Search, MapPin, Sprout, TriangleAlert, Leaf, Building2, Droplets, Zap, LoaderCircle, Info, ExternalLink, ChartNoAxesCombined } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, ChevronDown, Search, MapPin, Sprout, TriangleAlert, TreePine, Building2, Droplet, Zap, LoaderCircle, Info, ExternalLink, ChartNoAxesCombined } from "lucide-react";
 import { TOPICS, type TopicId, type TopicIndicator } from "../catalog";
 import { REGIONS } from "../../earthlens-chat/regions";
 import type { ExploreCatalog, ObservationResponse, ObservationSelection } from "../client/data-service";
@@ -14,7 +14,7 @@ export interface DataWorkspaceProps {
  lang:"en"|"my"; catalog:ExploreCatalog|null; catalogError:string; activeTopic:TopicId; openTopic:TopicId|null; datasetId:string; regionId:string; townshipId:string; locationMode:"township"|"reference"; start:string; end:string; mapFocused:boolean; dirty:boolean; loading:boolean; error:string; result:ObservationResponse|null; chart:ReactNode; details:ReactNode;
  onTopic:(id:TopicId)=>void;onIndicator:(indicator:TopicIndicator)=>void;onDataset:(id:string)=>void;onRegion:(id:string)=>void;onTownship:(id:string)=>void;onLocationMode:(mode:"township"|"reference")=>void;onStart:(s:string)=>void;onEnd:(s:string)=>void;onApply:()=>void;onMapFocus:(b:boolean)=>void;
 }
-const icons={agriculture:Sprout,"disaster-intelligence":TriangleAlert,"environmental-change":Leaf,"infrastructure-urban-change":Building2,water:Droplets,energy:Zap};
+const icons={agriculture:Sprout,"disaster-intelligence":TriangleAlert,"environmental-change":TreePine,"infrastructure-urban-change":Building2,water:Droplet,energy:Zap};
 const today=()=>new Date().toISOString().slice(0,10);
 const iso=(s?:string)=>Boolean(s&&/^\d{4}-\d{2}-\d{2}$/.test(s));
 

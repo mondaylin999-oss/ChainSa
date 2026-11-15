@@ -164,6 +164,7 @@ export default function Page() {
       if (!responseMatchesSelection(data, requestSelection)) throw new Error("The data source returned a different location or period. Please try this search again.");
       setResultKey(requestKey);
       setResult(data);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelector(".workspace-results")?.scrollIntoView({behavior:"smooth",block:"start"})));
       setChartState(data.summary.count === 0 ? "empty" : "ready");
       if (data.summary.count > 0) void saveSearch(requestSelection, data).catch(cause => history.setError(cause instanceof Error ? cause.message : "This search could not be saved on this device."));
     }).catch(cause => {
