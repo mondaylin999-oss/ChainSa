@@ -340,6 +340,7 @@ export default function Page() {
                       aria-controls={`rail-indicators-${topic.id}`}
                       aria-label={topic.label}
                       title={topic.label}
+                      data-topic={topic.id}
                       onClick={() => chooseTopic(topic.id)}
                     >
                       <span className="topic-icon-tile"><Icon size={20} aria-hidden="true" /></span>

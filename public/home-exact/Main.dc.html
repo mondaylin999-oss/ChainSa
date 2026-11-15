@@ -53,7 +53,69 @@ a:focus-visible,button:focus-visible{outline:2px solid #9fe870;outline-offset:3p
 .go{transition:transform .22s ease}
 .lift:hover .go{transform:translateX(5px)}
 .thumb{transition:transform .5s ease}
+.category-video{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.category-motion-toggle{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--et-303e6b);border-radius:9px;padding:6px 10px;background:transparent;color:var(--et-c5cee8);font:500 12px Inter,system-ui,sans-serif;cursor:pointer}
+.category-motion-toggle:hover{color:var(--et-ffffff);border-color:#6d4aff}
 .lift:hover .thumb{transform:scale(1.06)}
+
+/* Photo card entrance, hover and keyboard-focus animations. */
+.category-card{position:relative;isolation:isolate}
+.category-card::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 25%,#ffffff14 45%,#ffffff22 50%,transparent 65%);transform:translateX(-130%);transition:transform .7s ease;z-index:1}
+.category-card:is(:hover,:focus-visible)::after{transform:translateX(130%)}
+.category-card:focus-visible{transform:translateY(-5px);box-shadow:0 18px 42px #6d4aff26}
+.category-card:focus-visible .go{transform:translateX(5px)}
+.category-card>span:nth-child(2)>span:first-child{transition:transform .35s ease}
+.category-card:is(:hover,:focus-visible)>span:nth-child(2)>span:first-child{transform:translateY(-3px) rotate(-5deg)}
+@supports(animation-timeline:view()){
+ .category-card{animation:category-arrive .7s ease-out both;animation-timeline:view();animation-range:entry 0% entry 95%}
+ .category-card:nth-child(3n+2){animation-range:entry 0% entry 110%}
+ .category-card:nth-child(3n){animation-range:entry 0% entry 125%}
+}
+@keyframes category-arrive{from{opacity:0;translate:0 28px}to{opacity:1;translate:0 0}}
+@media(prefers-reduced-motion:reduce){
+ .category-card{animation:none;translate:none}
+  .category-card::after{display:none}
+ .category-card:is(:hover,:focus-visible),.category-card:is(:hover,:focus-visible) .go,.category-card:is(:hover,:focus-visible)>span:nth-child(2)>span:first-child{transform:none}
+}
+
+
+/* Three connected steps, pairing the original six instructions. */
+.howto-section{border:1px solid var(--et-1f2b52);border-radius:26px;background:var(--et-070d20);padding:36px;box-sizing:border-box;display:flex;flex-direction:column;gap:34px}
+.howto-heading{display:flex;flex-direction:column;gap:12px}
+.howto-eyebrow{font-size:.8125rem;font-weight:700;letter-spacing:.16em;color:var(--et-9fe870)}
+.howto-heading h2{margin:0;font-size:clamp(1.8rem,3vw,2.25rem);font-weight:800;letter-spacing:-.025em;color:var(--et-ffffff);line-height:1.2}
+.howto-journey{position:relative;padding:26px 0 36px}
+.howto-connector{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.howto-steps{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0;padding:0;list-style:none}
+.howto-step{padding:8px 32px 14px;min-width:0}
+.howto-number{display:grid;place-items:center;width:42px;height:42px;margin-bottom:18px;border-radius:50%;background:linear-gradient(135deg,#5146cf,#8639ca);color:#fff;font-size:1.125rem;font-weight:750;box-shadow:0 0 0 5px var(--et-070d20)}
+.howto-step h3{margin:0 0 12px;font-size:clamp(1.2rem,1.8vw,1.5rem);line-height:1.25;letter-spacing:-.025em;font-weight:750;color:var(--et-ffffff)}
+.howto-step p{margin:0;font-size:.9375rem;line-height:1.7;color:var(--et-c5cee8)}
+@media(max-width:860px){
+ .howto-section{padding:28px 22px;gap:22px}
+ .howto-journey{padding:0}
+ .howto-connector{display:none}
+ .howto-steps{grid-template-columns:1fr;gap:28px}
+ .howto-steps::before{content:"";position:absolute;left:20px;top:20px;bottom:30px;width:2px;background:linear-gradient(#a88cff33,#a88cff)}
+ .howto-step{position:relative;padding:0 0 0 64px;min-height:72px}
+ .howto-number{position:absolute;left:0;top:0;margin:0}
+ .howto-step h3{padding-top:5px}
+}
+
+
+.howto-motion-toggle{margin-top:2px}
+.howto-runner{position:absolute;left:0;top:0;display:block;width:52px;height:52px;z-index:2;pointer-events:none;will-change:transform;opacity:0}
+.howto-runner[data-ready]{opacity:1}
+.howto-runner-body{animation:howto-run-bob .5s ease-in-out infinite}
+.howto-runner-leg{transform-origin:28px 40px;animation:howto-run-stride .5s ease-in-out infinite alternate}
+.howto-runner-leg-back{animation-delay:-.5s}
+.howto-runner-arm{transform-origin:28px 26px;animation:howto-run-arm .5s ease-in-out infinite alternate}
+.howto-journey[data-motion-paused=true] .howto-runner svg *{animation-play-state:paused}
+@keyframes howto-run-bob{0%,100%{translate:0 0}50%{translate:0 -2px}}
+@keyframes howto-run-stride{from{rotate:-22deg}to{rotate:22deg}}
+@keyframes howto-run-arm{from{rotate:-12deg}to{rotate:15deg}}
+@media(prefers-reduced-motion:reduce){.howto-runner svg *{animation:none!important}}
+
 @keyframes etd-spin{to{transform:rotate(360deg)}}
 @keyframes etd-drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes etd-pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -70,7 +132,10 @@ a:focus-visible,button:focus-visible{outline:2px solid #9fe870;outline-offset:3p
 <svg aria-hidden="true" width="46" height="46" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="22" r="17" fill="#123a8a" stroke="#4f8cff" stroke-width="2"></circle><path d="M12 18c4-3 8-1 10 2s6 3 9 0 5-5 8-3" stroke="#7fd0ff" stroke-width="2" stroke-linecap="round"></path><path d="M24 44c-7-1-11-6-11-12 6 0 10 3 11 8 1-5 5-8 11-8 0 6-4 11-11 12z" fill="#3ecf6e"></path></svg>
 <span style="display: flex; flex-direction: column">
 <span style="font-size: 1.3125rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2">Earth Trend Detective</span>
-<span style="font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em; color: var(--et-a9b6d8)">MYANMAR EARTH INTELLIGENCE</span>
+<span style="display: flex; flex-direction: column; gap: 4px; color: var(--et-a9b6d8)">
+<span style="font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em">MYANMAR EARTH INTELLIGENCE</span>
+<span style="font-size: 0.6875rem; font-weight: 500">Power by NASA Data</span>
+</span>
 </span>
 </a>
 
@@ -156,12 +221,13 @@ Satellite intelligence for every township</span>
 <span style="font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.16em; color: var(--et-b79bff)">EXPLORE</span>
 <h2 style="margin: 0; font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; color: var(--et-ffffff); line-height: 1.1">Explore by Earth System</h2>
 <p style="margin: 0; color: var(--et-c5cee8)">Choose a category to detect trends, analyze changes, and get decision support.</p>
+<button type="button" class="category-motion-toggle" data-category-motion-toggle aria-pressed="false">Pause videos</button>
 </div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px">
 
-<a href="#systems" class="lift" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
+<a href="#systems" class="lift category-card" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
 <span style="display: block; height: 120px; overflow: hidden; background: var(--et-0b2417)">
-<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><g fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round"><path d="M-10 120C60 70 110 50 160 44" stroke-opacity="0.9"></path><path d="M40 120C90 80 130 58 172 48" stroke-opacity="0.7"></path><path d="M100 120C130 90 160 66 186 54" stroke-opacity="0.55"></path><path d="M170 120C180 96 192 74 202 60" stroke-opacity="0.45"></path><path d="M240 120C232 98 222 78 216 64" stroke-opacity="0.55"></path><path d="M320 120C286 92 252 72 230 62" stroke-opacity="0.7"></path></g><circle cx="256" cy="34" r="16" fill="#fbbf24" fill-opacity="0.85"></circle></svg></span>
+<video class="category-video" src="./videos/agriculture-green.mp4" poster="./photos/agriculture-green.png" autoplay loop muted playsinline preload="metadata" aria-hidden="true" disablepictureinpicture></video></span>
 <span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
 <span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: var(--et-123a26); display: flex; align-items: center; justify-content: center">
 <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9"></path><path d="M12 12c0-4 3-7 8-7 0 5-3 8-8 7z"></path><path d="M12 15c0-3-2-5-7-5 0 4 2 6 7 5z"></path></svg></span>
@@ -172,9 +238,9 @@ Satellite intelligence for every township</span>
 <svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
 </span></a>
 
-<a href="#systems" class="lift" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
+<a href="#systems" class="lift category-card" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
 <span style="display: block; height: 120px; overflow: hidden; background: var(--et-111936)">
-<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><g fill="#8fa2e8"><rect x="20" y="70" width="30" height="50" fill-opacity="0.35"></rect><rect x="58" y="46" width="34" height="74" fill-opacity="0.55"></rect><rect x="100" y="62" width="26" height="58" fill-opacity="0.4"></rect><rect x="134" y="24" width="38" height="96" fill-opacity="0.75"></rect><rect x="180" y="52" width="30" height="68" fill-opacity="0.5"></rect><rect x="218" y="36" width="34" height="84" fill-opacity="0.65"></rect><rect x="260" y="74" width="40" height="46" fill-opacity="0.35"></rect></g><g fill="#fde68a"><rect x="142" y="34" width="6" height="6"></rect><rect x="156" y="34" width="6" height="6"></rect><rect x="142" y="50" width="6" height="6"></rect><rect x="226" y="48" width="6" height="6"></rect><rect x="238" y="64" width="6" height="6"></rect><rect x="66" y="58" width="6" height="6"></rect></g></svg></span>
+<video class="category-video" src="./videos/infrastructure.mp4" poster="./photos/infrastructure.jpg" autoplay loop muted playsinline preload="metadata" aria-hidden="true" disablepictureinpicture></video></span>
 <span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
 <span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: var(--et-1c2440); display: flex; align-items: center; justify-content: center">
 <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c9d2ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8l6-3v16M10 21V11l10 3v7M2 21h20"></path></svg></span>
@@ -185,9 +251,9 @@ Satellite intelligence for every township</span>
 <svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
 </span></a>
 
-<a href="#systems" class="lift" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
+<a href="#systems" class="lift category-card" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
 <span style="display: block; height: 120px; overflow: hidden; background: var(--et-071c33)">
-<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><g fill="none" stroke="#5cc8ff" stroke-width="3" stroke-linecap="round"><path d="M-10 36c30-16 50 16 80 0s50 16 80 0 50 16 80 0 50 16 100 0" stroke-opacity="0.45"></path><path d="M-10 62c30-16 50 16 80 0s50 16 80 0 50 16 80 0 50 16 100 0" stroke-opacity="0.7"></path><path d="M-10 88c30-16 50 16 80 0s50 16 80 0 50 16 80 0 50 16 100 0" stroke-opacity="0.95"></path></g></svg></span>
+<video class="category-video" src="./videos/water.mp4" poster="./photos/water.jpg" autoplay loop muted playsinline preload="metadata" aria-hidden="true" disablepictureinpicture></video></span>
 <span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
 <span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: var(--et-0f2f4d); display: flex; align-items: center; justify-content: center">
 <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5cc8ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 5 6 8 6 11a6 6 0 0 1-12 0c0-3 2-6 6-11z"></path></svg></span>
@@ -198,9 +264,9 @@ Satellite intelligence for every township</span>
 <svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
 </span></a>
 
-<a href="#systems" class="lift" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
+<a href="#systems" class="lift category-card" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
 <span style="display: block; height: 120px; overflow: hidden; background: var(--et-241a08)">
-<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><circle cx="70" cy="56" r="22" fill="#fbbf24"></circle><g stroke="#fbbf24" stroke-width="3" stroke-linecap="round" stroke-opacity="0.7"><path d="M70 18v-10M70 104v-10M32 56H22M118 56h-10M43 29l-7-7M97 29l7-7M43 83l-7 7M97 83l7 7"></path></g><g fill="none" stroke="#fde68a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M190 110l14-70 14 70M196 80h16M184 52h40M256 110l12-58 12 58M261 86h14M250 62h36"></path><path d="M224 52c10 8 18 10 26 10" stroke-opacity="0.6"></path></g></svg></span>
+<video class="category-video" src="./videos/energy.mp4" poster="./photos/energy.jpg" autoplay loop muted playsinline preload="metadata" aria-hidden="true" disablepictureinpicture></video></span>
 <span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
 <span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: var(--et-3d2c0c); display: flex; align-items: center; justify-content: center">
 <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L5 14h6l-1 8 8-12h-6z"></path></svg></span>
@@ -211,9 +277,9 @@ Satellite intelligence for every township</span>
 <svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
 </span></a>
 
-<a href="#systems" class="lift" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
+<a href="#systems" class="lift category-card" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
 <span style="display: block; height: 120px; overflow: hidden; background: var(--et-08231c)">
-<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block"><g fill="#34d399"><path d="M30 120l26-60 26 60z" fill-opacity="0.45"></path><path d="M70 120l34-84 34 84z" fill-opacity="0.75"></path><path d="M124 120l24-56 24 56z" fill-opacity="0.5"></path><path d="M160 120l38-96 38 96z" fill-opacity="0.9"></path><path d="M222 120l26-62 26 62z" fill-opacity="0.55"></path><path d="M262 120l22-50 22 50z" fill-opacity="0.4"></path></g></svg></span>
+<video class="category-video" src="./videos/environment.mp4" poster="./photos/environment.jpg" autoplay loop muted playsinline preload="metadata" aria-hidden="true" disablepictureinpicture></video></span>
 <span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
 <span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: var(--et-0f3a2c); display: flex; align-items: center; justify-content: center">
 <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l6 8h-3l4 6H5l4-6H6z"></path><path d="M12 17v4"></path></svg></span>
@@ -224,9 +290,9 @@ Satellite intelligence for every township</span>
 <svg aria-hidden="true" class="go" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c3b6ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 12px"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
 </span></a>
 
-<a href="#systems" class="lift" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
+<a href="#systems" class="lift category-card" style="border: 1px solid var(--et-1f2b52); border-radius: 20px; background: var(--et-0a1228); overflow: hidden; display: flex; flex-direction: column; color: var(--et-e9edfa)">
 <span style="display: block; height: 120px; overflow: hidden; background: var(--et-2a0f1c)">
-<svg aria-hidden="true" class="thumb" viewBox="0 0 320 120" style="width: 100%; height: 100%; display: block"><g fill="none" stroke="#ff8fb0" stroke-width="2.5"><circle cx="160" cy="60" r="12" stroke-opacity="1"></circle><circle cx="160" cy="60" r="30" stroke-opacity="0.7"></circle><circle cx="160" cy="60" r="52" stroke-opacity="0.45"></circle><circle cx="160" cy="60" r="78" stroke-opacity="0.28"></circle><circle cx="160" cy="60" r="108" stroke-opacity="0.16"></circle></g><circle cx="160" cy="60" r="5" fill="#ff8fb0"></circle></svg></span>
+<video class="category-video" src="./videos/disaster.mp4" poster="./photos/disaster.jpg" autoplay loop muted playsinline preload="metadata" aria-hidden="true" disablepictureinpicture></video></span>
 <span style="padding: 22px; display: flex; gap: 16px; align-items: flex-start">
 <span style="flex: none; width: 48px; height: 48px; border-radius: 14px; background: var(--et-45162a); display: flex; align-items: center; justify-content: center">
 <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff8fb0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"></path><path d="M12 10v5M12 18v.5"></path></svg></span>
@@ -275,54 +341,56 @@ Satellite intelligence for every township</span>
 </section>
 
 <!-- HOW TO USE EXPLORE -->
-<section id="howto" style="border: 1px solid var(--et-1f2b52); border-radius: 26px; background: var(--et-070d20); padding: 36px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
-<div style="display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.16em; color: var(--et-9fe870)">HOW IT WORKS</span>
-<h2 style="margin: 0; font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; color: var(--et-ffffff); line-height: 1.1">How to use the Explore page</h2>
+<section id="howto" class="howto-section" aria-labelledby="howto-title">
+<div class="howto-heading">
+<span class="howto-eyebrow">HOW IT WORKS</span>
+<h2 id="howto-title">Explore in 3 easy steps</h2>
+<button type="button" class="category-motion-toggle howto-motion-toggle" data-howto-motion-toggle aria-pressed="true">Play animation</button>
 </div>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px">
-<div style="border: 1px solid var(--et-1f2b52); border-radius: 18px; background: var(--et-0a1228); padding: 22px; display: flex; gap: 16px; align-items: flex-start">
-<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--et-18224a); color: var(--et-ffffff); font-weight: 800; display: flex; align-items: center; justify-content: center">1</span>
-<div style="display: flex; flex-direction: column; gap: 4px">
-<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--et-ffffff)">Choose an Earth system</h3>
-<p style="margin: 0; font-size: 0.9375rem; color: var(--et-c5cee8)">Pick a category in the left panel, such as Agriculture or Water.</p>
-</div>
-</div>
-<div style="border: 1px solid var(--et-1f2b52); border-radius: 18px; background: var(--et-0a1228); padding: 22px; display: flex; gap: 16px; align-items: flex-start">
-<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--et-18224a); color: var(--et-ffffff); font-weight: 800; display: flex; align-items: center; justify-content: center">2</span>
-<div style="display: flex; flex-direction: column; gap: 4px">
-<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--et-ffffff)">Set township, dataset, time</h3>
-<p style="margin: 0; font-size: 0.9375rem; color: var(--et-c5cee8)">Use the three dropdowns: Township, Dataset (e.g. NDVI) and Time Period.</p>
-</div>
-</div>
-<div style="border: 1px solid var(--et-1f2b52); border-radius: 18px; background: var(--et-0a1228); padding: 22px; display: flex; gap: 16px; align-items: flex-start">
-<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--et-18224a); color: var(--et-ffffff); font-weight: 800; display: flex; align-items: center; justify-content: center">3</span>
-<div style="display: flex; flex-direction: column; gap: 4px">
-<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--et-ffffff)">Read the map</h3>
-<p style="margin: 0; font-size: 0.9375rem; color: var(--et-c5cee8)">Colors run from Low to High. Zoom, switch layers, or re-center on your township.</p>
-</div>
-</div>
-<div style="border: 1px solid var(--et-1f2b52); border-radius: 18px; background: var(--et-0a1228); padding: 22px; display: flex; gap: 16px; align-items: flex-start">
-<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--et-18224a); color: var(--et-ffffff); font-weight: 800; display: flex; align-items: center; justify-content: center">4</span>
-<div style="display: flex; flex-direction: column; gap: 4px">
-<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--et-ffffff)">Switch the view</h3>
-<p style="margin: 0; font-size: 0.9375rem; color: var(--et-c5cee8)">Tabs show the same data as Trend Analysis, Comparison, Map View or Data Table.</p>
-</div>
-</div>
-<div style="border: 1px solid var(--et-1f2b52); border-radius: 18px; background: var(--et-0a1228); padding: 22px; display: flex; gap: 16px; align-items: flex-start">
-<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--et-18224a); color: var(--et-ffffff); font-weight: 800; display: flex; align-items: center; justify-content: center">5</span>
-<div style="display: flex; flex-direction: column; gap: 4px">
-<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--et-ffffff)">Check the trend</h3>
-<p style="margin: 0; font-size: 0.9375rem; color: var(--et-c5cee8)">See the annual change, whether it is significant, plus temperature, rainfall and soil moisture.</p>
-</div>
-</div>
-<div style="border: 1px solid var(--et-1f2b52); border-radius: 18px; background: var(--et-0a1228); padding: 22px; display: flex; gap: 16px; align-items: flex-start">
-<span style="flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--et-18224a); color: var(--et-ffffff); font-weight: 800; display: flex; align-items: center; justify-content: center">6</span>
-<div style="display: flex; flex-direction: column; gap: 4px">
-<h3 style="margin: 0; font-size: 1.0625rem; font-weight: 700; color: var(--et-ffffff)">Ask for guidance</h3>
-<p style="margin: 0; font-size: 0.9375rem; color: var(--et-c5cee8)">AI Decision Support gives key insights and recommended actions. Open the detailed recommendation for more.</p>
-</div>
-</div>
+<div class="howto-journey">
+<svg class="howto-connector" viewBox="0 0 1200 280" preserveAspectRatio="none" fill="none" aria-hidden="true">
+<defs><linearGradient id="howto-line" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#a88cff" stop-opacity=".15"></stop><stop offset=".5" stop-color="#a88cff" stop-opacity=".65"></stop><stop offset="1" stop-color="#a88cff"></stop></linearGradient></defs>
+<path id="howto-route" d="M 16 12 H 376 Q 400 12 400 36 V 244 Q 400 268 424 268 H 776 Q 800 268 800 244 V 36 Q 800 12 824 12 H 1184" stroke="url(#howto-line)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linecap="round"></path>
+</svg>
+<span class="howto-runner" aria-hidden="true">
+<svg viewBox="0 0 64 64" width="52" height="52" fill="none">
+<ellipse cx="28" cy="61" rx="13" ry="2" fill="#a88cff" opacity=".2"></ellipse>
+<g class="howto-runner-body">
+<path d="M3 28h8M5 35h5M2 42h7" stroke="#a88cff" stroke-width="2" stroke-linecap="round" opacity=".5"></path>
+<g class="howto-runner-arm"><path d="M28 26l-9 8-6-5" stroke="#f3c79f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path></g>
+<g class="howto-runner-leg howto-runner-leg-back"><path d="M28 40l-7 10-9 3" stroke="#9270df" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M10 53h7" stroke="#e9edfa" stroke-width="3" stroke-linecap="round"></path></g>
+<g class="howto-runner-leg howto-runner-leg-front"><path d="M28 40l10 9-5 10" stroke="#c6b4ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path><path d="M31 60h7" stroke="#e9edfa" stroke-width="3" stroke-linecap="round"></path></g>
+<path d="M23 24l-5 3v11l6 3 5-12z" fill="#9fe870"></path>
+<path d="M28 23l9 4-7 16-10-5z" fill="#7954ef" stroke="#c3b6ff" stroke-width="1.5" stroke-linejoin="round"></path>
+<path d="M30 22l2-5" stroke="#f3c79f" stroke-width="5" stroke-linecap="round"></path>
+<circle cx="34" cy="13" r="7" fill="#f3c79f"></circle>
+<path d="M27 12c-1-9 12-10 14-2h-9l-2 5" fill="#34254e"></path>
+<path d="M26 10h17" stroke="#b79bff" stroke-width="3" stroke-linecap="round"></path>
+<circle cx="38" cy="13" r="1" fill="#211b46"></circle>
+<path d="M34 28l8 4 5-7" stroke="#f3c79f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+<path d="M45 24l-5 6" stroke="#9fe870" stroke-width="3.5" stroke-linecap="round"></path>
+<circle cx="51" cy="17" r="8" fill="#5cc8ff22" stroke="#9fe870" stroke-width="2.5"></circle>
+<path d="M47 16a4 4 0 0 1 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"></path>
+</g>
+</svg>
+</span>
+<ol class="howto-steps">
+<li class="howto-step">
+<span class="howto-number" aria-hidden="true">1</span>
+<h3>Choose your system &amp; data</h3>
+<p>Pick a category such as Agriculture or Water. Then choose your area, dataset and time period.</p>
+</li>
+<li class="howto-step">
+<span class="howto-number" aria-hidden="true">2</span>
+<h3>Read the map &amp; explore views</h3>
+<p>Zoom into your region or township, read the map, and explore the corresponding data in the observation chart.</p>
+</li>
+<li class="howto-step">
+<span class="howto-number" aria-hidden="true">3</span>
+<h3>Check trends &amp; ask for guidance</h3>
+<p>Check how the selected indicator changes over time. Ask the AI assistant for key insights, guidance and recommended actions.</p>
+</li>
+</ol>
 </div>
 </section>
 
@@ -464,5 +532,7 @@ document.addEventListener('click', function(event) {
   window.parent.postMessage({type:'earthlens-home-navigation', action:action, topic:topics[topic], region:regions[label]}, window.location.origin);
 });
 </script>
+<script src="./category-videos.js"></script>
+<script src="./howto-runner.js"></script>
 </body>
 </html>
