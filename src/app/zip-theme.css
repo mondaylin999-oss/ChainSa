@@ -84,7 +84,13 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app :is(.notice-error,.message-error) { background: var(--et-321c30); border-color: var(--et-73415e); color: var(--et-ffb8bc); }
 .earthlens-app :is(.chart-error,.field-error) { color: var(--et-ffb8bc); }
 .earthlens-app :is(.chart-unavailable,.coverage-heading) { color: var(--et-ead5a5); }
-.earthlens-app .myanmar-map { background: var(--et-091329); border-color: var(--et-26375b); border-radius: 16px; }
+.earthlens-app .myanmar-map { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+.earthlens-app .myanmar-map [role="button"]:focus,
+.earthlens-app .myanmar-map [role="button"]:focus-visible { outline: none; }
+.earthlens-app .myanmar-map [role="button"]:focus-visible { stroke: #8a6d00; stroke-width: 2; }
+.earthlens-app .map-stage,
+.earthlens-app .map-interactive-wrapper,
+.earthlens-app .map-stage-figure { border: 0; border-radius: 0; box-shadow: none; }
 .earthlens-app .map-neighbor-label { fill: var(--et-7182ab); }
 .earthlens-app :is(.map-region-label,.map-city-label) { fill: var(--et-e9edfa); paint-order: stroke; stroke: var(--et-091329); stroke-width: 2px; }
 .earthlens-app .map-region-selectable { stroke: var(--et-7e8cc1); }

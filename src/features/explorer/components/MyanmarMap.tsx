@@ -156,6 +156,7 @@ export function MyanmarMap({
       <svg
         className="myanmar-map"
         viewBox={viewBox}
+        preserveAspectRatio={focusedBounds ? "xMidYMid slice" : "xMidYMid meet"}
         style={{ "--map-zoom": zoom } as CSSProperties}
         role="img"
         aria-labelledby="myanmar-map-title myanmar-map-desc"
@@ -190,6 +191,7 @@ export function MyanmarMap({
                   strokeWidth={active ? 1.9 : 1.15}
                   vectorEffect="non-scaling-stroke"
                   filter={active ? "url(#map-active-glow)" : undefined}
+                  visibility={focusRegion && (!active || Boolean(selectedTownshipId)) ? "hidden" : undefined}
                   fillRule="evenodd"
                   className={`${onSelectRegion ? "map-region-selectable" : ""}${active ? " map-region-active" : ""}`.trim()}
                   role={onSelectRegion && featureRegion ? "button" : undefined}
@@ -230,7 +232,8 @@ export function MyanmarMap({
                 <g key={township.id}>
                   <path
                     d={geometryPolygons(feature.geometry).map(polygonPath).join(" ")}
-                    fill={selected ? "#ffd400" : "#fdfdfc"}
+                    fill={selected ? "#ffd400" : "transparent"}
+                    visibility={selectedTownshipId && !selected ? "hidden" : undefined}
                     stroke={selected ? "#8a6d00" : "#7f8a82"}
                     strokeWidth={selected ? 1.5 : .6}
                     vectorEffect="non-scaling-stroke"
@@ -247,7 +250,7 @@ export function MyanmarMap({
                   >
                     <title>{label}</title>
                   </path>
-                  <text
+                  {(!selectedTownshipId || selected) && <text
                     x={anchor.x}
                     y={anchor.y}
                     className="map-township-label"
@@ -266,7 +269,7 @@ export function MyanmarMap({
                         lengthAdjust="spacingAndGlyphs"
                       >{line}</tspan>
                     ))}
-                  </text>
+                  </text>}
                 </g>
               );
             })}

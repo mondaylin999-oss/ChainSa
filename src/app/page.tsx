@@ -330,7 +330,7 @@ export default function Page() {
                 const active = activeTopic === topic.id;
                 const open = openTopic === topic.id;
                 return (
-                  <div key={topic.id} className="rail-item">
+                  <div key={topic.id} className={open ? "rail-item rail-item-open" : "rail-item"}>
                     <button
                       type="button"
                       className={active ? "rail-topic-button rail-topic-button-active" : "rail-topic-button"}
