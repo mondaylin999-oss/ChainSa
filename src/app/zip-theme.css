@@ -255,3 +255,6 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 
 .earthlens-app .site-header .earthlens-brand-art {width:64px;height:64px;object-fit:contain}
 @media(max-width:760px){.earthlens-app .site-header .earthlens-brand-art{width:54px;height:54px}}
+
+/* Keep branding and Settings reachable while the page scrolls. */
+.earthlens-app>.site-header,.earthlens-app.workspace-redesign>.site-header {position:sticky;top:0;z-index:40;background:var(--et-050a18);box-shadow:0 3px 14px #0002}
