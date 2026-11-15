@@ -5,6 +5,9 @@
     "Switch to dark mode": "အမှောင်မုဒ်သို့ ပြောင်းရန်",
     "Switch to light mode": "အလင်းမုဒ်သို့ ပြောင်းရန်",
     "Interface language": "ဘာသာစကားရွေးချယ်ရန်",
+    "Settings": "ဆက်တင်များ",
+    "Language": "ဘာသာစကား",
+    "Display": "ပြသမှု",
     "English": "အင်္ဂလိပ်",
     "Earth Trend Detective": "ကမ္ဘာမြေပြောင်းလဲမှု လေ့လာရေး",
     "Earth Trend Detective · Myanmar Earth Intelligence": "ကမ္ဘာမြေပြောင်းလဲမှု လေ့လာရေး · မြန်မာ့ ကမ္ဘာမြေ အချက်အလက်",
@@ -287,8 +290,32 @@
 
   document.addEventListener("click", function (event) {
     if (!(event.target instanceof Element)) return;
+    var trigger = event.target.closest("[data-settings-toggle]");
+    if (trigger) {
+      var panel = trigger.parentElement.querySelector("[data-settings-panel]");
+      if (panel) {
+        panel.hidden = !panel.hidden;
+        trigger.setAttribute("aria-expanded", String(!panel.hidden));
+      }
+      return;
+    }
+    if (!event.target.closest("[data-settings-panel]")) {
+      document.querySelectorAll("[data-settings-panel]").forEach(function (panel) {
+        panel.hidden = true;
+        var owner = panel.parentElement.querySelector("[data-settings-toggle]");
+        if (owner) owner.setAttribute("aria-expanded", "false");
+      });
+    }
     var button = event.target.closest("[data-earthlens-language]");
     if (button) save(button.getAttribute("data-earthlens-language"), true);
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+    document.querySelectorAll("[data-settings-panel]").forEach(function (panel) {
+      panel.hidden = true;
+      var owner = panel.parentElement.querySelector("[data-settings-toggle]");
+      if (owner) owner.setAttribute("aria-expanded", "false");
+    });
   });
   window.addEventListener("earthlens-language-change", function (event) {
     if (event.detail === "en" || event.detail === "my") apply(event.detail);

@@ -24,6 +24,17 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .nav-link-active::after { display: none; }
 .earthlens-app .language-switch { background: var(--et-0c1532); border-color: var(--et-303e6b); }
 .earthlens-app .language-active { background: var(--et-29204e); color: var(--et-fff); }
+.settings-menu { position: relative; margin-left: auto; }
+.settings-trigger { width: 42px; height: 42px; display: grid; place-items: center; border: 1px solid var(--et-303e6b); border-radius: 12px; background: var(--et-0c1532); color: var(--et-e9edfa); cursor: pointer; }
+.settings-trigger:hover, .settings-trigger[aria-expanded="true"] { background: var(--et-211b46); border-color: var(--et-5a488c); color: var(--et-d6c9ff); }
+.settings-panel { position: absolute; z-index: 50; top: calc(100% + 10px); right: 0; width: 248px; padding: 14px; display: grid; gap: 14px; border: 1px solid var(--et-303e6b); border-radius: 16px; background: var(--et-0a1228); box-shadow: 0 18px 44px var(--et-0005); }
+.settings-panel[hidden] { display: none; }
+.settings-group { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.settings-label { color: var(--et-a6b3d0); font-size: 12px; font-weight: 650; }
+.settings-panel .theme-toggle { min-height: 36px; padding: 6px 9px; }
+:root[data-theme="light"] .earthlens-app .settings-trigger { background: #fff; border-color: #ccd5e4; color: #39455d; }
+:root[data-theme="light"] .earthlens-app .settings-panel { background: #fff; border-color: #d8dfeb; box-shadow: 0 18px 44px #24385a24; }
+:root[data-theme="light"] .earthlens-app .settings-label { color: #68758c; }
 .earthlens-app :is(.panel,.topic-rail,.topic-list,.floating-ai-panel) { background: var(--et-0a1228); border: 1px solid var(--et-1f2b52); border-radius: 20px; box-shadow: 0 18px 40px var(--et-0003); }
 /* The explore map sits straight on the page, not in a card. */
 .earthlens-app .map-stage { background: none; border: 0; box-shadow: none; padding: 0; }

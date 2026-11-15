@@ -28,7 +28,7 @@ import { fetchExploreCatalog, fetchObservations, type ExploreCatalog, type Obser
 import { TOPICS, type TopicId, type TopicIndicator } from "@/features/explorer/catalog";
 
 import { ReferenceHome } from "./reference-home";
-import { ThemeToggle } from "./theme-toggle";
+import { SettingsMenu } from "./settings-menu";
 
 type View = "home" | "explore";
 type Lang = "en" | "my";
@@ -315,14 +315,7 @@ export default function Page() {
           <img className="earthlens-brand-art" src="/home-exact/brand.svg" alt="" />
           <span className="brand-text"><strong>Earth Trend Detective</strong><small>MYANMAR EARTH INTELLIGENCE</small></span>
         </a>
-        <ThemeToggle />
-        <div className="language-switch" role="group" aria-label="Interface language">
-          {(["en", "my"] as const).map((language) => (
-            <button key={language} data-earthlens-language={language} aria-pressed={lang === language} className={lang === language ? "language-active" : ""} onClick={() => selectLanguage(language)}>
-              {language === "en" ? "EN" : "မြန်မာ"}
-            </button>
-          ))}
-        </div>
+        <SettingsMenu lang={lang} onLanguage={selectLanguage} />
       </header>
 
       {(
