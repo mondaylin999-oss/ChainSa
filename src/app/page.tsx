@@ -10,6 +10,7 @@ import {
   ArrowUpRight,
   Droplets,
   ExternalLink,
+  Info,
   Leaf,
   LoaderCircle,
   MapPin,
@@ -392,11 +393,25 @@ export default function Page() {
             <aside className="data-column" aria-label="Data selection and details">
               <div className="selection-panel panel">
                 <div className="panel-title-row selection-title"><div><p className="eyebrow">Build your view</p><h2>Data workspace</h2></div><span className="live-tag"><span className="status-dot" /> {chartState === "ready" ? "Observations loaded" : selectedDataset?.available ? "Data source available" : "No data available"}</span></div>
+                <details className="workspace-notices">
+                  <summary aria-label={lang === "my" ? "အချက်အလက်နှင့် သတိပြုရန်" : "Workspace information and notices"} title={lang === "my" ? "အချက်အလက်နှင့် သတိပြုရန်" : "Information and notices"}>
+                    <Info size={19} aria-hidden="true" />
+                  </summary>
+                  <div className="workspace-notices-content">
+                    <h3>{lang === "my" ? "သတိပြုရန်" : "Information & notices"}</h3>
+                    <p id="township-help">Selecting a township reloads NASA POWER at a point inside its boundary. Nearby townships may share the same NASA grid cell.</p>
+                    <p id="region-help">15 bundled regional reference locations; observations are point samples.</p>
+                    {selectedDataset && !selectedDataset.available && <p>{selectedDataset.reason}</p>}
+                    {selectedDataset?.coverage && <p>Published archive: {selectedDataset.coverage.start} to {selectedDataset.coverage.ongoing ? `the latest NASA release (${selectedDataset.coverage.end} or later)` : selectedDataset.coverage.end}. {selectedDataset.temporalResolution}. Selecting this dataset opens a suitable historical range.</p>}
+                    {!datasets.length && <p>No datasets are listed for this topic.</p>}
+                    <p>Apply your dates to update the graph. Recent days may not have published observations yet.</p>
+                    {datasetId === "fire-detections" && <p>NASA FIRMS supports up to 10 recent days ending today.</p>}
+                  </div>
+                </details>
                 <div className="selection-grid">
                   <div className="field-control">
                     <label htmlFor="township-select">Select Township</label>
                     <select id="township-select" value={townshipId} disabled={!regionId || !catalog?.townships.length} onChange={event=>{setTownshipId(event.target.value);setMapFocused(true);}} aria-describedby="township-help"><option value="">All townships in this region</option>{catalog?.townships.filter(item=>item.regionId===regionId).map(item=><option key={item.id} value={item.id}>{lang==="my"?item.nameMy:item.name}</option>)}</select>
-                    <p className="field-hint" id="township-help">Selecting a township reloads NASA POWER at a point inside its boundary. Nearby townships may share the same NASA grid cell.</p>
                   </div>
                   <div className="field-control">
                     <label htmlFor="regional-reference">Regional reference point <span className="field-meta">(not a township)</span></label>
@@ -425,7 +440,6 @@ export default function Page() {
                       <option key={`${region.id}-en`} value={`${region.name} — ${region.type}`} />,
                       <option key={`${region.id}-my`} value={`${region.nameMy} — ${region.type}`} />,
                     ])}</datalist>
-                    <p className="field-hint" id="region-help">15 bundled regional reference locations; observations are point samples.</p>
                   </div>
                   <div className="field-control">
                     <label htmlFor="dataset-select">Select data</label>
@@ -437,9 +451,6 @@ export default function Page() {
                         </option>
                       ))}
                     </select>
-                    {selectedDataset && !selectedDataset.available && <p className="field-hint">{selectedDataset.reason}</p>}
-                    {selectedDataset?.coverage && <p className="field-hint">Published archive: {selectedDataset.coverage.start} to {selectedDataset.coverage.ongoing ? `the latest NASA release (${selectedDataset.coverage.end} or later)` : selectedDataset.coverage.end}. {selectedDataset.temporalResolution}. Selecting this dataset opens a suitable historical range.</p>}
-                    {!datasets.length && <p className="field-hint">No datasets are listed for this topic.</p>}
                   </div>
                   <div className="field-control">
                     <label>Date range <span className="field-meta">(UTC)</span></label>
@@ -449,8 +460,7 @@ export default function Page() {
                       <div><label className="sr-only" htmlFor="end-date">End date</label><input id="end-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftEnd} onChange={(event) => setDraftEnd(event.target.value)} /></div>
                     </div>
                     <div className="date-actions"><button type="button" className="button-primary" disabled={Boolean(dateError)} onClick={()=>{if(!dateError){setStart(draftStart);setEnd(draftEnd);setReloadToken(token=>token+1);}}}>Apply dates</button>{datasetId !== "fire-detections" && <button type="button" className="text-button" onClick={()=>{setDraftStart("1989-01-01");setDraftEnd(questionDate(0));}}>1989–today</button>}</div>
-                    {dateError ? <p className="field-error" role="status">{dateError}</p> : <p className="field-hint">Apply your dates to update the graph. Recent days may not have published observations yet.</p>}
-                    {datasetId === "fire-detections" && <p className="field-hint">NASA FIRMS supports up to 10 recent days ending today.</p>}
+                    {dateError && <p className="field-error" role="status">{dateError}</p>}
                   </div>
                 </div>
                 {catalogError && <div className="inline-notice notice-error" role="alert">{catalogError}</div>}

@@ -169,3 +169,15 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 
 /* Category names are available as tooltips; the rail buttons show icons only. */
 .earthlens-app .topic-rail .rail-topic-button { width: fit-content; min-width: 48px; min-height: 48px; padding: 6px; justify-content: center; gap: 0; }
+
+/* Supporting notes are available from the workspace information disclosure. */
+.earthlens-app .selection-panel { position: relative; }
+.earthlens-app .selection-title { padding-right: 36px; }
+.earthlens-app .workspace-notices > summary { position: absolute; right: 16px; top: 20px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--et-303e6b); border-radius: 10px; color: var(--et-c3b6ff); background: var(--et-0c1532); cursor: pointer; list-style: none; }
+.earthlens-app .workspace-notices > summary::-webkit-details-marker { display: none; }
+.earthlens-app .workspace-notices > summary:hover,
+.earthlens-app .workspace-notices[open] > summary { background: var(--et-211b46); border-color: var(--et-8872db); }
+.earthlens-app .workspace-notices > summary:focus-visible { outline: 2px solid var(--et-8872db); outline-offset: 3px; }
+.earthlens-app .workspace-notices-content { margin: 0 0 16px; padding: 14px; border: 1px solid var(--et-303e6b); border-radius: 12px; background: var(--et-0c1532); color: var(--et-c5cee6); font-size: 12px; line-height: 1.6; }
+.earthlens-app .workspace-notices-content h3 { margin: 0 0 10px; font-size: 13px; color: var(--et-e9edfa); }
+.earthlens-app .workspace-notices-content p { margin: 8px 0 0; }
