@@ -184,3 +184,33 @@
 .workspace-map-surface .map-region-context:hover,.workspace-map-surface .map-township-context:hover {fill:#ffffff;stroke:#73839a}
 .workspace-map-surface .map-region-active,.workspace-map-surface .map-township-active {fill:#ffe34d;filter:url(#map-active-glow)}
 .workspace-map-surface .map-region-active:hover,.workspace-map-surface .map-township-active:hover {fill:#ffe34d}
+
+/* Side panels release their grid space while the map and results remain mounted. */
+.workspace-redesign .site-header {justify-content:space-between}
+.workspace-redesign .site-header>.brand-lockup {margin-right:auto;margin-left:0;flex:0 1 auto}
+.workspace-body {position:relative;--navigation-width:238px;--controls-width:368px;grid-template-columns:var(--navigation-width) minmax(0,1fr) var(--controls-width);column-gap:0;transition:grid-template-columns .28s ease}
+.workspace-body>.workspace-navigation {margin-right:18px;min-width:0;transition:transform .28s ease,opacity .2s ease}
+.workspace-body>.workspace-controls {margin-left:18px;min-width:0;transition:transform .28s ease,opacity .2s ease}
+.workspace-body[data-navigation-open="false"] {--navigation-width:0px}
+.workspace-body[data-controls-open="false"] {--controls-width:0px}
+.workspace-body[data-navigation-open="false"]>.workspace-navigation {opacity:0;transform:translateX(-100%);pointer-events:none;max-height:0;overflow:hidden;margin:0}
+.workspace-body[data-controls-open="false"]>.workspace-controls {opacity:0;transform:translateX(100%);pointer-events:none;max-height:0;overflow:hidden;margin:0}
+.workspace-edge-toggle {position:absolute;top:16px;z-index:10;width:34px;height:38px;display:grid;place-items:center;border:1px solid var(--et-1f2b52);border-radius:10px;background:var(--et-0c1532);color:var(--et-ffffff);cursor:pointer;box-shadow:0 3px 12px #0002}
+.workspace-edge-toggle[hidden] {display:none}
+.workspace-edge-toggle:hover {border-color:var(--chainsa-button-blue,#159bd3);color:#159bd3}
+.workspace-edge-left {left:8px}
+.workspace-edge-right {right:8px}
+.workspace-body[data-navigation-open="false"] .workspace-map-card>header {padding-left:52px}
+.workspace-body[data-controls-open="false"] .workspace-map-card>header {padding-right:52px}
+@media(min-width:1700px){.workspace-body{--navigation-width:268px;--controls-width:408px}}
+@media(min-width:761px) and (max-width:1150px){.workspace-body{--navigation-width:202px;--controls-width:322px}.workspace-body>.workspace-navigation{margin-right:12px}.workspace-body>.workspace-controls{margin-left:12px}}
+@media(min-width:761px){.workspace-body>.workspace-controls{grid-column:auto}}
+@media(max-width:760px){
+ .workspace-body>.workspace-navigation,.workspace-body>.workspace-controls{position:absolute;top:0;z-index:20;width:min(340px,calc(100% - 46px));max-height:78vh;overflow:auto;margin:0;border:1px solid var(--et-1f2b52);border-radius:16px;background:var(--et-0a1228);box-shadow:0 12px 30px #0006}
+ .workspace-body>.workspace-navigation{left:0}.workspace-body>.workspace-controls{right:0;padding:12px}
+ .workspace-body>.workspace-controls>.workspace-panel-toggle{margin-bottom:12px}
+ .workspace-body>.workspace-controls form{padding:0}
+ .workspace-body[data-navigation-open="false"]>.workspace-navigation,.workspace-body[data-controls-open="false"]>.workspace-controls{visibility:hidden}
+ .workspace-body:has(>.workspace-navigation:not([inert])) .workspace-edge-right,.workspace-body:has(>.workspace-controls:not([inert])) .workspace-edge-left{z-index:10}
+}
+@media(prefers-reduced-motion:reduce){.workspace-body,.workspace-body>.workspace-navigation,.workspace-body>.workspace-controls{transition:none}}

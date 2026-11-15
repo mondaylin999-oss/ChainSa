@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { ArrowRight, Check, ChevronDown, Search, MapPin, Sprout, TriangleAlert, Leaf, Building2, Droplets, Zap, LoaderCircle, Info, ExternalLink, ChartNoAxesCombined } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, ChevronDown, Search, MapPin, Sprout, TriangleAlert, Leaf, Building2, Droplets, Zap, LoaderCircle, Info, ExternalLink, ChartNoAxesCombined } from "lucide-react";
 import { TOPICS, type TopicId, type TopicIndicator } from "../catalog";
 import { REGIONS } from "../../earthlens-chat/regions";
 import type { ExploreCatalog, ObservationResponse, ObservationSelection } from "../client/data-service";
@@ -44,10 +44,12 @@ export function DataWorkspace(p:DataWorkspaceProps) {
  function status(id:string){const d=catalog?.datasets.find(x=>x.id===id);return !d?t("Loading","ရယူနေသည်"):d.available?t("Available","ရရှိနိုင်သည်"):d.setupRequired?t("Setup required","ချိတ်ဆက်ရန်လိုသည်"):t("Unavailable","မရရှိနိုင်ပါ");}
  return <div className="workspace-shell">
   <header className="workspace-heading"><div><p className="workspace-eyebrow">{t("MYANMAR • EARTH OBSERVATIONS","မြန်မာနိုင်ငံ • ကမ္ဘာမြေတိုင်းတာချက်များ")}</p><h1>{t("Data workspace","အချက်အလက် လေ့လာရေးနေရာ")}</h1><p>{t("Start with an indicator. Choose a location and dates, then apply to explore NASA observations.","ညွှန်ကိန်းကို အရင်ရွေးပါ။ တည်နေရာနှင့် ရက်စွဲရွေးပြီး NASA တိုင်းတာချက်များကို ကြည့်ရန် နှိပ်ပါ။")}</p></div><span className={`workspace-state ${!p.dirty&&result?"is-applied":""}`} role="status">{p.loading?<LoaderCircle size={16} className="spin"/>:!p.dirty&&result?<Check size={16}/>:<Info size={16}/>} {p.loading?t("Retrieving data…","ဒေတာရယူနေသည်…"):!p.dirty&&result?t("Selection applied","ရွေးချယ်မှု အသုံးပြုပြီး"):t("Selection not applied","ရွေးချယ်မှု မသုံးရသေးပါ")}</span></header>
-  <div className="workspace-body">
-   <aside className="workspace-navigation" aria-label={t("Environmental indicators","ပတ်ဝန်းကျင် ညွှန်ကိန်းများ")}>
-    <button className="workspace-panel-toggle" aria-expanded={navigationOpen} aria-controls="workspace-indicators" onClick={()=>setNavigationOpen(!navigationOpen)}><span>{t("Indicators","ညွှန်ကိန်းများ")} <small>{count}</small></span><ChevronDown size={17}/></button>
-    <div id="workspace-indicators" className={navigationOpen?"":"workspace-collapsed"}>
+  <div className="workspace-body" data-navigation-open={navigationOpen} data-controls-open={controlsOpen}>
+   <button type="button" className="workspace-edge-toggle workspace-edge-left" hidden={navigationOpen} onClick={()=>setNavigationOpen(true)} aria-expanded={navigationOpen} aria-controls="workspace-navigation" aria-label={t("Show indicators","ညွှန်ကိန်းများ ပြရန်")} title={t("Show indicators","ညွှန်ကိန်းများ ပြရန်")}><ChevronRight size={20}/></button>
+   <button type="button" className="workspace-edge-toggle workspace-edge-right" hidden={controlsOpen} onClick={()=>setControlsOpen(true)} aria-expanded={controlsOpen} aria-controls="workspace-controls" aria-label={t("Show view controls","ရွေးချယ်မှုများ ပြရန်")} title={t("Show view controls","ရွေးချယ်မှုများ ပြရန်")}><ChevronLeft size={20}/></button>
+   <aside id="workspace-navigation" className="workspace-navigation" inert={!navigationOpen} aria-hidden={!navigationOpen} aria-label={t("Environmental indicators","ပတ်ဝန်းကျင် ညွှန်ကိန်းများ")}>
+    <button className="workspace-panel-toggle" aria-expanded={navigationOpen} aria-controls="workspace-navigation" aria-label={t("Hide indicators","ညွှန်ကိန်းများ ဖျောက်ရန်")} title={t("Hide indicators","ညွှန်ကိန်းများ ဖျောက်ရန်")} onClick={()=>setNavigationOpen(!navigationOpen)}><span>{t("Indicators","ညွှန်ကိန်းများ")} <small>{count}</small></span><ChevronLeft size={17}/></button>
+    <div id="workspace-indicators">
      <label className="workspace-search"><Search size={17}/><span className="sr-only">{t("Search indicators","ညွှန်ကိန်းရှာရန်")}</span><input type="search" value={query} onChange={e=>{setQuery(e.target.value);setNavigationOpen(true);}} placeholder={t("Search indicators…","ညွှန်ကိန်း ရှာရန်…")}/></label>
      {!catalog&&!p.catalogError&&<p role="status">{t("Loading indicator availability…","ညွှန်ကိန်း ရရှိနိုင်မှုကို ရယူနေသည်…")}</p>}
      {p.catalogError&&<p className="workspace-warning" role="alert">{workspaceError(p.catalogError,lang)}</p>}
@@ -84,9 +86,9 @@ export function DataWorkspace(p:DataWorkspaceProps) {
     {result?p.details:<p className="workspace-source-placeholder">{t("After you apply a selection, the NASA source, observation period, spatial basis and limitations appear here.","ရွေးချယ်မှုကို အသုံးပြုပြီးပါက NASA ရင်းမြစ်၊ တိုင်းတာထားသော ကာလ၊ နေရာအခြေခံနှင့် ကန့်သတ်ချက်များကို ဤနေရာတွင် ပြမည်။")}</p>}
    </section>
    </div>
-   <aside className="workspace-controls" aria-label={t("Guided data selection","အဆင့်လိုက် ဒေတာရွေးချယ်ရန်")}>
-    <button className="workspace-panel-toggle" aria-expanded={controlsOpen} aria-controls="workspace-control-content" onClick={()=>setControlsOpen(!controlsOpen)}><span>{t("Build your view","လေ့လာရန် ရွေးချယ်ပါ")}</span><ChevronDown size={17}/></button>
-    <form id="workspace-control-content" className={controlsOpen?"":"workspace-collapsed"} onSubmit={e=>{e.preventDefault();if(!validation&&!p.loading)p.onApply();}}>
+   <aside id="workspace-controls" className="workspace-controls" inert={!controlsOpen} aria-hidden={!controlsOpen} aria-label={t("Guided data selection","အဆင့်လိုက် ဒေတာရွေးချယ်ရန်")}>
+    <button className="workspace-panel-toggle" aria-expanded={controlsOpen} aria-controls="workspace-controls" aria-label={t("Hide view controls","ရွေးချယ်မှုများ ဖျောက်ရန်")} title={t("Hide view controls","ရွေးချယ်မှုများ ဖျောက်ရန်")} onClick={()=>setControlsOpen(!controlsOpen)}><span>{t("Build your view","လေ့လာရန် ရွေးချယ်ပါ")}</span><ChevronRight size={17}/></button>
+    <form id="workspace-control-content" onSubmit={e=>{e.preventDefault();if(!validation&&!p.loading)p.onApply();}}>
      <fieldset className="workspace-step"><legend><b>1</b>{t("Choose a location","တည်နေရာ ရွေးပါ")}</legend>
       <div className="workspace-location-modes" role="group" aria-label={t("Location selection mode","တည်နေရာ ရွေးချယ်မှုနည်းလမ်း")}><button type="button" aria-pressed={p.locationMode==="township"} onClick={()=>p.onLocationMode("township")}>{t("Township","မြို့နယ်")}</button><button type="button" aria-pressed={p.locationMode==="reference"} onClick={()=>p.onLocationMode("reference")}>{t("Reference point","ကိုယ်စားပြုနေရာ")}</button></div>
       <p>{p.locationMode==="township"?t("Analyze satellite data within the selected township boundary.","ရွေးချယ်ထားသော မြို့နယ်နယ်နိမိတ်အတွင်းရှိ ဂြိုဟ်တုအချက်အလက်များကို လေ့လာရန်။"):t("Analyze satellite data around a selected reference location. This is not a township-wide average.","ရွေးချယ်ထားသော တည်နေရာအနီးရှိ ဂြိုဟ်တုအချက်အလက်များကို လေ့လာရန်။ မြို့နယ်တစ်ခုလုံး၏ ပျမ်းမျှတန်ဖိုး မဟုတ်ပါ။")}</p>

@@ -303,14 +303,6 @@ export default function Page() {
   return (
     <main className={`earthlens-app${view === "explore" ? " is-exploring workspace-redesign" : ""}`} lang={lang}>
       <header className="site-header">
-          <button type="button" className="explore-back" onClick={() => {
-            if (townshipId) setTownshipId("");
-            else if (mapFocused) setMapFocused(false);
-            else { setChatOpen(false); setView("home"); }
-          }} aria-label={townshipId ? "Back to region" : mapFocused ? "Back to all regions" : "Back to Home"}>
-            <ArrowLeft size={16} aria-hidden="true" />{lang === "my" ? "နောက်သို့" : "Back"}
-            <span>{townshipId ? t("To region", "ဒေသသို့") : mapFocused ? t("All regions", "ဒေသအားလုံး") : t("Home", "ပင်မစာမျက်နှာ")}</span>
-          </button>
         <a className="brand-lockup" href="#home" onClick={(event) => { event.preventDefault(); setView("home"); }} aria-label={lang === "my" ? "ChainSa ပင်မစာမျက်နှာ" : "ChainSa home"}>
           <img className="earthlens-brand-art" src="/brand/chainsa-icon.png" alt="" />
           <span className="brand-text"><strong className="chainsa-wordmark" aria-label="ChainSa">Ch<span className="brand-letter-yellow">a</span><span className="brand-letter-blue">i</span>nSa</strong><small>{t("MYANMAR EARTH INTELLIGENCE", "မြန်မာ့ပတ်ဝန်းကျင်ဆိုင်ရာ အချက်အလက်များ")}</small></span>
