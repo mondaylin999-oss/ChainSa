@@ -264,3 +264,7 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .chat-compose input{min-height:100px;border-radius:18px;width:100%}
 .earthlens-app .chat-compose{align-items:center}.workspace-results{scroll-margin-top:110px}
 .earthlens-app .earthbeat-controls{padding:20px;border:1px solid var(--et-303e6b);border-radius:16px;background:var(--et-0c1532);margin:20px 0}
+
+/* Keep example prompts in one horizontal row at every screen width. */
+.earthlens-app .chat-panel .suggested-questions {display:flex;flex-direction:row;flex-wrap:nowrap;gap:8px;margin:0;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;padding:8px 2px;box-sizing:border-box;scrollbar-width:thin;overscroll-behavior-x:contain}
+.earthlens-app .chat-panel .suggested-questions>button {flex:0 0 auto;width:auto;max-width:none;white-space:nowrap;text-align:left}
