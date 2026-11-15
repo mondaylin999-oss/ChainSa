@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="/earthlens-palette.css">
+<link rel="stylesheet" href="/brand-buttons.css">
 <link rel="stylesheet" href="/history.css">
 <script src="/theme.js"></script>
 <script src="/earthlens-language.js"></script>
-<title>Earth Trend Detective — Home</title>
+<title>ChainSa — Home</title>
 <script src="./vendor/react.js"></script>
 <script src="./vendor/react-dom.js"></script>
 <script src="./support.js"></script>
@@ -132,6 +133,16 @@ a:focus-visible,button:focus-visible{outline:2px solid #9fe870;outline-offset:3p
 @keyframes etd-pulse{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes etd-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.brand-letter-yellow{color:#ffc42a}.brand-letter-blue{color:#159bd3}
+.chainsa-wordmark{font-size:1.875rem!important;line-height:1.2!important}@media(max-width:760px){.chainsa-wordmark{font-size:1.5rem!important}}
+.chainsa-logo{width:64px;height:64px;object-fit:contain}@media(max-width:760px){.chainsa-logo{width:54px;height:54px}}
+.significant-trends-section{padding:36px;border:1px solid var(--et-1f2b52);border-radius:24px;background:var(--et-0a1228)}
+.significant-trends-eyebrow{margin:0 0 12px;color:#159bd3;font-size:12px;font-weight:700;letter-spacing:.12em}
+.significant-trends-section h2{margin:0 0 12px;font-size:clamp(26px,3vw,36px);line-height:1.3;color:var(--et-ffffff)}
+.significant-trends-section p{color:var(--et-a9b6d8);line-height:1.8}
+.significant-trends-content{display:flex;align-items:center;gap:24px;margin-top:24px;padding:24px;border:1px solid var(--et-1f2b52);border-radius:16px;background:var(--et-0c1532)}
+.significant-trends-content>svg{flex-shrink:0;color:#ffc42a}.significant-trends-content>div{flex:1;min-width:0}.significant-trends-content h3{margin:0 0 8px;font-size:18px;color:var(--et-ffffff)}.significant-trends-content p{margin:0;font-size:14px}.significant-trends-content .significant-trends-note{margin-top:10px;font-size:12px}
+@media(max-width:760px){.significant-trends-section{padding:22px}.significant-trends-content{flex-direction:column;align-items:flex-start;padding:18px;gap:16px}.significant-trends-content a{box-sizing:border-box;width:100%;white-space:normal!important}}
 </style>
 </helmet>
 <div style="min-height: 100vh; background: var(--et-040816); color: var(--et-e9edfa); font-family: Inter, system-ui, sans-serif; font-size: 1rem; line-height: 1.5; overflow-x: hidden">
@@ -140,9 +151,9 @@ a:focus-visible,button:focus-visible{outline:2px solid #9fe870;outline-offset:3p
 <header style="border-bottom: 1px solid var(--et-172142); background: var(--et-050a18)">
 <div style="max-width: 1320px; margin: 0 auto; padding: 14px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px 32px; box-sizing: border-box">
 <a href="#top" style="display: flex; align-items: center; gap: 14px; color: var(--et-ffffff)">
-<svg aria-hidden="true" width="46" height="46" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="22" r="17" fill="#123a8a" stroke="#4f8cff" stroke-width="2"></circle><path d="M12 18c4-3 8-1 10 2s6 3 9 0 5-5 8-3" stroke="#7fd0ff" stroke-width="2" stroke-linecap="round"></path><path d="M24 44c-7-1-11-6-11-12 6 0 10 3 11 8 1-5 5-8 11-8 0 6-4 11-11 12z" fill="#3ecf6e"></path></svg>
+<img src="/brand/chainsa-icon.png" alt="" class="chainsa-logo" width="64" height="64" style="object-fit:contain;flex-shrink:0" />
 <span style="display: flex; flex-direction: column">
-<span style="font-size: 1.3125rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2">Earth Trend Detective</span>
+<span style="font-size: 1.3125rem; font-weight: 700; letter-spacing: -0.01em; line-height: 1.2" class="chainsa-wordmark" aria-label="ChainSa">Ch<span class="brand-letter-yellow">a</span><span class="brand-letter-blue">i</span>nSa</span>
 <span style="display: flex; flex-direction: column; gap: 4px; color: var(--et-a9b6d8)">
 <span style="font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.16em">MYANMAR EARTH INTELLIGENCE</span>
 <span style="font-size: 0.6875rem; font-weight: 500">Powered by NASA data</span>
@@ -193,7 +204,7 @@ Satellite intelligence for every township</span>
 </div>
 
 <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 14px">
-<a href="#systems" style="display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 30px; border-radius: 16px; background: {{accent}}; color: var(--et-ffffff); font-size: 1.0625rem; font-weight: 700; box-sizing: border-box; box-shadow: 0 12px 36px rgba(109,74,255,0.45)">
+<a href="#systems" style="display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 30px; border-radius: 16px; background: var(--chainsa-button-blue); color: var(--et-ffffff); font-size: 1.0625rem; font-weight: 700; box-sizing: border-box; box-shadow: 0 12px 36px rgba(8,121,166,0.22)">
 <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M15.5 8.5l-2 5-5 2 2-5z"></path></svg>Explore Live Trends</a>
 
 </div>
@@ -292,7 +303,7 @@ Satellite intelligence for every township</span>
 
 </div>
 <div style="display: flex; justify-content: flex-end">
-<a href="#systems" class="lift" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 14px; background: {{accent}}; color: var(--et-ffffff); font-weight: 700; box-sizing: border-box">Explore
+<a href="#systems" class="lift" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 14px; background: var(--chainsa-button-blue); color: var(--et-ffffff); font-weight: 700; box-sizing: border-box">Explore
 <svg aria-hidden="true" class="go" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
 </div>
 </section>
@@ -324,6 +335,16 @@ Satellite intelligence for every township</span>
 </div>
 <div style="display: flex; justify-content: flex-end">
 
+</div>
+</section>
+
+<!-- SIGNIFICANT TRENDS -->
+<section id="significant-trends" aria-labelledby="significant-trends-title" class="significant-trends-section">
+<div><p class="significant-trends-eyebrow">OBSERVED CHANGE</p><h2 id="significant-trends-title">Significant Trends</h2><p>Explore changes over time and check whether the available observations support a statistically significant trend.</p></div>
+<div class="significant-trends-content">
+<svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 3v18h18M6 15l4-5 4 3 6-8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<div><h3>No analysis selected</h3><p>Choose a location, indicator and date range in Explore, then apply your selection. Open Detailed statistics &amp; scientific notes to see the significance result.</p><p class="significant-trends-note">Significance testing is currently available for NASA POWER air temperature when coverage and quality checks pass. Other indicators show descriptive trends.</p></div>
+<a href="/trends" target="_top" style="display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;border-radius:12px;background:var(--chainsa-button-blue);color:#fff;font-weight:600;white-space:nowrap">Explore trends →</a>
 </div>
 </section>
 
@@ -386,7 +407,7 @@ Satellite intelligence for every township</span>
 <h2 id="recent-history-title" style="margin:0;font-size:clamp(1.6rem,3vw,2.25rem);color:var(--et-ffffff)">Recent Discoveries</h2>
 <p style="margin:0;color:var(--et-a9b6d8);font-size:14px">Saved on this device. Clearing browser data removes this history. Download PDFs to keep a copy.</p>
 <div data-recent-history><p class="history-empty">Opening saved searches…</p></div>
-<div style="display:flex;justify-content:flex-end"><a href="#history" data-view-history style="display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:14px;background:{{accent}};color:#fff;font-weight:700">View History →</a></div>
+<div style="display:flex;justify-content:flex-end"><a href="#history" data-view-history style="display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:14px;background:var(--chainsa-button-blue);color:#fff;font-weight:700">View History →</a></div>
 </section>
 
 <!-- JUMP TO A REGION -->
@@ -402,7 +423,7 @@ Satellite intelligence for every township</span>
 </sc-for>
 </div>
 <div style="display: flex; justify-content: flex-end">
-<a href="#systems" class="lift" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 14px; background: {{accent}}; color: var(--et-ffffff); font-weight: 700; box-sizing: border-box">Explore Other Regions
+<a href="#systems" class="lift" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 14px; background: var(--chainsa-button-blue); color: var(--et-ffffff); font-weight: 700; box-sizing: border-box">Explore Other Regions
 <svg aria-hidden="true" class="go" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
 </div>
 </section>
@@ -411,7 +432,7 @@ Satellite intelligence for every township</span>
 
 <footer style="margin-top: 72px; border-top: 1px solid var(--et-172142)">
 <div style="max-width: 1320px; margin: 0 auto; padding: 24px 32px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.875rem; color: var(--et-a9b6d8); box-sizing: border-box">
-<span>Earth Trend Detective · Myanmar Earth Intelligence</span>
+<span>ChainSa · Myanmar Earth Intelligence</span>
 <span>Powered by NASA Earth Observation Data</span>
 </div>
 </footer>

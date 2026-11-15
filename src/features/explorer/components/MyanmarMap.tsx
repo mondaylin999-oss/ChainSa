@@ -94,6 +94,8 @@ export function MyanmarMap({
 }: MyanmarMapProps) {
   const [townshipData, setTownshipData] = useState<BoundaryCollection | null>(null);
   const [townshipError, setTownshipError] = useState(false);
+  const [townshipLoading, setTownshipLoading] = useState(false);
+  const t = (en: string, my: string) => language === "my" ? my : en;
   const mapSurface = useRef<SVGSVGElement>(null);
   const [manualZoom, setManualZoom] = useState({ key: "", factor: 1 });
   const [pan, setPan] = useState({ key: "", x: 0, y: 0 });
@@ -148,6 +150,8 @@ export function MyanmarMap({
   useEffect(() => {
     if (!focusRegion || townshipData) return;
     const controller = new AbortController();
+    setTownshipLoading(true);
+    setTownshipError(false);
     fetch("/township-boundaries.geojson", { signal: controller.signal })
       .then(response => {
         if (!response.ok) throw new Error("Boundary data unavailable");
@@ -159,7 +163,7 @@ export function MyanmarMap({
       })
       .catch(() => {
         if (!controller.signal.aborted) setTownshipError(true);
-      });
+      }).finally(() => { if (!controller.signal.aborted) setTownshipLoading(false); });
     return () => controller.abort();
   }, [focusRegion, townshipData]);
 
@@ -175,7 +179,8 @@ export function MyanmarMap({
   const focusedFeature = visibleTownships.find(feature => feature.properties.TS_PCODE === selectedTownshipId)
     ?? (focusRegion ? selectedFeature : undefined);
   const focusedBounds = focusedFeature ? featureBounds(focusedFeature.geometry) : null;
-  const padding = selectedTownshipId ? 1.8 : 18;
+  const shortestSide = focusedBounds ? Math.min(focusedBounds.maxX-focusedBounds.minX,focusedBounds.maxY-focusedBounds.minY) : 0;
+  const padding = selectedTownshipId ? Math.max(.4, shortestSide*.08) : Math.max(3, shortestSide*.06);
   const viewBox = focusedBounds
     ? `${focusedBounds.minX - padding} ${focusedBounds.minY - padding} ${Math.max(padding * 2, focusedBounds.maxX - focusedBounds.minX + padding * 2)} ${Math.max(padding * 2, focusedBounds.maxY - focusedBounds.minY + padding * 2)}`
     : COUNTRY_VIEWBOX;
@@ -210,12 +215,15 @@ export function MyanmarMap({
     return Number(firstActive) - Number(secondActive);
   });
 
+  // Declutter labels only; every boundary remains interactive and has its full name in a tooltip.
+  const occupiedLabels: Array<{left:number;right:number;top:number;bottom:number}> = [];
+
   return (
     <div className="map-interactive-wrapper" data-focused={focusRegion}>
-      <div className="map-zoom-controls" role="group" aria-label="Map zoom controls">
-        <button type="button" aria-label="Zoom in" title="Zoom in" disabled={zoomFactor >= 4} onClick={() => changeZoom(1.25)}>+</button>
-        <button type="button" aria-label="Zoom out" title="Zoom out" disabled={zoomFactor <= 0.5} onClick={() => changeZoom(0.8)}>−</button>
-        <button type="button" aria-label="Reset map zoom" title="Reset zoom" onClick={() => setManualZoom({ key: selectionKey, factor: 1 })}>↺</button>
+      <div className="map-zoom-controls" role="group" aria-label={t("Map zoom controls", "မြေပုံ အနီးအဝေး ထိန်းချုပ်ရန်")}>
+        <button type="button" aria-label={t("Zoom in", "ချဲ့ရန်")} title={t("Zoom in", "ချဲ့ရန်")} disabled={zoomFactor >= 4} onClick={() => changeZoom(1.25)}>+</button>
+        <button type="button" aria-label={t("Zoom out", "ချုံ့ရန်")} title={t("Zoom out", "ချုံ့ရန်")} disabled={zoomFactor <= 0.5} onClick={() => changeZoom(0.8)}>−</button>
+        <button type="button" aria-label={t("Reset map zoom", "မြေပုံ အနီးအဝေး မူလအတိုင်း ပြန်ထားရန်")} title={t("Reset zoom", "မူလအတိုင်း ပြန်ထားရန်")} onClick={() => setManualZoom({ key: selectionKey, factor: 1 })}>↺</button>
       </div>
       <svg
         ref={mapSurface}
@@ -261,8 +269,8 @@ export function MyanmarMap({
         </desc>
         <defs>
           <filter id="map-active-glow" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#f5c400" floodOpacity=".6" />
-            <feDropShadow dx="0" dy="0" stdDeviation="12" floodColor="#ffd800" floodOpacity=".34" />
+            <feDropShadow dx="0" dy="0" stdDeviation="2" floodColor="#ffe34d" floodOpacity=".4" />
+            <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#ffd800" floodOpacity=".15" />
           </filter>
         </defs>
         <g className="map-zoom-layer" transform={zoomTransform}>
@@ -272,25 +280,26 @@ export function MyanmarMap({
           <text x="470" y="351" className="map-neighbor-label">LAOS</text>
           <text x="450" y="545" className="map-neighbor-label">THAILAND</text>
 
-          <g aria-label="State and region boundaries">
+          <g aria-label={t("State and region boundaries", "တိုင်းဒေသကြီးနှင့် ပြည်နယ် နယ်နိမိတ်များ")}>
             {orderedFeatures.map(feature => {
               const featureRegion = REGIONS.find(item => item.iso === feature.properties.iso);
               const active = featureRegion?.id === selectedRegionId;
+              const highlighted = active && !selectedTownshipId;
+              const context = Boolean(selectedRegionId) && !highlighted;
               return (
                 <path
                   key={feature.properties.iso}
                   d={geometryPolygons(feature.geometry).map(polygonPath).join(" ")}
-                  fill={active ? "#ffd400" : "#fdfdfc"}
-                  stroke={active ? "#8a6d00" : "#6d7b71"}
-                  strokeWidth={active ? 1.9 : 1.15}
+                  fill={highlighted ? "#ffe34d" : context ? "#ffffff" : "#fdfdfc"}
+                  stroke={highlighted ? "#c6a42d" : context ? "#85918c" : "#6d7b71"}
+                  strokeWidth={highlighted ? 1.9 : 1.15}
                   vectorEffect="non-scaling-stroke"
-                  filter={active ? "url(#map-active-glow)" : undefined}
-                  visibility={focusRegion && (!active || Boolean(selectedTownshipId)) ? "hidden" : undefined}
+                  filter={highlighted ? "url(#map-active-glow)" : undefined}
                   fillRule="evenodd"
-                  className={`${onSelectRegion ? "map-region-selectable" : ""}${active ? " map-region-active" : ""}`.trim()}
+                  className={`${onSelectRegion ? "map-region-selectable" : ""}${highlighted ? " map-region-active" : context ? " map-region-context" : ""}`.trim()}
                   role={onSelectRegion && featureRegion ? "button" : undefined}
                   tabIndex={onSelectRegion && featureRegion ? 0 : undefined}
-                  aria-label={featureRegion ? `${featureRegion.name} ${featureRegion.type} — regional reference point` : feature.properties.name}
+                  aria-label={featureRegion ? (language === "my" ? `${featureRegion.nameMy} — ကိုယ်စားပြုတည်နေရာ` : `${featureRegion.name} ${featureRegion.type} — regional reference point`) : feature.properties.name}
                   onClick={() => featureRegion && onSelectRegion?.(featureRegion.id)}
                   onKeyDown={event => {
                     if (featureRegion && (event.key === "Enter" || event.key === " ")) {
@@ -303,7 +312,7 @@ export function MyanmarMap({
             })}
           </g>
 
-          <g aria-label="Township boundaries">
+          <g aria-label={t("Township boundaries", "မြို့နယ် နယ်နိမိတ်များ")}>
             {visibleTownships.map(feature => {
               const township = townships.find(item => item.id === feature.properties.TS_PCODE);
               if (!township) return null;
@@ -320,15 +329,19 @@ export function MyanmarMap({
                 ? [words.slice(0, Math.ceil(words.length / 2)).join(" "), words.slice(Math.ceil(words.length / 2)).join(" ")]
                 : [label];
               const viewWidth = Number(viewBox.split(" ")[2]);
-              const fontSize = Math.min(viewWidth / 48, (bounds.maxY - bounds.minY) / (lines.length + 1.5));
-              const labelWidth = Math.max(fontSize, (bounds.maxX - bounds.minX) * .85);
+              const fontSize = Math.min(viewWidth / 64, viewHeight / 48) / zoomFactor;
+              const labelWidth = Math.max(...lines.map(line=>line.length)) * fontSize * (language === "my" ? .8 : .58);
+              const box = {left:anchor.x-labelWidth/2-fontSize,right:anchor.x+labelWidth/2+fontSize,top:anchor.y-fontSize*lines.length,bottom:anchor.y+fontSize*lines.length};
+              const showLabel = selected || !occupiedLabels.some(other=>box.left<other.right&&box.right>other.left&&box.top<other.bottom&&box.bottom>other.top);
+              if (showLabel && (!selectedTownshipId || selected)) occupiedLabels.push(box);
               return (
                 <g key={township.id}>
                   <path
                     d={geometryPolygons(feature.geometry).map(polygonPath).join(" ")}
-                    fill={selected ? "#ffd400" : "transparent"}
-                    visibility={selectedTownshipId && !selected ? "hidden" : undefined}
-                    stroke={selected ? "#8a6d00" : "#7f8a82"}
+                    fill={selected ? "#ffe34d" : selectedTownshipId ? "#ffffff" : "transparent"}
+                    className={selected ? "map-township-active" : selectedTownshipId ? "map-township-context" : undefined}
+                    filter={selected ? "url(#map-active-glow)" : undefined}
+                    stroke={selected ? "#c6a42d" : selectedTownshipId ? "#85918c" : "#7f8a82"}
                     strokeWidth={selected ? 1.5 : .6}
                     vectorEffect="non-scaling-stroke"
                     role="button"
@@ -344,7 +357,7 @@ export function MyanmarMap({
                   >
                     <title>{label}</title>
                   </path>
-                  {(!selectedTownshipId || selected) && <text
+                  {showLabel && (!selectedTownshipId || selected) && <text
                     x={anchor.x}
                     y={anchor.y}
                     className="map-township-label"
@@ -359,8 +372,6 @@ export function MyanmarMap({
                         key={index}
                         x={anchor.x}
                         dy={index === 0 ? -(lines.length - 1) * fontSize * .6 : fontSize * 1.2}
-                        textLength={line.length * fontSize * (language === "my" ? .85 : .58) > labelWidth ? labelWidth : undefined}
-                        lengthAdjust="spacingAndGlyphs"
                       >{line}</tspan>
                     ))}
                   </text>}
@@ -399,12 +410,13 @@ export function MyanmarMap({
       </svg>
       {focusRegion && (
         <div className="map-drilldown-actions">
-          <button className="text-button" onClick={() => onSelectRegion?.("")}>All regions</button>
-          {selectedTownshipId && <button className="text-button" onClick={() => onSelectTownship?.("")}>All townships in {region?.name}</button>}
-          <small>MIMU PCode 9.4 · Township boundaries</small>
+          <button className="text-button" onClick={() => onSelectRegion?.("")}>{t("All regions", "တိုင်းဒေသကြီးနှင့် ပြည်နယ်အားလုံး")}</button>
+          {selectedTownshipId && <button className="text-button" onClick={() => onSelectTownship?.("")}>{language === "my" ? `${region?.nameMy} ရှိ မြို့နယ်အားလုံး` : `All townships in ${region?.name}`}</button>}
+          <small>MIMU PCode 9.4 · {t("Township boundaries", "မြို့နယ်နယ်နိမိတ်များ")}</small>
         </div>
       )}
-      {townshipError && <p role="alert">Township outlines could not load. Use the township selector.</p>}
+      {focusRegion && townshipLoading && <p role="status">{t("Loading township boundaries…", "မြို့နယ်နယ်နိမိတ်များကို ရယူနေသည်…")}</p>}
+      {focusRegion && townshipError && <p role="alert">{t("Township outlines could not load. Use the township selector.", "မြို့နယ်နယ်နိမိတ်များကို ရယူမရပါ။ မြို့နယ်ရွေးချယ်ခလုတ်ကို သုံးပါ။")}</p>}
     </div>
   );
 }

@@ -27,19 +27,19 @@ export function SettingsMenu({ lang, onLanguage }: { lang: Language; onLanguage:
 
   return (
     <div className="settings-menu" ref={root}>
-      <button className="settings-trigger" type="button" aria-label="Settings" aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(value => !value)}>
+      <button className="settings-trigger" type="button" aria-label={lang === "my" ? "ဆက်တင်များ" : "Settings"} aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(value => !value)}>
         <Settings size={19} aria-hidden="true" />
       </button>
-      {open && <section className="settings-panel" role="dialog" aria-label="Settings">
+      {open && <section className="settings-panel" role="dialog" aria-label={lang === "my" ? "ဆက်တင်များ" : "Settings"}>
         <div className="settings-group">
-          <span className="settings-label">Language</span>
-          <div className="language-switch" role="group" aria-label="Interface language">
+          <span className="settings-label">{lang === "my" ? "ဘာသာစကား" : "Language"}</span>
+          <div className="language-switch" role="group" aria-label={lang === "my" ? "အသုံးပြုမည့် ဘာသာစကား" : "Interface language"}>
             {(["en", "my"] as const).map(language => <button key={language} type="button" data-earthlens-language={language} aria-pressed={lang === language} className={lang === language ? "language-active" : ""} onClick={() => onLanguage(language)}>{language === "en" ? "EN" : "မြန်မာ"}</button>)}
           </div>
         </div>
         <div className="settings-group">
-          <span className="settings-label">Display</span>
-          <ThemeToggle />
+          <span className="settings-label">{lang === "my" ? "မြင်ကွင်း" : "Display"}</span>
+          <ThemeToggle lang={lang} />
         </div>
       </section>}
     </div>

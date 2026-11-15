@@ -7,10 +7,14 @@ import { EnvironmentalChart } from "@/features/environmental/components/Environm
 import { DataTrendInsight } from "@/features/environmental/components/DataTrendInsight";
 import { analyzeSeries } from "@/features/environmental/analysis/explainChanges";
 import type { DataSeries } from "@/features/environmental/types/environmental";
+import { chartText, type ChartLanguage } from "@/features/environmental/components/chartCopy";
+import styles from "./EarthbeatExperience.module.css";
 import type { ObservationResponse } from "../client/data-service";
 
-export function EarthbeatExperience({ result }: { result: ObservationResponse }) {
+export function EarthbeatExperience({ result, lang = "en", expandScientificNotes = false }: { result: ObservationResponse; lang?: ChartLanguage; expandScientificNotes?: boolean }) {
+  const t = (text: string) => chartText(lang, text);
   const location=result.location ?? result.region;
+  const locationName = lang === "my" ? location.nameMy || location.name : location.name;
   const points = useMemo(() => result.observations.map(point => ({...point,time:Date.parse(point.date)})),[result]);
   const valid = useMemo(() => points.filter(point => point.value !== null),[points]);
   const [active,setActive] = useState(-1);
@@ -60,19 +64,29 @@ export function EarthbeatExperience({ result }: { result: ObservationResponse })
     if(index!==undefined){event.preventDefault();select(index);}if(event.key===" "||event.key==="Enter"){event.preventDefault();toggle();}
   }
   const current=points[active];
-  return <div className="earthbeat-experience">
-    <EnvironmentalChart series={series} locationName={location.name} startDate={result.period.start} endDate={result.period.end} activeDate={current?.date} activeFraction={playhead} interactions={{role:"slider",tabIndex:0,"aria-label":"Interactive observation graph","aria-valuemin":0,"aria-valuemax":Math.max(0,points.length-1),"aria-valuenow":Math.max(0,active),"aria-valuetext":current?`${current.date}: ${current.value} ${result.dataset.unit}`:"No observation selected",onKeyDown:keyboard,onPointerDown:(event:PointerEvent<SVGSVGElement>)=>{if(event.pointerType==="mouse"&&event.button!==0)return;event.preventDefault();dragging.current=true;event.currentTarget.setPointerCapture(event.pointerId);event.currentTarget.focus();lastIndex.current=pointer(event);select(lastIndex.current);},onPointerMove:(event:PointerEvent<SVGSVGElement>)=>{const index=pointer(event);if(dragging.current&&index!==lastIndex.current){lastIndex.current=index;select(index);}},onPointerUp:()=>{dragging.current=false;},onPointerCancel:()=>{dragging.current=false;},onLostPointerCapture:()=>{dragging.current=false;}}}/>
-    <div className="earthbeat-controls" aria-label="EARTHBEAT sound controls">
+  const summaryNumber = (value:number|null) => value !== null && Number.isFinite(value)
+    ? new Intl.NumberFormat(lang === "my" ? "my-MM" : "en", {maximumFractionDigits:2}).format(value)
+    : "—";
+  return <div className={`earthbeat-experience ${styles.experience}`} lang={lang}>
+    <EnvironmentalChart lang={lang} observationTimeline={result.observations} series={series} locationName={locationName} startDate={result.period.start} endDate={result.period.end} activeDate={current?.date} activeFraction={playhead} interactions={{role:"slider",tabIndex:0,"aria-label":t("Interactive observation graph"),"aria-valuemin":0,"aria-valuemax":Math.max(0,points.length-1),"aria-valuenow":Math.max(0,active),"aria-valuetext":current?`${current.date}: ${current.value} ${t(result.dataset.unit)}`:t("No observation selected"),onKeyDown:keyboard,onPointerDown:(event:PointerEvent<SVGSVGElement>)=>{if(event.pointerType==="mouse"&&event.button!==0)return;event.preventDefault();dragging.current=true;event.currentTarget.setPointerCapture(event.pointerId);event.currentTarget.focus();lastIndex.current=pointer(event);select(lastIndex.current);},onPointerMove:(event:PointerEvent<SVGSVGElement>)=>{const index=pointer(event);if(dragging.current&&index!==lastIndex.current){lastIndex.current=index;select(index);}},onPointerUp:()=>{dragging.current=false;},onPointerCancel:()=>{dragging.current=false;},onLostPointerCapture:()=>{dragging.current=false;}}}/>
+    <div className="earthbeat-controls" aria-label={t("EARTHBEAT sound controls")}>
       <div className="earthbeat-player-heading">
-        <div><strong>EARTHBEAT</strong><p>{location.name} · {result.dataset.label} · {result.period.start} — {result.period.end}</p></div>
-        <button type="button" className="earthbeat-speaker button-primary" onClick={() => void toggle()} disabled={!valid.length || starting} aria-pressed={state === "playing"} aria-label={state === "playing" ? "Stop EARTHBEAT sound" : "Play EARTHBEAT sound"} title={state === "playing" ? "Stop EARTHBEAT sound" : "Play EARTHBEAT sound"}>
+        <div><strong>EARTHBEAT</strong><p>{locationName} · {t(result.dataset.label)} · {result.period.start} — {result.period.end}</p></div>
+        <button type="button" className="earthbeat-speaker button-primary" onClick={() => void toggle()} disabled={!valid.length || starting} aria-pressed={state === "playing"} aria-label={state === "playing" ? t("Stop EARTHBEAT sound") : t("Play EARTHBEAT sound")} title={state === "playing" ? t("Stop EARTHBEAT sound") : t("Play EARTHBEAT sound")}>
           {state === "playing" ? <Volume2 size={22} aria-hidden="true" /> : <VolumeX size={22} aria-hidden="true" />}
         </button>
       </div>
-      <p aria-live={state === "playing" ? "off" : "polite"}>{current ? `${current.date} · ${current.value === null ? "No reading" : `${current.value} ${result.dataset.unit}`}` : "Click the speaker to hear this graph."}</p>
-      <p>Sound follows the graph smoothly and repeats every 24 seconds until stopped. Missing readings and long gaps are silent.</p>
-      {error && <p role="alert">{error}</p>}
+      <p aria-live={state === "playing" ? "off" : "polite"}>{current ? `${current.date} · ${current.value === null ? t("No reading") : `${current.value} ${t(result.dataset.unit)}`}` : t("Click the speaker to hear this graph.")}</p>
+      <p>{t("Sound follows the graph smoothly and repeats every 24 seconds until stopped. Missing readings and long gaps are silent.")}</p>
+      <p>{t("Use Left/Right arrows, Home or End to select a reading; Enter or Space plays or pauses sound.")}</p>
+      {error && <p role="alert">{t(error)}</p>}
     </div>
-    <DataTrendInsight series={series} analysis={analysis} locationName={location.name} latitude={location.lat} longitude={location.lon}/>
+    <details className="workspace-advanced-insights" open={expandScientificNotes || undefined}><summary>{lang === "my" ? "အသေးစိတ် စာရင်းအင်းနှင့် သိပ္ပံဆိုင်ရာ မှတ်စုများ" : "Detailed statistics & scientific notes"}</summary><DataTrendInsight lang={lang} series={series} analysis={analysis} locationName={locationName} latitude={location.lat} longitude={location.lon}/></details>
+    <dl className={styles.summary} aria-label={lang === "my" ? "တိုင်းတာချက် အကျဉ်းချုပ်" : "Observation summary"}>
+      <div><dt>{lang === "my" ? "ပျမ်းမျှ" : "Mean"}</dt><dd>{summaryNumber(result.summary.mean)} <small>{result.dataset.unit}</small></dd></div>
+      <div><dt>{t("Minimum")}</dt><dd>{summaryNumber(result.summary.min)} <small>{result.dataset.unit}</small></dd></div>
+      <div><dt>{t("Maximum")}</dt><dd>{summaryNumber(result.summary.max)} <small>{result.dataset.unit}</small></dd></div>
+      <div><dt>{t("Observations")}</dt><dd title={lang === "my" ? "အသုံးပြုနိုင်သော / ရရှိသော တိုင်းတာချက်များ" : "Valid / returned observations"}>{result.summary.count} <small>/ {result.observations.length}</small></dd></div>
+    </dl>
   </div>;
 }

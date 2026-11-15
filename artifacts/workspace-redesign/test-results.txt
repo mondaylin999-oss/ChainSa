@@ -1,0 +1,146 @@
+
+> earthlens-chatbot@0.1.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /Users/yoonlaewai/Duwin/TerraAI
+
+ ✓ tests/search-history.test.ts (9 tests) 26ms
+stderr | tests/chat-flow.test.ts > seven-section concise answer format > English: all seven sections in order, exact disclaimer, no forecast claimed
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+stderr | tests/presentation.test.ts > Evidence-Based Action Cards > every card has all five fields and evidence references to real facts
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+stderr | tests/chat-flow.test.ts > seven-section concise answer format > keeps the seven sections even when NASA is unavailable, and does not call the AI
+[earthlens-chat] NASA POWER: NASA POWER returned HTTP 503.
+[earthlens-chat] NASA POWER history: NASA POWER returned HTTP 503.
+
+stderr | tests/chat-flow.test.ts > seven-section concise answer format > keeps the seven sections even when NASA is unavailable, and does not call the AI
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+stderr | tests/chat-flow.test.ts > indicators and decision support > raises a drought warning when recent rain and soil wetness are far below past years
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+stderr | tests/modis-ndvi.test.ts > chatbot uses MODIS NDVI > still answers when MODIS is down
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+stderr | tests/modis-ndvi.test.ts > NDVI comparison without the long-term POWER record > still shows the NDVI past-year comparison when POWER history fails
+[earthlens-chat] NASA POWER history: NASA POWER returned HTTP 504.
+
+ ✓ tests/modis-ndvi.test.ts (12 tests) 303ms
+stderr | tests/chat-flow.test.ts > indicators and decision support > always ends decision support with the official DMH check
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+ ✓ tests/live-only.test.ts (4 tests) 488ms
+   ✓ live-only production data > builds a browser application without the sample observation generator  480ms
+stderr | tests/presentation.test.ts > Evidence-Based Action Cards > confidence is a category with a reason, never a percentage
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+stderr | tests/presentation.test.ts > Evidence-Based Action Cards > Myanmar cards use the Myanmar labels and the disclaimer stays last
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+stderr | tests/presentation.test.ts > shorter answers > keeps historical and outlook sections to a few lines
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+stderr | tests/chat-flow.test.ts > AI provider chain (direct answer only) > uses OpenRouter first and places the verified AI text in Direct Answer only
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+stderr | tests/chat-flow.test.ts > AI provider chain (direct answer only) > keeps AI text in Direct Answer only, joining any bullets into one paragraph
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+stderr | tests/chat-flow.test.ts > AI provider chain (direct answer only) > rejects AI text that turns history into a forecast or invents a probability
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+stderr | tests/chat-flow.test.ts > AI provider chain (direct answer only) > rejects AI text that turns history into a forecast or invents a probability
+[earthlens-chat] AI answer rejected (forecast/probability wording): \d+(?:\.\d+)?\s*%\s*(?:chance|probability|likelihood|risk)
+
+stderr | tests/chat-flow.test.ts > AI provider chain (direct answer only) > rejects AI text that turns history into a forecast or invents a probability
+[earthlens-chat] AI answer rejected (forecast/probability wording): \bwill\s+(?:rain|flood|be\s+(?:dry|wet|hot|rainy)|receive|get|see|experience|drop|rise)\b
+
+stderr | tests/presentation.test.ts > Executive Summary (region · key findings · key recommendation) > English: three-part summary first, then the six numbered detailed sections, disclaimer last
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+ ✓ tests/explorer-integration.test.ts (2 tests) 29ms
+stderr | tests/chat-flow.test.ts > AI provider chain (direct answer only) > rejects invented numbers
+[earthlens-chat] AI answer had numbers not in NASA data: 777.7
+
+stderr | tests/chat-flow.test.ts > AI provider chain (direct answer only) > rejects invented numbers
+[earthlens-chat] AI answer had numbers not in NASA data: 777.7
+
+stderr | tests/presentation.test.ts > Executive Summary (region · key findings · key recommendation) > returns the three parts as a structured field
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+stderr | tests/chat-flow.test.ts > AI provider chain (direct answer only) > falls back OpenRouter (429) -> Groq, and stops OpenRouter on 402
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+stderr | tests/presentation.test.ts > Executive Summary (region · key findings · key recommendation) > key findings and recommendation only use values from the table and cards
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+ ✓ tests/township-observations.test.ts (3 tests) 69ms
+stderr | tests/presentation.test.ts > Executive Summary (region · key findings · key recommendation) > uses the map-selected region and says so
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+ ✓ tests/black-marble.test.ts (20 tests) 132ms
+ ✓ tests/chat-flow.test.ts (18 tests) 667ms
+stderr | tests/presentation.test.ts > Executive Summary (region · key findings · key recommendation) > when the question names another region, shows both so the user is not confused
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+stderr | tests/presentation.test.ts > Executive Summary (region · key findings · key recommendation) > Myanmar: three Myanmar paragraphs on top
+[earthlens-chat] MODIS NDVI: NASA MODIS (ORNL DAAC) returned HTTP 503.
+
+ ✓ tests/climate-indicators.test.ts (19 tests) 245ms
+ ✓ tests/workspace-chart.test.ts (37 tests) 17ms
+ ✓ tests/environmental-significance.test.ts (12 tests) 24ms
+stderr | tests/nasa.test.ts > grounding > reports failure honestly when NASA POWER is down
+[earthlens-chat] NASA POWER: NASA POWER returned HTTP 503.
+
+stderr | tests/presentation.test.ts > AI safety fixes (Nov 2026 comparison) > a rejected OpenRouter key (401) skips straight to Groq instead of trying another OpenRouter model
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+ ✓ tests/nasa.test.ts (7 tests) 12ms
+ ✓ tests/explore-api.test.ts (4 tests) 30ms
+stderr | tests/presentation.test.ts > AI safety fixes (Nov 2026 comparison) > with AI_LANGUAGES=en (default), Myanmar answers use the template and no AI is called
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+ ✓ tests/remaining-indicators.test.ts (24 tests) 39ms
+ ✓ tests/environmental-dataTrendInsight.test.ts (2 tests) 13ms
+stderr | tests/presentation.test.ts > AI safety fixes (Nov 2026 comparison) > English still uses AI with AI_LANGUAGES=en
+[earthlens-chat] MODIS NDVI: Could not reach NASA MODIS (ORNL DAAC).
+
+stderr | tests/presentation.test.ts > AI safety fixes (Nov 2026 comparison) > rejects AI text that calls conditions normal when the data is far from usual
+[earthlens-chat] AI answer rejected (contradicts NASA comparison): says "normal" but rain_30d_pct=100, rain_90d_pct=100, soil_pct=100
+
+stderr | tests/presentation.test.ts > AI safety fixes (Nov 2026 comparison) > rejects AI text that calls conditions normal when the data is far from usual
+[earthlens-chat] AI answer rejected (contradicts NASA comparison): says "normal" but rain_30d_pct=100, rain_90d_pct=100, soil_pct=100
+
+ ✓ tests/presentation.test.ts (29 tests) 1040ms
+ ✓ tests/satellite-data.test.ts (4 tests) 18ms
+ ✓ tests/environmental-statistics.test.ts (2 tests) 9ms
+ ✓ tests/ndvi-range.test.ts (2 tests) 16ms
+ ✓ tests/earthbeat.test.ts (8 tests) 14ms
+ ✓ tests/workspace-selection.test.ts (98 tests) 7ms
+stderr | tests/verify-and-env.test.ts > free-only model configuration > reads the brief's variable names and still refuses paid models
+[earthlens-chat] AI_ALLOW_PAID_MODELS is not 'false'. This project only uses free models; the setting is ignored.
+[earthlens-chat] AI_ALLOW_PAID_MODELS is not 'false'. This project only uses free models; the setting is ignored.
+[earthlens-chat] Ignoring non-free openrouter models: openai/gpt-5
+
+stderr | tests/verify-and-env.test.ts > free-only model configuration > only accepts OpenRouter free models
+[earthlens-chat] Ignoring non-free openrouter models: openai/gpt-4o
+
+stderr | tests/verify-and-env.test.ts > free-only model configuration > only accepts allow-listed Groq models
+[earthlens-chat] Ignoring non-free groq models: llama-3.3-70b-versatile
+
+ ✓ tests/verify-and-env.test.ts (8 tests) 5ms
+ ✓ tests/climate-stats.test.ts (5 tests) 6ms
+ ✓ tests/detection.test.ts (6 tests) 7ms
+ ✓ tests/explorer-dates.test.ts (3 tests) 3ms
+ ✓ tests/site-analyze.test.ts (4 tests) 6ms
+ ✓ tests/public-satellite-values.test.ts (13 tests) 4020ms
+   ✓ public NASA satellite values > retries one NASA gateway error but reports a second one  4005ms
+
+ Test Files  26 passed (26)
+      Tests  355 passed (355)
+   Start at  13:43:21
+   Duration  5.17s (transform 1.12s, setup 0ms, collect 6.26s, tests 7.24s, environment 2ms, prepare 1.29s)
+

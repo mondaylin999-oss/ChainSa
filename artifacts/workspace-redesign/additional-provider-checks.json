@@ -1,0 +1,43 @@
+[
+  {
+    "selection": {
+      "topicId": "environmental-change",
+      "regionId": "yangon",
+      "datasetId": "vegetation-index",
+      "start": "2025-01-01",
+      "end": "2025-01-17"
+    },
+    "error": "The operation was aborted due to timeout"
+  },
+  {
+    "selection": {
+      "topicId": "disaster-intelligence",
+      "regionId": "yangon",
+      "datasetId": "fire-detections",
+      "start": "2026-11-09",
+      "end": "2026-11-15"
+    },
+    "status": 200,
+    "count": 7,
+    "missingCount": 0,
+    "source": {
+      "name": "NASA FIRMS NOAA-20 VIIRS (public seven-day feed)",
+      "url": "https://firms.modaps.eosdis.nasa.gov/active_fire/"
+    },
+    "spatialBasis": {
+      "kind": "area-total",
+      "label": "Full Region Area Total (detection count)"
+    }
+  },
+  {
+    "selection": {
+      "topicId": "water",
+      "regionId": "yangon",
+      "datasetId": "river-width",
+      "start": "2024-06-01",
+      "end": "2024-06-15"
+    },
+    "status": 404,
+    "error": "No SWOT river reach from the SWOT River Database lies within about 16 km of this regional reference point, so there is insufficient data. Choose a township on a large river."
+  }
+]

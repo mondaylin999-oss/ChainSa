@@ -17,7 +17,7 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .site-header { background: var(--et-050a18); border-color: var(--et-172142); min-height: 80px; height: auto; padding: 14px max(32px, calc((100vw - 1256px) / 2)); }
 .earthlens-app .brand-text strong { color: var(--et-fff); font-size: 17px; letter-spacing: -.02em; }
 .earthlens-app .brand-text small { color: var(--et-a6b3d0); font-size: 9px; letter-spacing: .16em; }
-.earthlens-brand-art { width: 46px; height: 46px; }
+.earthlens-brand-art { width: 46px; height: 46px; object-fit: contain; flex-shrink: 0; }
 .earthlens-app .main-nav { gap: 6px; margin-left: auto; }
 .earthlens-app .nav-link { color: var(--et-e9edfa); font-size: 14px; min-height: 44px; padding: 0 16px; border-radius: 12px; }
 .earthlens-app .nav-link-active { background: var(--et-1b1740); color: var(--et-c3b6ff); }
@@ -235,3 +235,12 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .topic-rail .rail-topic-button:is([data-topic="agriculture"],[data-topic="water"],[data-topic="infrastructure-urban-change"],[data-topic="disaster-intelligence"],[data-topic="energy"],[data-topic="environmental-change"]) .rail-topic-name { color: #fff; text-shadow: 0 1px 4px #0009; }
 .earthlens-app .topic-rail .rail-topic-button:is([data-topic="agriculture"],[data-topic="water"],[data-topic="infrastructure-urban-change"],[data-topic="disaster-intelligence"],[data-topic="energy"],[data-topic="environmental-change"]) .topic-icon-tile { background: rgba(20,16,48,.65); color: #fff; border-color: rgba(255,255,255,.3); }
 .earthlens-app .topic-rail .rail-topic-button-active:is([data-topic="agriculture"],[data-topic="water"],[data-topic="infrastructure-urban-change"],[data-topic="disaster-intelligence"],[data-topic="energy"],[data-topic="environmental-change"]) { border-color: #a88cff; box-shadow: inset 0 0 0 1px #a88cff; }
+
+.brand-letter-yellow {color:#ffc42a}
+.brand-letter-blue {color:#159bd3}
+
+.earthlens-app .brand-text strong.chainsa-wordmark {font-size:30px;line-height:1.2}
+@media(max-width:760px){.earthlens-app .brand-text strong.chainsa-wordmark{font-size:24px}}
+
+.earthlens-app .site-header .earthlens-brand-art {width:64px;height:64px;object-fit:contain}
+@media(max-width:760px){.earthlens-app .site-header .earthlens-brand-art{width:54px;height:54px}}
