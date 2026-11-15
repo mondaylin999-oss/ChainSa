@@ -43,6 +43,8 @@ export async function chatCompletion(req: CompletionRequest): Promise<Completion
     return { outcome: name === "TimeoutError" || name === "AbortError" ? "timeout" : "http_error" };
   }
   // 429 = rate/free limit reached; 402 = OpenRouter "payment required" — never retried with a paid model.
+  // A rejected key is not a temporary error: report it so the chain skips this provider.
+  if (res.status === 401 || res.status === 403) return { outcome: "invalid_credentials", status: res.status };
   if (res.status === 429 || res.status === 402) return { outcome: "rate_limited", status: res.status };
   if (!res.ok) return { outcome: "http_error", status: res.status };
   let json: { model?: string; choices?: { message?: { content?: string | null } }[] };

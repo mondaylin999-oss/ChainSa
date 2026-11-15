@@ -59,7 +59,13 @@ export type AttemptOutcome =
   | "timeout"
   | "empty"
   | "unverified_numbers"
-  | "forbidden_claim";
+  | "forbidden_claim"
+  /** 401/403: the API key was rejected — the provider is skipped for this answer. */
+  | "invalid_credentials"
+  /** The AI text contradicts the NASA comparison (e.g. says "normal" when values are far above usual). */
+  | "contradicts_data"
+  /** AI is switched off for this answer language (AI_LANGUAGES). */
+  | "language_disabled";
 
 export interface ProviderAttempt {
   provider: "openrouter" | "groq";

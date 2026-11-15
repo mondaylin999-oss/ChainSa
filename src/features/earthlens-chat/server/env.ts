@@ -18,6 +18,8 @@ export interface ServerConfig {
   openrouter: ProviderConfig;
   groq: ProviderConfig;
   firmsMapKey: string;
+  /** Answer languages the AI may write in (AI_LANGUAGES). Others always use the template. Default: English only. */
+  aiLanguages: ("en" | "my")[];
   aiTimeoutMs: number;
   /** strict = reject AI answers with numbers not found in NASA facts (default); warn = keep them but log. */
   verifyMode: "strict" | "warn";
@@ -97,6 +99,8 @@ export function getConfig(): ServerConfig {
       rejectedModels: groqModels.filter((m) => !groqAllowed.has(m)),
     },
     firmsMapKey: (e.NASA_FIRMS_MAP_KEY || e.FIRMS_MAP_KEY || "").trim(),
+    // Burmese from the tested free model was poor (Nov 2026 comparison), so AI writes English only by default.
+    aiLanguages: list(e.AI_LANGUAGES, ["en"]).map((l) => l.toLowerCase()).filter((l): l is "en" | "my" => l === "en" || l === "my"),
     aiTimeoutMs: int(e.AI_TIMEOUT_MS, 25_000, 3_000, 60_000),
     verifyMode: (e.CHAT_VERIFY_MODE ?? "").toLowerCase() === "warn" ? "warn" : "strict",
     nasaTimeoutMs: int(e.NASA_TIMEOUT_MS, 20_000, 3_000, 60_000),

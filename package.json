@@ -11,7 +11,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check:secrets": "node scripts/check-secrets.mjs"
+    "check:secrets": "node scripts/check-secrets.mjs",
+    "compare:ai": "vitest run --config scripts/compare-ai/vitest.config.ts"
   },
   "dependencies": {
     "@google/earthengine": "^1.7.52",

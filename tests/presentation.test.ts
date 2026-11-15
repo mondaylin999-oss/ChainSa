@@ -240,3 +240,74 @@ describe("follow-up questions", () => {
     expect(res.status).toBe(200);
   });
 });
+
+describe("AI safety fixes (Nov 2026 comparison)", () => {
+  const keysCfg = (over = {}) =>
+    baseConfig({
+      openrouter: { name: "openrouter", apiKey: "or-test", baseUrl: "https://openrouter.test/api/v1", models: ["openrouter/free", "meta-llama/llama-3.3-70b-instruct:free"], rejectedModels: [] },
+      groq: { name: "groq", apiKey: "gq-test", baseUrl: "https://groq.test/openai/v1", models: ["openai/gpt-oss-20b"], rejectedModels: [] },
+      ...over,
+    });
+  const completion = (content: string) => Response.json({ model: "m", choices: [{ message: { content } }] });
+
+  it("a rejected OpenRouter key (401) skips straight to Groq instead of trying another OpenRouter model", async () => {
+    const { f, calls } = mockFetch({
+      "https://power.larc.nasa.gov": nasa(),
+      "https://openrouter.test": () => new Response("User not found", { status: 401 }),
+      "https://groq.test": () => completion("Crops in Mandalay look fine."),
+    });
+    const r = await answerChat({ message: "crops in Mandalay" }, { config: keysCfg(), fetchImpl: f, today: TODAY });
+    expect(calls.filter((c) => c.url.startsWith("https://openrouter.test"))).toHaveLength(1);
+    expect(r.attempts[0].outcome).toBe("invalid_credentials");
+    expect(r.provider).toBe("groq");
+  });
+
+  it("with AI_LANGUAGES=en (default), Myanmar answers use the template and no AI is called", async () => {
+    const { f, calls } = mockFetch({ "https://power.larc.nasa.gov": nasa(), "https://openrouter.test": () => completion("x"), "https://groq.test": () => completion("x") });
+    const r = await answerChat({ message: "မန္တလေးတိုင်းဒေသကြီးတွင် သီးနှံများအတွက် အခြေအနေ" }, { config: keysCfg({ aiLanguages: ["en"] }), fetchImpl: f, today: TODAY });
+    expect(r.lang).toBe("my");
+    expect(r.generator).toBe("template");
+    expect(r.attempts.map((a) => a.outcome)).toEqual(["language_disabled"]);
+    expect(calls.some((c) => c.url.includes(".test"))).toBe(false);
+  });
+
+  it("English still uses AI with AI_LANGUAGES=en", async () => {
+    const { f } = mockFetch({ "https://power.larc.nasa.gov": nasa(), "https://openrouter.test": () => completion("Crops in Mandalay look fine.") });
+    const r = await answerChat({ message: "crops in Mandalay" }, { config: keysCfg({ aiLanguages: ["en"] }), fetchImpl: f, today: TODAY });
+    expect(r.generator).toBe("llm");
+  });
+
+  it("rejects AI text that calls conditions normal when the data is far from usual", async () => {
+    // wet override → rainfall and soil wetness rank far above past years
+    const wet = { overrideFrom: "2026-10-20", override: { PRECTOTCORR: 120, GWETROOT: 0.99 } };
+    const { f } = mockFetch({
+      "https://power.larc.nasa.gov": nasa(wet),
+      "https://openrouter.test": () => completion("Rainfall and soil wetness are within normal ranges, so there is no flood signal."),
+      "https://groq.test": () => completion("It has been much wetter than usual in Yangon."),
+    });
+    const r = await answerChat({ message: "flooding in Yangon?" }, { config: keysCfg(), fetchImpl: f, today: TODAY });
+    expect(r.attempts[0].outcome).toBe("contradicts_data");
+    expect(r.summaryParts!.keyFindings).not.toMatch(/within normal ranges/);
+    expect(r.provider).toBe("groq");
+  });
+
+  it("rejects risk statements about the coming weeks (there is no validated forecast)", async () => {
+    const { forbiddenClaims } = await import("@/features/earthlens-chat/server/verify");
+    expect(forbiddenClaims("There is no drought risk for rice farmers in Magway in the next 30 days.")).not.toHaveLength(0);
+    expect(forbiddenClaims("In the coming weeks there is low flood risk.")).not.toHaveLength(0);
+    expect(forbiddenClaims("NASA data shows no drought signal for Magway right now.")).toHaveLength(0);
+  });
+});
+
+describe("contradiction check wording", () => {
+  it("allows correct comparisons and catches 'normal' claims", async () => {
+    const { contradictsData } = await import("@/features/earthlens-chat/server/verify");
+    const facts = [{ id: "rain_30d_pct", param: "rainfall", label: "", labelMy: "", value: 95, unit: "percentile", decimals: 0, source: "nasa-power-daily" }] as never[];
+    expect(contradictsData("It has been much wetter than usual.", facts)).toBeNull();
+    expect(contradictsData("Rainfall is far above usual for this season.", facts)).toBeNull();
+    expect(contradictsData("Rainfall is within normal ranges.", facts)).not.toBeNull();
+    expect(contradictsData("Conditions look as usual.", facts)).not.toBeNull();
+    // no extreme ranks → nothing to contradict
+    expect(contradictsData("Rainfall is within normal ranges.", [{ id: "rain_30d_pct", param: "rainfall", label: "", labelMy: "", value: 55, unit: "percentile", decimals: 0, source: "nasa-power-daily" }] as never[])).toBeNull();
+  });
+});
