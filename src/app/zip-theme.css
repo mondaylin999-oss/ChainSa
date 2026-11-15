@@ -158,3 +158,5 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .detail-warning { padding: 10px 12px; border: 1px solid #6b5a2a; border-radius: 10px; background: #2a2414; }
 .earthlens-app .detail-warning dt { color: #f3d58a; }
 .earthlens-app .detail-warning dd { color: #f1e6c8; }
+
+.earthlens-app .map-township-label { fill: #243b32; stroke: #fff; stroke-width: .22em; paint-order: stroke; stroke-linejoin: round; font-family: var(--font-sans); font-weight: 650; }

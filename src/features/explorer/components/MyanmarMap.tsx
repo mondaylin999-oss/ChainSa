@@ -129,9 +129,7 @@ export function MyanmarMap({
   const viewBox = focusedBounds
     ? `${focusedBounds.minX - padding} ${focusedBounds.minY - padding} ${Math.max(padding * 2, focusedBounds.maxX - focusedBounds.minX + padding * 2)} ${Math.max(padding * 2, focusedBounds.maxY - focusedBounds.minY + padding * 2)}`
     : COUNTRY_VIEWBOX;
-  const markerRadius = focusedBounds
-    ? Math.max(.05, Math.max(focusedBounds.maxX - focusedBounds.minX, focusedBounds.maxY - focusedBounds.minY) / 100)
-    : .8;
+
 
   let zoom = 1;
   let zoomTransform = "translate(0, 0) scale(1)";
@@ -219,7 +217,15 @@ export function MyanmarMap({
               const anchor = sample
                 ? project([sample.lon, sample.lat])
                 : { x: (bounds.minX + bounds.maxX) / 2, y: (bounds.minY + bounds.maxY) / 2 };
-              const label = language === "my" ? township.nameMy : township.name;
+              const label = (language === "my" ? township.nameMy : township.name) || township.name;
+              // Keep long names on two lines and scale lettering with the focused map.
+              const words = label.split(/\s+/);
+              const lines = label.length > 12 && words.length > 1
+                ? [words.slice(0, Math.ceil(words.length / 2)).join(" "), words.slice(Math.ceil(words.length / 2)).join(" ")]
+                : [label];
+              const viewWidth = Number(viewBox.split(" ")[2]);
+              const fontSize = Math.min(viewWidth / 48, (bounds.maxY - bounds.minY) / (lines.length + 1.5));
+              const labelWidth = Math.max(fontSize, (bounds.maxX - bounds.minX) * .85);
               return (
                 <g key={township.id}>
                   <path
@@ -241,7 +247,26 @@ export function MyanmarMap({
                   >
                     <title>{label}</title>
                   </path>
-                  <circle cx={anchor.x} cy={anchor.y} r={selected ? markerRadius * 1.5 : markerRadius} fill="#55615a" pointerEvents="none" />
+                  <text
+                    x={anchor.x}
+                    y={anchor.y}
+                    className="map-township-label"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize={fontSize}
+                    pointerEvents="none"
+                    aria-hidden="true"
+                  >
+                    {lines.map((line, index) => (
+                      <tspan
+                        key={index}
+                        x={anchor.x}
+                        dy={index === 0 ? -(lines.length - 1) * fontSize * .6 : fontSize * 1.2}
+                        textLength={line.length * fontSize * (language === "my" ? .85 : .58) > labelWidth ? labelWidth : undefined}
+                        lengthAdjust="spacingAndGlyphs"
+                      >{line}</tspan>
+                    ))}
+                  </text>
                 </g>
               );
             })}
