@@ -1,6 +1,6 @@
 # Category video loops
 
-Representative stock footage for the six home-page category cards. These are local, silent MP4 clips under the Mixkit Stock Video Free License, not live camera feeds.
+Decorative footage for the six home-page category cards. These are local, silent MP4 clips, not live camera feeds or observed environmental events. Environmental Change, Water and Disaster Intelligence use user-provided Gemini-generated clips; the other three clips retain their Mixkit sources below.
 
 License: https://mixkit.co/license/#videoFree
 
@@ -11,16 +11,16 @@ License: https://mixkit.co/license/#videoFree
   - Source: https://mixkit.co/free-stock-video/aerial-view-of-city-traffic-at-night-11/
   - Download: https://assets.mixkit.co/videos/11/11-360.mp4
 - **water.mp4**
-  - Source: https://mixkit.co/free-stock-video/forest-stream-in-the-sunlight-529/
-  - Download: https://assets.mixkit.co/videos/529/529-360.mp4
+  - User-provided source: `gemini_generated_video_85d04222.mp4`
+  - River scene; 10 seconds.
 - **energy.mp4**
   - Source: https://mixkit.co/free-stock-video/wind-farms-out-at-sea-4234/
   - Download: https://assets.mixkit.co/videos/4234/4234-360.mp4
 - **environment.mp4**
-  - Source: https://mixkit.co/free-stock-video/tree-branches-in-the-breeze-1188/
-  - Download: https://assets.mixkit.co/videos/1188/1188-360.mp4
+  - User-provided source: `gemini_generated_video_5c19a42f.mp4`
+  - Green hills and fields; 20 seconds.
 - **disaster.mp4**
-  - Source: https://mixkit.co/free-stock-video/firefighters-putting-out-a-big-fire-5280/
-  - Download: https://assets.mixkit.co/videos/5280/5280-360.mp4
+  - User-provided source: `gemini_generated_video_1bf34b43.mp4`
+  - Storm and lightning scene; 10 seconds.
 
-The 360p renditions keep the six small card headers lightweight (about 9 MB total). Playback is muted, inline and loops continuously, with a manual pause option and reduced-motion preference support. Still poster images are documented in ../photos/SOURCES.md.
+The three replacement clips use H.264 at 640 x 360, 24 fps, without audio and with MP4 fast-start. They total approximately 3.2 MB. Playback remains muted and inline, loops continuously, and supports manual pause and reduced-motion preferences. Matching still frames are used for Home posters and Explore category backgrounds.
