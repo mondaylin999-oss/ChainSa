@@ -348,7 +348,7 @@ export default function Page() {
     <main className="earthlens-app" lang={lang}>
       <ReferenceHome historyPreview={{ cards: history.cards, loading: history.loading, error: history.error, busyId: history.busyId }} onHistory={historyAction} lang={lang} onExplore={(topic) => { if (topic) setActiveTopic(topic); setView("explore"); }} onAsk={() => setChatOpen(true)} onRegion={(id) => { chooseRegion(id); setView("explore"); }} onLanguage={selectLanguage} />
       <button className="floating-ai-launcher button-primary" aria-expanded={chatOpen} aria-controls="floating-ai-panel" onClick={() => setChatOpen(open => !open)}><MessageCircle size={18} /> {lang === "my" ? "AI စကားပြော" : "AI chat"}</button>
-      {chatOpen && <section id="floating-ai-panel" className="floating-ai-panel" role="dialog" aria-label="EarthLens AI chat" onKeyDown={event => { if (event.key === "Escape") setChatOpen(false); }}><button className="floating-ai-close button-secondary" onClick={() => setChatOpen(false)}>Close chat</button><ChatPanel lang={lang} selectedRegionId={regionId} inputRef={chatInputRef} /></section>}
+      {chatOpen && <section id="floating-ai-panel" className="floating-ai-panel" role="dialog" aria-label="EarthLens AI chat" onKeyDown={event => { if (event.key === "Escape") setChatOpen(false); }}><button className="floating-ai-close button-secondary" onClick={() => setChatOpen(false)} aria-label="Close chat" title="Close chat"><span aria-hidden="true">×</span></button><ChatPanel lang={lang} selectedRegionId={regionId} inputRef={chatInputRef} /></section>}
     </main>
   );
 
@@ -371,6 +371,14 @@ export default function Page() {
   return (
     <main className={`earthlens-app${view === "explore" ? " is-exploring" : ""}`} lang={lang}>
       <header className="site-header">
+          <button type="button" className="explore-back" onClick={() => {
+            if (townshipId) setTownshipId("");
+            else if (mapFocused) setMapFocused(false);
+            else { setChatOpen(false); setView("home"); }
+          }} aria-label={townshipId ? "Back to region" : mapFocused ? "Back to all regions" : "Back to Home"}>
+            <ArrowLeft size={16} aria-hidden="true" />{lang === "my" ? "နောက်သို့" : "Back"}
+            <span>{townshipId ? "To region" : mapFocused ? "All regions" : "Home"}</span>
+          </button>
         <a className="brand-lockup" href="#home" onClick={(event) => { event.preventDefault(); setView("home"); }} aria-label="Myanmar EarthLens home">
           <img className="earthlens-brand-art" src="/home-exact/brand.svg" alt="" />
           <span className="brand-text"><strong>Earth Trend Detective</strong><small>MYANMAR EARTH INTELLIGENCE</small></span>
@@ -453,7 +461,7 @@ export default function Page() {
 
             <aside className="data-column" aria-label="Data selection and details">
               <div className="selection-panel panel">
-                <div className="panel-title-row selection-title"><div><p className="eyebrow">Build your view</p><h2>Data workspace</h2></div><span className="live-tag"><span className="status-dot" /> {chartState === "ready" ? "Observations loaded" : selectedDataset?.available ? "Data source available" : "No data available"}</span></div>
+                <div className="panel-title-row selection-title"><div><p className="eyebrow">Build your view</p><h2>Data workspace</h2></div><div className="workspace-status"><span className="live-tag"><span className="status-dot" /> {chartState === "ready" ? "Observations loaded" : selectedDataset?.available ? "Data source available" : "No data available"}</span>
                 <details className="workspace-notices">
                   <summary aria-label={lang === "my" ? "အချက်အလက်နှင့် သတိပြုရန်" : "Workspace information and notices"} title={lang === "my" ? "အချက်အလက်နှင့် သတိပြုရန်" : "Information and notices"}>
                     <Info size={19} aria-hidden="true" />
@@ -468,7 +476,7 @@ export default function Page() {
                     <p>Apply your dates to update the graph. Recent days may not have published observations yet.</p>
                     {datasetId === "fire-detections" && <p>NASA FIRMS supports up to 10 recent days ending today.</p>}
                   </div>
-                </details>
+                </details></div></div>
                 <div className="selection-grid">
                   <div className="field-control">
                     <label htmlFor="township-select">Select Township</label>
@@ -606,18 +614,11 @@ export default function Page() {
               </div>
             </aside>
           </div>
-          <button type="button" className="explore-back" onClick={() => {
-            if (townshipId) setTownshipId("");
-            else if (mapFocused) setMapFocused(false);
-            else { setChatOpen(false); setView("home"); }
-          }} aria-label={townshipId ? "Back to region" : mapFocused ? "Back to all regions" : "Back to Home"}>
-            <ArrowLeft size={16} aria-hidden="true" />{lang === "my" ? "နောက်သို့" : "Back"}
-            <span>{townshipId ? "To region" : mapFocused ? "All regions" : "Home"}</span>
-          </button>
+
           <footer className="site-footer"><span>Natural Earth admin-1 boundaries · NASA POWER daily · NASA FIRMS when configured</span><a href="/earthlens.html">Original dashboard preview <ExternalLink size={13} /></a></footer>
         </div>
       )}
-      {view === "explore" && <><button className="floating-ai-launcher button-primary" aria-expanded={chatOpen} aria-controls="floating-ai-panel" onClick={()=>setChatOpen(open=>!open)}><MessageCircle size={18}/> AI chat</button>{chatOpen && <section id="floating-ai-panel" className="floating-ai-panel" role="dialog" aria-label="EarthLens AI chat" onKeyDown={event=>{if(event.key==="Escape")setChatOpen(false);}}><button className="floating-ai-close button-secondary" onClick={()=>setChatOpen(false)} autoFocus>Close chat</button><ChatPanel lang={lang} selectedRegionId={regionId} inputRef={chatInputRef}/></section>}</>}
+      {view === "explore" && <><button className="floating-ai-launcher button-primary" aria-expanded={chatOpen} aria-controls="floating-ai-panel" onClick={()=>setChatOpen(open=>!open)}><MessageCircle size={18}/> AI chat</button>{chatOpen && <section id="floating-ai-panel" className="floating-ai-panel" role="dialog" aria-label="EarthLens AI chat" onKeyDown={event=>{if(event.key==="Escape")setChatOpen(false);}}><button className="floating-ai-close button-secondary" onClick={()=>setChatOpen(false)} autoFocus aria-label="Close chat" title="Close chat"><span aria-hidden="true">×</span></button><ChatPanel lang={lang} selectedRegionId={regionId} inputRef={chatInputRef}/></section>}</>}
     </main>
   );
 }

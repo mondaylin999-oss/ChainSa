@@ -1,5 +1,8 @@
 (function () {
   var translations = {
+    "Sound volume": "အသံအတိုးအကျယ်",
+    "Decrease sound volume": "အသံလျှော့ရန်",
+    "Increase sound volume": "အသံတိုးရန်",
     "Environmental Overview": "ပတ်ဝန်းကျင် အခြေအနေ အကျဉ်းချုပ်",
     "What Changed?": "ဘာတွေ ပြောင်းလဲသွားသလဲ။",
     "Monthly and Calendar-quarter Patterns": "လစဉ်နှင့် ပြက္ခဒိန်သုံးလပတ် အခြေအနေများ",

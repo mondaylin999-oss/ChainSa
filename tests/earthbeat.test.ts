@@ -47,6 +47,25 @@ describe("EARTHBEAT shared observations",()=>{
 });
 
 describe("EARTHBEAT continuous playback", () => {
+  it("changes and clamps live volume independently of the pitch and missing-data envelope", async () => {
+    vi.useFakeTimers();
+    const audio = audioFixture();
+    const envelope = audio.context.createGain();
+    const output = { gain: { value: 2, setValueAtTime: vi.fn(), cancelScheduledValues: vi.fn(), linearRampToValueAtTime: vi.fn() }, connect: vi.fn(), disconnect: vi.fn() };
+    vi.mocked(audio.context.createGain).mockReturnValueOnce(envelope).mockReturnValueOnce(output as unknown as GainNode);
+    const player = new EarthbeatEngine(vi.fn(), vi.fn(), () => audio.context);
+    player.load(earthbeatObservations(rows, "T2M"));
+    player.setVolume(75);
+    await player.play();
+    expect(output.gain.setValueAtTime).toHaveBeenCalledWith(3, 0);
+    const pitchCalls = audio.frequency.linearRampToValueAtTime.mock.calls.length;
+    player.setVolume(-10);
+    expect(output.gain.linearRampToValueAtTime).toHaveBeenLastCalledWith(0, .05);
+    player.setVolume(200);
+    expect(output.gain.linearRampToValueAtTime).toHaveBeenLastCalledWith(4, .05);
+    expect(audio.frequency.linearRampToValueAtTime.mock.calls.length).toBe(pitchCalls);
+    player.dispose();
+  });
   it("starts only on request, glides across timestamps and repeats on the same oscillator", async () => {
     vi.useFakeTimers();
     const audio = audioFixture();

@@ -3,10 +3,7 @@
 (() => {
   const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
   const mobile = window.matchMedia("(max-width: 860px)");
-  let userPaused = preference.matches;
-  let pointerNear = false;
-  let focusWithin = false;
-  let sectionListeners;
+
   let journey;
   let runner;
   let route;
@@ -18,7 +15,7 @@
   const duration = 18000;
 
   function isPaused() {
-    return userPaused || (!pointerNear && !focusWithin);
+    return preference.matches || document.hidden;
   }
 
   function measure() {
@@ -67,12 +64,6 @@
     cancelAnimationFrame(frame);
     lastTime = undefined;
     if (journey) journey.dataset.motionPaused = String(paused);
-    const button = document.querySelector("[data-howto-motion-toggle]");
-    if (button) {
-      const label = paused ? "Play animation" : "Pause animation";
-      if (button.textContent !== label) button.textContent = label;
-      button.setAttribute("aria-pressed", String(paused));
-    }
     if (!paused && runner) frame = requestAnimationFrame(tick);
   }
 
@@ -80,46 +71,17 @@
     const next = document.querySelector(".howto-runner");
     if (!next || next === runner) return;
     resizeObserver?.disconnect();
-    sectionListeners?.abort();
     runner = next;
     journey = runner.closest(".howto-journey");
     route = journey.querySelector("#howto-route");
-    const section = journey.closest(".howto-section");
-    sectionListeners = new AbortController();
-    const options = { signal: sectionListeners.signal };
-    pointerNear = section.matches(":hover");
-    focusWithin = section.contains(document.activeElement);
-    section.addEventListener("pointerenter", () => {
-      pointerNear = true;
-      update();
-    }, options);
-    section.addEventListener("pointerleave", () => {
-      pointerNear = false;
-      update();
-    }, options);
-    section.addEventListener("focusin", () => {
-      focusWithin = true;
-      update();
-    }, options);
-    section.addEventListener("focusout", event => {
-      focusWithin = section.contains(event.relatedTarget);
-      update();
-    }, options);
     resizeObserver = new ResizeObserver(measure);
     resizeObserver.observe(journey);
     measure();
     update();
   }
 
-  document.addEventListener("click", event => {
-    if (!(event.target instanceof Element) || !event.target.closest("[data-howto-motion-toggle]")) return;
-    userPaused = !isPaused();
-    update();
-  });
-  preference.addEventListener("change", event => {
-    userPaused = event.matches;
-    update();
-  });
+  preference.addEventListener("change", update);
+  document.addEventListener("visibilitychange", update);
   mobile.addEventListener("change", measure);
   new MutationObserver(initialize).observe(document.body, { childList: true, subtree: true });
   initialize();

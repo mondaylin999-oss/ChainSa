@@ -26,7 +26,7 @@ export function DataTableView({ table, lang }: { table: DataTable; lang: Lang })
           <col className="w-[22%]" />
         </colgroup>
         <thead>
-          <tr className="border-b border-[#e4e9e2] align-bottom text-[10px] font-semibold text-[#66776a]">
+          <tr className="border-b border-[var(--et-26375b)] align-bottom text-[10px] font-semibold text-[var(--et-c5cee6)]">
             <th scope="col" className="py-1 pr-2 font-medium">{t.colParam}</th>
             <th scope="col" className="py-1 pr-2 font-medium">{t.colLatest}</th>
             <th scope="col" className="py-1 pr-2 font-medium">{t.colTypical}</th>
@@ -35,49 +35,49 @@ export function DataTableView({ table, lang }: { table: DataTable; lang: Lang })
         </thead>
         <tbody>
           {table.rows.map((r) => (
-            <tr key={r.label} className="border-b border-[#e4e9e2] align-top">
-              <th scope="row" className="py-1.5 pr-2 font-medium text-[#415349]">{r.label}</th>
-              <td className="py-1.5 pr-2 text-[#20372d]">
+            <tr key={r.label} className="border-b border-[var(--et-26375b)] align-top">
+              <th scope="row" className="py-1.5 pr-2 font-medium text-[var(--et-c5cee6)]">{r.label}</th>
+              <td className="py-1.5 pr-2 text-[var(--et-c5cee6)]">
                 <span className="whitespace-nowrap font-semibold">{r.latest.value} {r.latest.unit}</span>
-                <span className="block text-[10px] text-[#748278]">{r.latest.when}</span>
+                <span className="block text-[10px] text-[var(--et-c5cee6)]">{r.latest.when}</span>
               </td>
-              <td className="py-1.5 pr-2 text-[#526357]">
+              <td className="py-1.5 pr-2 text-[var(--et-c5cee6)]">
                 {r.reference ? (
                   <>
                     <span className="whitespace-nowrap">{r.reference.value} {r.reference.unit}</span>
-                    <span className="block text-[10px] text-[#748278]">{r.referenceLabel}</span>
+                    <span className="block text-[10px] text-[var(--et-c5cee6)]">{r.referenceLabel}</span>
                   </>
                 ) : (
-                  <span className="text-[#748278]" title={t.notAvailable}>--</span>
+                  <span className="text-[var(--et-c5cee6)]" title={t.notAvailable}>--</span>
                 )}
               </td>
-              <td className="py-1.5 text-[#526357]">
+              <td className="py-1.5 text-[var(--et-c5cee6)]">
                 {r.difference ? (
                   <>
-                    <span className={`whitespace-nowrap font-medium ${r.difference.value > 0 ? "text-[#2f7659]" : r.difference.value < 0 ? "text-[#94652a]" : ""}`}>
+                    <span className={`whitespace-nowrap font-medium ${r.difference.value > 0 ? "text-[var(--et-c5cee6)]" : r.difference.value < 0 ? "text-[var(--et-c5cee6)]" : ""}`}>
                       {sign(r.difference.value)} {r.difference.unit}
                     </span>
-                    {r.rank !== null && <span className="block text-[10px] text-[#748278]">{t.rank} {r.rank}/100</span>}
+                    {r.rank !== null && <span className="block text-[10px] text-[var(--et-c5cee6)]">{t.rank} {r.rank}/100</span>}
                   </>
                 ) : (
-                  <span className="text-[#748278]" title={t.notAvailable}>--</span>
+                  <span className="text-[var(--et-c5cee6)]" title={t.notAvailable}>--</span>
                 )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="mt-1 text-[10px] text-[#748278]">{t.tableNote}</p>
+      <p className="mt-1 text-[10px] text-[var(--et-c5cee6)]">{t.tableNote}</p>
     </div>
   );
 }
 
 const ICON: Record<DecisionType, typeof Leaf> = { agriculture: Sprout, water: Droplets, electricity: Zap, disaster: CloudRain, heat: Flame, vegetation: Leaf };
 const CONF_STYLE: Record<ConfidenceLevel, string> = {
-  high: "border-[#cce2d2] bg-[#edf5ed] text-[#205b43]",
-  moderate: "border-[#d6e6d9] bg-[#edf5ed] text-[#2f7659]",
-  low: "border-[#eadcc5] bg-[#faf4e9] text-[#94652a]",
-  insufficient: "border-[#dce5dd] bg-[#f7f8f4] text-[#526357]",
+  high: "border-[var(--et-26375b)] bg-[var(--et-101b35)] text-[var(--et-c5cee6)]",
+  moderate: "border-[var(--et-26375b)] bg-[var(--et-101b35)] text-[var(--et-c5cee6)]",
+  low: "border-[var(--et-26375b)] bg-[var(--et-101b35)] text-[var(--et-c5cee6)]",
+  insufficient: "border-[var(--et-26375b)] bg-[var(--et-101b35)] text-[var(--et-c5cee6)]",
 };
 
 export function ActionCardView({ card, lang }: { card: ActionCard; lang: Lang }) {
@@ -85,33 +85,33 @@ export function ActionCardView({ card, lang }: { card: ActionCard; lang: Lang })
   const Icon = ICON[card.decisionType] ?? Leaf;
   const [level, ...rest] = card.confidence.reason.split(" — ");
   return (
-    <article className="rounded-xl border border-[#e4e9e2] bg-white p-3" aria-label={`${t.actionCard}: ${card.title}`}>
+    <article className="rounded-xl border border-[var(--et-26375b)] bg-[var(--et-101b35)] p-3" aria-label={`${t.actionCard}: ${card.title}`}>
       <header className="mb-2 flex items-center gap-2">
-        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-[#e1efe3] text-[#2f7659]"><Icon className="h-3.5 w-3.5" /></span>
-        <h4 className="text-[13px] font-semibold text-[#20372d]">{card.title}</h4>
+        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-[var(--et-101b35)] text-[var(--et-c5cee6)]"><Icon className="h-3.5 w-3.5" /></span>
+        <h4 className="text-[13px] font-semibold text-[var(--et-c5cee6)]">{card.title}</h4>
       </header>
       <dl className="space-y-2 text-[12px]">
         <div>
-          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[#66776a]">{t.observedChange}</dt>
-          <dd className="text-[#415349]">{card.observedChange}</dd>
+          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[var(--et-c5cee6)]">{t.observedChange}</dt>
+          <dd className="text-[var(--et-c5cee6)]">{card.observedChange}</dd>
         </div>
         <div>
-          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[#66776a]">{t.potentialImpact}</dt>
-          <dd className="text-[#526357]">{card.potentialImpact}</dd>
+          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[var(--et-c5cee6)]">{t.potentialImpact}</dt>
+          <dd className="text-[var(--et-c5cee6)]">{card.potentialImpact}</dd>
         </div>
         <div>
-          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[#66776a]">{t.suggestedOptions}</dt>
-          <dd><ul className="list-disc space-y-0.5 pl-4 text-[#526357]">{card.suggestedOptions.map((o) => <li key={o}>{o}</li>)}</ul></dd>
+          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[var(--et-c5cee6)]">{t.suggestedOptions}</dt>
+          <dd><ul className="list-disc space-y-0.5 pl-4 text-[var(--et-c5cee6)]">{card.suggestedOptions.map((o) => <li key={o}>{o}</li>)}</ul></dd>
         </div>
         <div>
-          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[#66776a]">{t.evidenceNeeded}</dt>
-          <dd><ul className="list-disc space-y-0.5 pl-4 text-[#526357]">{card.evidenceNeeded.map((o) => <li key={o}>{o}</li>)}</ul></dd>
+          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[var(--et-c5cee6)]">{t.evidenceNeeded}</dt>
+          <dd><ul className="list-disc space-y-0.5 pl-4 text-[var(--et-c5cee6)]">{card.evidenceNeeded.map((o) => <li key={o}>{o}</li>)}</ul></dd>
         </div>
         <div>
-          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[#66776a]">{t.confidence}</dt>
+          <dt className="text-[10px] font-semibold uppercase tracking-wide text-[var(--et-c5cee6)]">{t.confidence}</dt>
           <dd className="mt-0.5">
             <span className={`inline-block rounded-full border px-2 py-0.5 text-[11px] font-medium ${CONF_STYLE[card.confidence.level]}`}>{level}</span>
-            {rest.length > 0 && <span className="ml-1 text-[11px] text-[#66776a]">{rest.join(" — ")}</span>}
+            {rest.length > 0 && <span className="ml-1 text-[11px] text-[var(--et-c5cee6)]">{rest.join(" — ")}</span>}
           </dd>
         </div>
       </dl>
@@ -130,21 +130,21 @@ const Lines = ({ text, className = "" }: { text: string; className?: string }) =
 function SummaryBlock({ parts, lang }: { parts: SummaryParts; lang: Lang }) {
   const t = UI_STRINGS[lang];
   const rows: { icon: typeof MapPin; label: string; text: string; tone: string }[] = [
-    { icon: MapPin, label: t.summaryRegion, text: parts.region, tone: parts.regionSelected ? "text-[#2f7659]" : "text-[#94652a]" },
-    { icon: Search, label: t.summaryFindings, text: parts.keyFindings, tone: "text-[#2f7659]" },
-    { icon: CheckCircle2, label: t.summaryRecommendation, text: parts.recommendation, tone: "text-[#205b43]" },
+    { icon: MapPin, label: t.summaryRegion, text: parts.region, tone: parts.regionSelected ? "text-[var(--et-c5cee6)]" : "text-[var(--et-c5cee6)]" },
+    { icon: Search, label: t.summaryFindings, text: parts.keyFindings, tone: "text-[var(--et-c5cee6)]" },
+    { icon: CheckCircle2, label: t.summaryRecommendation, text: parts.recommendation, tone: "text-[var(--et-c5cee6)]" },
   ];
   return (
-    <section aria-label={answerFormat.sections[0].heading[lang]} className="rounded-xl border border-[#d6e6d9] bg-[#edf5ed] p-3">
-      <h3 className="mb-2 flex items-center gap-1.5 font-display text-[14px] font-semibold text-[#20372d]">
-        <Sparkles className="h-4 w-4 text-[#2f7659]" />
+    <section aria-label={answerFormat.sections[0].heading[lang]} className="rounded-xl border border-[var(--et-26375b)] bg-[var(--et-101b35)] p-3">
+      <h3 className="mb-2 flex items-center gap-1.5 font-display text-[14px] font-semibold text-[var(--et-c5cee6)]">
+        <Sparkles className="h-4 w-4 text-[var(--et-c5cee6)]" />
         {answerFormat.sections[0].heading[lang]}
       </h3>
       <div className="space-y-2.5">
         {rows.map((r) => (
           <div key={r.label} className="flex gap-2">
             <r.icon className={`mt-0.5 h-4 w-4 shrink-0 ${r.tone}`} aria-hidden />
-            <p className="text-[13.5px] leading-relaxed text-[#20372d]">
+            <p className="text-[13.5px] leading-relaxed text-[var(--et-c5cee6)]">
               <span className={`mr-1 font-semibold ${r.tone}`}>{r.label}:</span>
               {r.text}
             </p>
@@ -159,21 +159,21 @@ function SummaryBlock({ parts, lang }: { parts: SummaryParts; lang: Lang }) {
 function AccordionSection({ id, n, title, open, onToggle, children, uid }: { id: string; n: number; title: string; open: boolean; onToggle: () => void; children: ReactNode; uid: string }) {
   const panelId = `${uid}-${id}`;
   return (
-    <div className="rounded-xl border border-[#e4e9e2] bg-white">
+    <div className="rounded-xl border border-[var(--et-26375b)] bg-[var(--et-101b35)]">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition hover:bg-[#edf5ed] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7ba989]"
+        className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left transition hover:bg-[var(--et-101b35)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7ba989]"
       >
-        <span className="flex-1 font-display text-[13.5px] font-semibold text-[#20372d]">
-          <span className="mr-1.5 text-[#2f7659]">{n}.</span>
+        <span className="flex-1 font-display text-[13.5px] font-semibold text-[var(--et-c5cee6)]">
+          <span className="mr-1.5 text-[var(--et-c5cee6)]">{n}.</span>
           {title}
         </span>
         <span
           aria-hidden
-          className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${open ? "border-[#7ba989] bg-[#dcecdf] text-[#20372d]" : "border-[#dce5dd] bg-[#edf5ed] text-[#526357]"}`}
+          className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-colors duration-300 ${open ? "border-[var(--et-26375b)] bg-[var(--et-101b35)] text-[var(--et-c5cee6)]" : "border-[var(--et-26375b)] bg-[var(--et-101b35)] text-[var(--et-c5cee6)]"}`}
         >
           <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
         </span>
@@ -209,7 +209,7 @@ export function StructuredAnswer({ r, lang }: { r: ChatResponseBody; lang: Lang 
     return (
       <div className="space-y-2">
         <SummaryBlock parts={r.summaryParts} lang={lang} />
-        <p className="text-[11px] text-[#66776a]">{r.sections.disclaimer}</p>
+        <p className="text-[11px] text-[var(--et-c5cee6)]">{r.sections.disclaimer}</p>
       </div>
     );
   }
@@ -220,24 +220,24 @@ export function StructuredAnswer({ r, lang }: { r: ChatResponseBody; lang: Lang 
   const bodies: Record<string, ReactNode> = {
     current: r.dataTable ? (
       <>
-        <p className="text-[11px] text-[#66776a]">{locationLine}</p>
+        <p className="text-[11px] text-[var(--et-c5cee6)]">{locationLine}</p>
         <DataTableView table={r.dataTable} lang={lang} />
       </>
     ) : (
-      <Lines text={s.current} className="text-[#526357]" />
+      <Lines text={s.current} className="text-[var(--et-c5cee6)]" />
     ),
-    history: <Lines text={s.history} className="text-[#526357]" />,
-    outlook: <Lines text={s.outlook} className="text-[#526357]" />,
+    history: <Lines text={s.history} className="text-[var(--et-c5cee6)]" />,
+    outlook: <Lines text={s.outlook} className="text-[var(--et-c5cee6)]" />,
     actions: r.actionCards?.length ? (
       <div className="space-y-2">
         {r.actionCards.map((c) => <ActionCardView key={c.id} card={c} lang={lang} />)}
-        <p className="flex items-start gap-1 text-[11px] text-[#748278]"><ShieldAlert className="mt-0.5 h-3 w-3 shrink-0" />{t.confidenceNote}</p>
+        <p className="flex items-start gap-1 text-[11px] text-[var(--et-c5cee6)]"><ShieldAlert className="mt-0.5 h-3 w-3 shrink-0" />{t.confidenceNote}</p>
       </div>
     ) : (
-      <p className="rounded-lg border border-[#e4e9e2] bg-[#f7f8f4] px-2 py-1.5 text-[12.5px] text-[#526357]">{r.actionNote ?? s.actions}</p>
+      <p className="rounded-lg border border-[var(--et-26375b)] bg-[var(--et-101b35)] px-2 py-1.5 text-[12.5px] text-[var(--et-c5cee6)]">{r.actionNote ?? s.actions}</p>
     ),
-    sources: <Lines text={s.sources} className="text-[12px] text-[#66776a]" />,
-    disclaimer: <Lines text={s.disclaimer} className="text-[12px] text-[#66776a]" />,
+    sources: <Lines text={s.sources} className="text-[12px] text-[var(--et-c5cee6)]" />,
+    disclaimer: <Lines text={s.disclaimer} className="text-[12px] text-[var(--et-c5cee6)]" />,
   };
 
   return (
@@ -246,15 +246,15 @@ export function StructuredAnswer({ r, lang }: { r: ChatResponseBody; lang: Lang 
       {r.summaryParts ? (
         <SummaryBlock parts={r.summaryParts} lang={lang} />
       ) : (
-        s.summary && <Lines text={s.summary} className="rounded-xl border border-[#d6e6d9] bg-[#edf5ed] p-3 text-[#20372d]" />
+        s.summary && <Lines text={s.summary} className="rounded-xl border border-[var(--et-26375b)] bg-[var(--et-101b35)] p-3 text-[var(--et-c5cee6)]" />
       )}
 
-      <div className="flex items-center gap-2 pt-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[#748278]">
-        <span className="h-px flex-1 bg-[#e4e9e2]" />
+      <div className="flex items-center gap-2 pt-2 text-[10.5px] font-semibold uppercase tracking-[0.12em] text-[var(--et-c5cee6)]">
+        <span className="h-px flex-1 bg-[var(--et-101b35)]" />
         {answerFormat.detailedHeading[lang]}
-        <span className="h-px flex-1 bg-[#e4e9e2]" />
+        <span className="h-px flex-1 bg-[var(--et-101b35)]" />
       </div>
-      <p className="text-center text-[11px] text-[#748278]">{t.expandHint}</p>
+      <p className="text-center text-[11px] text-[var(--et-c5cee6)]">{t.expandHint}</p>
 
       <div className="space-y-1.5">
         {DETAILED.map((sec, i) => (

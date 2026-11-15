@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Settings } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
+import { VolumeControl } from "./volume-control";
 
 type Language = "en" | "my";
 
@@ -41,6 +42,7 @@ export function SettingsMenu({ lang, onLanguage }: { lang: Language; onLanguage:
           <span className="settings-label">Display</span>
           <ThemeToggle />
         </div>
+        <VolumeControl lang={lang} />
       </section>}
     </div>
   );

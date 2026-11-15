@@ -47,6 +47,8 @@ export class EarthbeatEngine {
   private context?: AudioContext;
   private oscillator?: OscillatorNode;
   private gain?: GainNode;
+  private output?: GainNode;
+  private level = 50;
   private timer?: ReturnType<typeof setTimeout>;
   private progressTimer?: ReturnType<typeof setInterval>;
   private generation = 0;
@@ -70,6 +72,17 @@ export class EarthbeatEngine {
     this.range = earthbeatRange(this.points);
   }
 
+  setVolume(percent: number) {
+    if (!Number.isFinite(percent)) return;
+    this.level = Math.max(0, Math.min(100, percent));
+    if (this.output && this.context) {
+      const now = this.context.currentTime;
+      this.output.gain.cancelScheduledValues(now);
+      this.output.gain.setValueAtTime(this.output.gain.value, now);
+      this.output.gain.linearRampToValueAtTime(this.level / 100 * 4, now + .05);
+    }
+  }
+
   async play() {
     this.pause();
     const generation = this.generation;
@@ -80,8 +93,11 @@ export class EarthbeatEngine {
     const context = this.context;
     this.oscillator = context.createOscillator();
     this.gain = context.createGain();
+    this.output = context.createGain();
+    this.output.gain.setValueAtTime(this.level / 100 * 4, context.currentTime);
     this.oscillator.type = "sine";
-    this.oscillator.connect(this.gain).connect(context.destination);
+    this.oscillator.connect(this.gain).connect(this.output);
+    this.output.connect(context.destination);
     this.oscillator.start();
     this.stateChange("playing");
     this.scheduleCycle();
@@ -104,15 +120,17 @@ export class EarthbeatEngine {
     if (this.oscillator && this.gain && this.context) {
       const voice = this.oscillator;
       const envelope = this.gain;
+      const output = this.output;
       const now = this.context.currentTime;
       envelope.gain.cancelScheduledValues(now);
       envelope.gain.setValueAtTime(envelope.gain.value, now);
       envelope.gain.linearRampToValueAtTime(0, now + this.fade);
-      voice.onended = () => { voice.disconnect(); envelope.disconnect(); };
+      voice.onended = () => { voice.disconnect(); envelope.disconnect(); output?.disconnect(); };
       try { voice.stop(now + this.fade); } catch { /* Already stopped. */ }
     }
     this.oscillator = undefined;
     this.gain = undefined;
+    this.output = undefined;
     if (!this.disposed) this.stateChange("paused");
   }
 

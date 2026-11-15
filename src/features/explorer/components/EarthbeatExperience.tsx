@@ -8,6 +8,7 @@ import { DataTrendInsight } from "@/features/environmental/components/DataTrendI
 import { analyzeSeries } from "@/features/environmental/analysis/explainChanges";
 import type { DataSeries } from "@/features/environmental/types/environmental";
 import type { ObservationResponse } from "../client/data-service";
+import { readVolume, VOLUME_EVENT } from "@/features/earthbeat/volume";
 
 export function EarthbeatExperience({ result }: { result: ObservationResponse }) {
   const location=result.location ?? result.region;
@@ -24,9 +25,12 @@ export function EarthbeatExperience({ result }: { result: ObservationResponse })
   useEffect(() => {
     const player = new EarthbeatEngine((index, _point, fraction) => { setActive(index); setPlayhead(fraction === undefined || !valid.length ? undefined : (points[0].time + fraction * (points.at(-1)!.time - points[0].time) - valid[0].time) / Math.max(1, valid.at(-1)!.time - valid[0].time)); },setState);
     player.load(points); engine.current=player; setActive(-1); setPlayhead(undefined); setError("");
+    player.setVolume(readVolume());
+    const volumeChanged = (event: Event) => player.setVolume(event instanceof CustomEvent ? event.detail : readVolume());
+    window.addEventListener(VOLUME_EVENT, volumeChanged); window.addEventListener("storage", volumeChanged);
     const hidden = () => {if(document.hidden)player.pause();};
     document.addEventListener("visibilitychange",hidden);
-    return () => {document.removeEventListener("visibilitychange",hidden);player.dispose();engine.current=null;};
+    return () => {window.removeEventListener(VOLUME_EVENT,volumeChanged);window.removeEventListener("storage",volumeChanged);document.removeEventListener("visibilitychange",hidden);player.dispose();engine.current=null;};
   },[points]);
   const series: DataSeries = useMemo(() => ({
     indicator:result.dataset.parameter === "T2M" ? "temperature" : result.dataset.parameter === "PRECTOTCORR" ? "precipitation" : /vegetation/.test(result.dataset.id) ? "ndvi" : "environmental",
