@@ -15,6 +15,16 @@
 <helmet>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Padauk:wght@400;700&amp;display=swap">
 <style>
+
+/* A shared landscape beneath the headline, map and cards, feathered into the page. */
+.hero-scene{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;opacity:.85;-webkit-mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent),linear-gradient(to bottom,transparent,#000 10%,#000 76%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent),linear-gradient(to bottom,transparent,#000 10%,#000 76%,transparent);mask-composite:intersect}
+.hero-scene-media{display:block;width:100%;height:100%;object-fit:cover;object-position:center 58%}
+.hero-scene::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,8,22,.88),rgba(4,8,22,.64) 48%,rgba(4,8,22,.38));}
+#top>.hero-content{position:relative;z-index:1}
+:root[data-theme=light] .hero-scene{opacity:.65}
+:root[data-theme=light] .hero-scene::after{background:linear-gradient(90deg,rgba(245,246,252,.92),rgba(245,246,252,.75) 48%,rgba(245,246,252,.42))}
+@media(max-width:760px){.hero-scene-media{object-position:44% center}.hero-scene::after{background:linear-gradient(to bottom,rgba(4,8,22,.8),rgba(4,8,22,.5) 65%,rgba(4,8,22,.72))}:root[data-theme=light] .hero-scene::after{background:linear-gradient(to bottom,rgba(245,246,252,.88),rgba(245,246,252,.58) 65%,rgba(245,246,252,.8))}}
+
 body{margin:0;background:var(--et-040816);color:var(--et-e9edfa);font-family:Inter,Padauk,system-ui,sans-serif}
 .header-actions{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap}
 .home-settings{position:relative;margin-left:auto}
@@ -89,8 +99,11 @@ a:focus-visible,button:focus-visible{outline:2px solid #9fe870;outline-offset:3p
 </header>
 
 <!-- HERO -->
-<section id="top" style="position: relative; overflow: hidden; background: radial-gradient(900px 560px at 80% 45%, var(--et-12306e) 0%, rgba(18,48,110,0) 70%), radial-gradient(1.5px 1.5px at 12% 22%, var(--et-ffffff) 50%, transparent 51%), radial-gradient(1px 1px at 28% 68%, var(--et-cfe0ff) 50%, transparent 51%), radial-gradient(1.5px 1.5px at 46% 14%, var(--et-ffffff) 50%, transparent 51%), radial-gradient(1px 1px at 6% 86%, var(--et-cfe0ff) 50%, transparent 51%), radial-gradient(1px 1px at 38% 40%, var(--et-ffffff) 50%, transparent 51%), var(--et-040816)">
-<div style="max-width: 1320px; margin: 0 auto; padding: 64px 32px 56px; display: flex; flex-direction: column; gap: 36px; box-sizing: border-box">
+<section id="top" style="position:relative;overflow:hidden;background:var(--et-040816);isolation:isolate">
+<div class="hero-scene" aria-hidden="true">
+<video class="hero-scene-media" data-hero-video autoplay muted loop playsinline preload="none" poster="./assets/myanmar-farming-sunset.png" tabindex="-1" disablepictureinpicture></video>
+</div>
+<div class="hero-content" style="max-width: 1320px; margin: 0 auto; padding: 64px 32px 56px; display: flex; flex-direction: column; gap: 36px; box-sizing: border-box">
 <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 56px">
 
 <div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
