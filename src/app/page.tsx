@@ -418,56 +418,64 @@ export default function Page() {
                 <div className="selection-grid">
                   <div className="field-control">
                     <label htmlFor="township-select">Select Township</label>
-                    <select id="township-select" value={townshipId} disabled={!regionId || !catalog?.townships.length} onChange={event=>{setTownshipId(event.target.value);setMapFocused(true);}} aria-describedby="township-help"><option value="">All townships in this region</option>{catalog?.townships.filter(item=>item.regionId===regionId).map(item=><option key={item.id} value={item.id}>{lang==="my"?item.nameMy:item.name}</option>)}</select>
+                    <div className="field-control-body">
+                      <select id="township-select" value={townshipId} disabled={!regionId || !catalog?.townships.length} onChange={event=>{setTownshipId(event.target.value);setMapFocused(true);}} aria-describedby="township-help"><option value="">All townships in this region</option>{catalog?.townships.filter(item=>item.regionId===regionId).map(item=><option key={item.id} value={item.id}>{lang==="my"?item.nameMy:item.name}</option>)}</select>
+                    </div>
                   </div>
                   <div className="field-control">
                     <label htmlFor="regional-reference">Regional reference point <span className="field-meta">(not a township)</span></label>
-                    <input
-                      id="regional-reference"
-                      list="region-options"
-                      value={regionSearch}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        setRegionSearch(value);
-                        const match = REGIONS.find((region) => `${region.name} — ${region.type}` === value || `${region.nameMy} — ${region.type}` === value);
-                        if (match) chooseRegion(match.id);
-                        else {setRegionId("");setTownshipId("");setMapFocused(false);}
-                      }}
-                      onBlur={() => {
-                        const match = REGIONS.find((region) => `${region.name} — ${region.type}` === regionSearch || `${region.nameMy} — ${region.type}` === regionSearch);
-                        if (!match) {
-                          const fallback = REGIONS.find((region) => region.id === regionId);
-                          setRegionSearch(fallback ? `${fallback.name} — ${fallback.type}` : "");
-                        }
-                      }}
-                      placeholder="Search a state or region"
-                      aria-describedby="region-help"
-                    />
-                    <datalist id="region-options">{REGIONS.flatMap((region) => [
-                      <option key={`${region.id}-en`} value={`${region.name} — ${region.type}`} />,
-                      <option key={`${region.id}-my`} value={`${region.nameMy} — ${region.type}`} />,
-                    ])}</datalist>
+                    <div className="field-control-body">
+                      <input
+                        id="regional-reference"
+                        list="region-options"
+                        value={regionSearch}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setRegionSearch(value);
+                          const match = REGIONS.find((region) => `${region.name} — ${region.type}` === value || `${region.nameMy} — ${region.type}` === value);
+                          if (match) chooseRegion(match.id);
+                          else {setRegionId("");setTownshipId("");setMapFocused(false);}
+                        }}
+                        onBlur={() => {
+                          const match = REGIONS.find((region) => `${region.name} — ${region.type}` === regionSearch || `${region.nameMy} — ${region.type}` === regionSearch);
+                          if (!match) {
+                            const fallback = REGIONS.find((region) => region.id === regionId);
+                            setRegionSearch(fallback ? `${fallback.name} — ${fallback.type}` : "");
+                          }
+                        }}
+                        placeholder="Search a state or region"
+                        aria-describedby="region-help"
+                      />
+                      <datalist id="region-options">{REGIONS.flatMap((region) => [
+                        <option key={`${region.id}-en`} value={`${region.name} — ${region.type}`} />,
+                        <option key={`${region.id}-my`} value={`${region.nameMy} — ${region.type}`} />,
+                      ])}</datalist>
+                    </div>
                   </div>
                   <div className="field-control">
                     <label htmlFor="dataset-select">Select data</label>
-                    <select id="dataset-select" value={datasetId} onChange={(event) => chooseDataset(event.target.value)} disabled={!datasets.length}>
-                      <option value="">Choose a dataset</option>
-                      {datasets.map((dataset) => (
-                        <option key={dataset.id} value={dataset.id}>
-                          {dataset.label} ({dataset.unit}){dataset.available ? "" : dataset.setupRequired ? " — finish setup" : " — access needed"}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="field-control-body">
+                      <select id="dataset-select" value={datasetId} onChange={(event) => chooseDataset(event.target.value)} disabled={!datasets.length}>
+                        <option value="">Choose a dataset</option>
+                        {datasets.map((dataset) => (
+                          <option key={dataset.id} value={dataset.id}>
+                            {dataset.label} ({dataset.unit}){dataset.available ? "" : dataset.setupRequired ? " — finish setup" : " — access needed"}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className="field-control">
                     <label>Date range <span className="field-meta">(UTC)</span></label>
-                    <div className="date-range">
-                      <div><label className="sr-only" htmlFor="start-date">Start date</label><input id="start-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftStart} onChange={(event) => setDraftStart(event.target.value)} /></div>
-                      <span aria-hidden="true">to</span>
-                      <div><label className="sr-only" htmlFor="end-date">End date</label><input id="end-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftEnd} onChange={(event) => setDraftEnd(event.target.value)} /></div>
+                    <div className="field-control-body">
+                      <div className="date-range">
+                        <div><label className="sr-only" htmlFor="start-date">Start date</label><input id="start-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftStart} onChange={(event) => setDraftStart(event.target.value)} /></div>
+                        <span aria-hidden="true">to</span>
+                        <div><label className="sr-only" htmlFor="end-date">End date</label><input id="end-date" type="date" min="1981-01-01" max={questionDate(0)} value={draftEnd} onChange={(event) => setDraftEnd(event.target.value)} /></div>
+                      </div>
+                      <div className="date-actions"><button type="button" className="button-primary" disabled={Boolean(dateError)} onClick={()=>{if(!dateError){setStart(draftStart);setEnd(draftEnd);setReloadToken(token=>token+1);}}}>Apply dates</button>{datasetId !== "fire-detections" && <button type="button" className="text-button" onClick={()=>{setDraftStart("1989-01-01");setDraftEnd(questionDate(0));}}>1989–today</button>}</div>
+                      {dateError && <p className="field-error" role="status">{dateError}</p>}
                     </div>
-                    <div className="date-actions"><button type="button" className="button-primary" disabled={Boolean(dateError)} onClick={()=>{if(!dateError){setStart(draftStart);setEnd(draftEnd);setReloadToken(token=>token+1);}}}>Apply dates</button>{datasetId !== "fire-detections" && <button type="button" className="text-button" onClick={()=>{setDraftStart("1989-01-01");setDraftEnd(questionDate(0));}}>1989–today</button>}</div>
-                    {dateError && <p className="field-error" role="status">{dateError}</p>}
                   </div>
                 </div>
                 {catalogError && <div className="inline-notice notice-error" role="alert">{catalogError}</div>}

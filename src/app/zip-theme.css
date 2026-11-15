@@ -205,3 +205,11 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .earthbeat-player-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .earthlens-app .earthbeat-player-heading p { margin: 6px 0 0; }
 .earthlens-app .earthbeat-speaker { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; }
+
+/* Each pair of fields shares its label row, including translated or wrapped labels. */
+.earthlens-app .selection-grid { row-gap: 6px; }
+.earthlens-app .selection-grid > .field-control { display: grid; grid-row: span 2; grid-template-rows: subgrid; align-content: start; padding-bottom: 10px; }
+.earthlens-app .selection-grid > .field-control > label { margin: 0; align-self: start; }
+.earthlens-app .field-control-body { min-width: 0; }
+.earthlens-app .field-control-body input,
+.earthlens-app .field-control-body select { height: 44px; box-sizing: border-box; }
