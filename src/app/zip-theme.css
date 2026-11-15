@@ -186,3 +186,5 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 .earthlens-app .map-zoom-controls button:hover { background: var(--et-332461); }
 .earthlens-app .map-zoom-controls button:disabled { opacity: .4; cursor: default; }
 .earthlens-app .topic-rail[data-area-selected="true"] .rail-topic-button { width: fit-content; min-width: 48px; min-height: 48px; padding: 6px; justify-content: center; gap: 0; }
+
+.earthlens-app .myanmar-map { touch-action: none; }

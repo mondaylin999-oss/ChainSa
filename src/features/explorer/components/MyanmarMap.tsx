@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import townshipPoints from "../township-points.json";
 import type { Township } from "../client/data-service";
 import boundaries from "../../earthlens-chat/server/nasa/myanmar-admin1.json";
@@ -94,12 +94,53 @@ export function MyanmarMap({
 }: MyanmarMapProps) {
   const [townshipData, setTownshipData] = useState<BoundaryCollection | null>(null);
   const [townshipError, setTownshipError] = useState(false);
+  const mapSurface = useRef<SVGSVGElement>(null);
   const [manualZoom, setManualZoom] = useState({ key: "", factor: 1 });
   const selectionKey = `${selectedRegionId ?? ""}:${selectedTownshipId ?? ""}:${focusRegion}`;
   const zoomFactor = manualZoom.key === selectionKey ? manualZoom.factor : 1;
   function changeZoom(multiplier: number) {
     setManualZoom({ key: selectionKey, factor: Math.min(4, Math.max(0.5, zoomFactor * multiplier)) });
   }
+
+  // Capture zoom gestures only on the map surface, never on the page or panels.
+  useEffect(() => {
+    const surface = mapSurface.current;
+    if (!surface) return;
+    let pinchDistance: number | undefined;
+    const applyZoom = (multiplier: number) => setManualZoom(previous => ({
+      key: selectionKey,
+      factor: Math.min(4, Math.max(0.5, (previous.key === selectionKey ? previous.factor : 1) * multiplier)),
+    }));
+    const wheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const delta = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? surface.clientHeight : 1);
+      applyZoom(Math.exp(-Math.max(-100, Math.min(100, delta)) * .002));
+    };
+    const distance = (touches: TouchList) => Math.hypot(touches[0].clientX - touches[1].clientX, touches[0].clientY - touches[1].clientY);
+    const startPinch = (event: TouchEvent) => {
+      pinchDistance = event.touches.length === 2 ? distance(event.touches) : undefined;
+      if (event.touches.length === 2) event.preventDefault();
+    };
+    const movePinch = (event: TouchEvent) => {
+      if (event.touches.length !== 2) return;
+      event.preventDefault();
+      const next = distance(event.touches);
+      if (pinchDistance && next > 0) applyZoom(next / pinchDistance);
+      pinchDistance = next;
+    };
+    surface.addEventListener("wheel", wheel, { passive: false });
+    surface.addEventListener("touchstart", startPinch, { passive: false });
+    surface.addEventListener("touchmove", movePinch, { passive: false });
+    surface.addEventListener("touchend", startPinch, { passive: false });
+    surface.addEventListener("touchcancel", startPinch, { passive: false });
+    return () => {
+      surface.removeEventListener("wheel", wheel);
+      surface.removeEventListener("touchstart", startPinch);
+      surface.removeEventListener("touchmove", movePinch);
+      surface.removeEventListener("touchend", startPinch);
+      surface.removeEventListener("touchcancel", startPinch);
+    };
+  }, [selectionKey]);
 
   useEffect(() => {
     if (!focusRegion || townshipData) return;
@@ -171,6 +212,7 @@ export function MyanmarMap({
         <button type="button" aria-label="Reset map zoom" title="Reset zoom" onClick={() => setManualZoom({ key: selectionKey, factor: 1 })}>↺</button>
       </div>
       <svg
+        ref={mapSurface}
         className="myanmar-map"
         viewBox={manualViewBox}
         preserveAspectRatio={focusedBounds ? "xMidYMid slice" : "xMidYMid meet"}
