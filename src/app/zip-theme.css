@@ -201,3 +201,7 @@ body, .earthlens-app { background: var(--et-040816); color: var(--et-e9edfa); }
 
 .earthlens-app .myanmar-map { cursor: grab; }
 .earthlens-app .myanmar-map:active { cursor: grabbing; }
+
+.earthlens-app .earthbeat-player-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.earthlens-app .earthbeat-player-heading p { margin: 6px 0 0; }
+.earthlens-app .earthbeat-speaker { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; min-height: 44px; padding: 0; border-radius: 50%; }

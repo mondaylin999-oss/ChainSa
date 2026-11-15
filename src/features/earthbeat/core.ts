@@ -42,125 +42,140 @@ export function earthbeatNearest(points: EarthbeatObservation[], fraction: numbe
 
 export type EarthbeatState = "paused" | "playing" | "ended";
 
+/** One continuous voice, with timestamp spacing compressed into a repeating 24-second cycle. */
 export class EarthbeatEngine {
   private context?: AudioContext;
-  private master?: GainNode;
-  private voices = new Set<OscillatorNode>();
+  private oscillator?: OscillatorNode;
+  private gain?: GainNode;
   private timer?: ReturnType<typeof setTimeout>;
+  private progressTimer?: ReturnType<typeof setInterval>;
   private generation = 0;
   private disposed = false;
-  private index = 0;
-  private volume = 0.15;
-  private duration = 0.25;
-  private range: [number, number] = [0, 1];
   private points: EarthbeatObservation[] = [];
-  private state: EarthbeatState = "paused";
+  private range: [number, number] = [0, 1];
+  private cycleStart = 0;
+  private readonly duration = 24;
+  private readonly volume = 0.15;
+  private readonly fade = 0.12;
+
   constructor(
-    private progress: (index: number, observation: EarthbeatObservation) => void,
+    private progress: (index: number, observation: EarthbeatObservation, fraction?: number) => void,
     private stateChange: (state: EarthbeatState) => void,
     private createContext = () => new AudioContext(),
   ) {}
 
   load(points: EarthbeatObservation[]) {
     this.pause();
-    this.points = points;
-    this.range = earthbeatRange(points);
-    this.index = Math.max(0, points.findIndex(point => point.value !== null));
-  }
-
-  private async unlock(generation: number) {
-    if (this.disposed) return false;
-    if (!this.context) {
-      this.context = this.createContext();
-      this.master = this.context.createGain();
-      this.master.gain.value = this.volume;
-      this.master.connect(this.context.destination);
-    }
-    await this.context.resume();
-    return !this.disposed && generation === this.generation;
+    this.points = points.filter(p => Number.isFinite(p.time)).map(p => ({ ...p, value: p.value !== null && Number.isFinite(p.value) ? p.value : null })).sort((a, b) => a.time - b.time);
+    this.range = earthbeatRange(this.points);
   }
 
   async play() {
     this.pause();
     const generation = this.generation;
-    if (!this.points.some(point => point.value !== null) || !(await this.unlock(generation))) return;
-    this.setState("playing");
-    this.next();
+    if (this.disposed || !this.points.some(p => p.value !== null)) return;
+    this.context ??= this.createContext();
+    await this.context.resume();
+    if (this.disposed || generation !== this.generation) return;
+    const context = this.context;
+    this.oscillator = context.createOscillator();
+    this.gain = context.createGain();
+    this.oscillator.type = "sine";
+    this.oscillator.connect(this.gain).connect(context.destination);
+    this.oscillator.start();
+    this.stateChange("playing");
+    this.scheduleCycle();
+    this.progressTimer = setInterval(() => this.reportProgress(), 40);
   }
 
+  // Inspecting a point is silent; only the speaker button starts sound.
   async seek(index: number) {
     this.pause();
     const point = this.points[index];
-    if (!point || point.value === null) return;
-    this.index = index;
-    this.progress(index, point);
-    const generation = this.generation;
-    if (await this.unlock(generation)) this.tone(point.value!);
-  }
-
-  restart() {
-    this.pause();
-    this.index = Math.max(0, this.points.findIndex(point => point.value !== null));
-    if (this.points[this.index]?.value !== null && this.points[this.index]) this.progress(this.index, this.points[this.index]);
+    if (point) this.progress(index, point, earthbeatTimeFraction(point, this.points));
   }
 
   pause() {
     this.generation++;
     clearTimeout(this.timer);
+    clearInterval(this.progressTimer);
     this.timer = undefined;
-    this.voices.forEach(voice => { try { voice.stop(); } catch {} });
-    this.voices.clear();
-    this.setState("paused");
-  }
-
-  setVolume(volume: number) {
-    this.volume = Math.max(0, Math.min(1, volume));
-    if (this.master && this.context) this.master.gain.setTargetAtTime(this.volume, this.context.currentTime, 0.01);
-  }
-
-  setSpeed(observationsPerSecond: number) {
-    this.duration = 1 / Math.max(1, Math.min(8, observationsPerSecond));
+    this.progressTimer = undefined;
+    if (this.oscillator && this.gain && this.context) {
+      const voice = this.oscillator;
+      const envelope = this.gain;
+      const now = this.context.currentTime;
+      envelope.gain.cancelScheduledValues(now);
+      envelope.gain.setValueAtTime(envelope.gain.value, now);
+      envelope.gain.linearRampToValueAtTime(0, now + this.fade);
+      voice.onended = () => { voice.disconnect(); envelope.disconnect(); };
+      try { voice.stop(now + this.fade); } catch { /* Already stopped. */ }
+    }
+    this.oscillator = undefined;
+    this.gain = undefined;
+    if (!this.disposed) this.stateChange("paused");
   }
 
   dispose() {
-    this.disposed = true;
     this.pause();
+    this.disposed = true;
     void this.context?.close();
   }
 
-  private setState(state: EarthbeatState) {
-    this.state = state;
-    if (!this.disposed) this.stateChange(state);
+  private scheduleCycle() {
+    if (!this.context || !this.oscillator || !this.gain) return;
+    this.cycleStart = this.context.currentTime;
+    const start = this.cycleStart;
+    const frequency = this.oscillator.frequency;
+    const amplitude = this.gain.gain;
+    frequency.cancelScheduledValues(start);
+    amplitude.cancelScheduledValues(start);
+    amplitude.setValueAtTime(0, start);
+    const gaps = this.points.slice(1).map((p, i) => p.time - this.points[i].time).filter(g => g > 0).sort((a, b) => a - b);
+    const gapLimit = gaps.length ? gaps[Math.floor(gaps.length / 2)] * 3 : Infinity;
+    let previous: EarthbeatObservation | undefined;
+    this.points.forEach(point => {
+      const time = start + (this.points.length === 1 ? 0 : earthbeatTimeFraction(point, this.points) * this.duration);
+      if (point.value === null) {
+        amplitude.setValueAtTime(0, time);
+      } else {
+        const pitch = earthbeatPitch(point.value, this.range);
+        const connected = previous?.value != null && point.time - previous.time <= gapLimit;
+        if (connected) {
+          frequency.linearRampToValueAtTime(pitch, time);
+        } else {
+          if (previous?.value != null) {
+            const previousTime = start + earthbeatTimeFraction(previous, this.points) * this.duration;
+            amplitude.setValueAtTime(0, previousTime + Math.min(this.fade, (time - previousTime) / 2));
+          }
+          frequency.setValueAtTime(pitch, time);
+          amplitude.setValueAtTime(0, time);
+          amplitude.linearRampToValueAtTime(this.volume, time + Math.min(this.fade, Math.max(0, start + this.duration - time)));
+        }
+      }
+      previous = point;
+    });
+    const last = this.points.at(-1)!;
+    const penultimate = this.points.at(-2);
+    if (last.value !== null && (!penultimate || (penultimate.value !== null && last.time - penultimate.time <= gapLimit))) {
+      amplitude.setValueAtTime(this.volume, start + this.duration - this.fade);
+      amplitude.linearRampToValueAtTime(0, start + this.duration);
+    } else amplitude.setValueAtTime(0, start + this.duration);
+    this.reportProgress();
+    this.timer = setTimeout(() => this.scheduleCycle(), this.duration * 1000);
   }
 
-  private next() {
-    while (this.index < this.points.length && this.points[this.index].value === null) this.index++;
-    if (this.index >= this.points.length) {
-      this.index = Math.max(0, this.points.findIndex(point => point.value !== null));
-      if (!this.points[this.index] || this.points[this.index].value === null) return;
+  private reportProgress() {
+    if (!this.context || !this.points.length) return;
+    const fraction = Math.max(0, Math.min(1, (this.context.currentTime - this.cycleStart) / this.duration));
+    const time = this.points[0].time + fraction * (this.points.at(-1)!.time - this.points[0].time);
+    let index = 0;
+    // Select the observation at or immediately before the playhead, including missing readings.
+    let lo = 0, hi = this.points.length - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >>> 1;
+      if (this.points[mid].time <= time) { index = mid; lo = mid + 1; } else hi = mid - 1;
     }
-    const index = this.index;
-    const point = this.points[index];
-    this.tone(point.value!);
-    this.progress(index, point);
-    this.timer = setTimeout(() => { this.index = index + 1; this.next(); }, this.duration * 1000);
-  }
-
-  private tone(value: number) {
-    if (!this.context || !this.master) return;
-    const oscillator = this.context.createOscillator();
-    const envelope = this.context.createGain();
-    const now = this.context.currentTime;
-    const length = Math.min(this.duration * 0.85, 0.3);
-    oscillator.type = "sine";
-    oscillator.frequency.value = earthbeatPitch(value, this.range);
-    envelope.gain.setValueAtTime(0, now);
-    envelope.gain.linearRampToValueAtTime(1, now + 0.008);
-    envelope.gain.linearRampToValueAtTime(0, now + length);
-    oscillator.connect(envelope).connect(this.master);
-    this.voices.add(oscillator);
-    oscillator.onended = () => { this.voices.delete(oscillator); oscillator.disconnect(); envelope.disconnect(); };
-    oscillator.start(now);
-    oscillator.stop(now + length + 0.01);
+    this.progress(index, this.points[index], fraction);
   }
 }

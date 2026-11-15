@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { calculateChartDomain } from "../src/features/environmental/components/EnvironmentalChart";
 import { EarthbeatEngine, earthbeatNearest, earthbeatObservations, earthbeatPitch, earthbeatRange, earthbeatTimeFraction } from "../src/features/earthbeat/core";
 
 const rows = [
@@ -8,24 +9,17 @@ const rows = [
 ];
 
 function audioFixture(resume = () => Promise.resolve()) {
-  const frequencies: number[] = [];
-  const stops = vi.fn();
-  const gains: Array<{value:number;setTargetAtTime:ReturnType<typeof vi.fn>}> = [];
+  const clockStart = Date.now();
+  const gain = { value: 0, cancelScheduledValues: vi.fn(), setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() };
+  const frequency = { value: 0, cancelScheduledValues: vi.fn(), setValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() };
+  const oscillator = { type: "sine", frequency, connect: vi.fn((target: unknown) => target), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(), onended: null };
+  const gainNode = { gain, connect: vi.fn(), disconnect: vi.fn() };
   const context = {
-    currentTime:0, destination:{}, resume:vi.fn(resume), close:vi.fn(()=>Promise.resolve()),
-    createGain:()=> {
-      const gain = {value:1,setValueAtTime:vi.fn(),linearRampToValueAtTime:vi.fn(),setTargetAtTime:vi.fn()};
-      gains.push(gain);
-      const node = {gain,connect:()=>node,disconnect:vi.fn()};
-      return node;
-    },
-    createOscillator:()=> {
-      const node = {type:"sine",frequency:{value:0},onended:null,connect:(target:unknown)=>target,
-        start:()=>frequencies.push(node.frequency.value),stop:stops,disconnect:vi.fn()};
-      return node;
-    },
+    get currentTime() { return (Date.now() - clockStart) / 1000; },
+    destination: {}, resume: vi.fn(resume), close: vi.fn(() => Promise.resolve()),
+    createGain: vi.fn(() => gainNode), createOscillator: vi.fn(() => oscillator),
   };
-  return {context:context as unknown as AudioContext, frequencies,stops,gains};
+  return { context: context as unknown as AudioContext, gain, frequency, oscillator, createOscillator: context.createOscillator };
 }
 
 afterEach(()=>vi.useRealTimers());
@@ -52,77 +46,93 @@ describe("EARTHBEAT shared observations",()=>{
   });
 });
 
-describe("EARTHBEAT audio and graph synchronization",()=>{
-  it("creates audio only after an explicit action, and skips missing notes while advancing the graph",async()=>{
+describe("EARTHBEAT continuous playback", () => {
+  it("starts only on request, glides across timestamps and repeats on the same oscillator", async () => {
     vi.useFakeTimers();
     const audio = audioFixture();
-    const createContext = vi.fn(()=>audio.context);
+    const create = vi.fn(() => audio.context);
     const progress = vi.fn();
-    const state = vi.fn();
-    const player = new EarthbeatEngine(progress,state,createContext);
-    player.load(earthbeatObservations(rows,"T2M"));
-    expect(createContext).not.toHaveBeenCalled();
+    const player = new EarthbeatEngine(progress, vi.fn(), create);
+    player.load(earthbeatObservations([{date:"2024-01-01",T2M:25},{date:"2024-01-02",T2M:30},{date:"2024-01-11",T2M:35}], "T2M"));
+    expect(create).not.toHaveBeenCalled();
     await player.play();
-    expect(progress.mock.calls[0][0]).toBe(0);
-    expect(audio.frequencies).toEqual([220]);
-    vi.advanceTimersByTime(250);
-    expect(progress.mock.calls[1][0]).toBe(2);
-    expect(audio.frequencies).toEqual([220,880]);
-    vi.advanceTimersByTime(250);
-    expect(state).toHaveBeenLastCalledWith("playing");
-    expect(progress.mock.calls[2][0]).toBe(0);
-    expect(audio.frequencies).toEqual([220,880,220]);
-    player.pause();
-    vi.advanceTimersByTime(1000);
-    expect(progress).toHaveBeenCalledTimes(3);
-    player.dispose();
-  });
-  it("selecting a graph point auditions that point and Play resumes from the selection",async()=>{
-    vi.useFakeTimers();
-    const audio = audioFixture();
-    const progress = vi.fn();
-    const player = new EarthbeatEngine(progress,vi.fn(),()=>audio.context);
-    player.load(earthbeatObservations(rows,"T2M"));
-    await player.seek(2);
-    expect(progress).toHaveBeenLastCalledWith(2,expect.objectContaining({value:35}));
-    expect(audio.frequencies).toEqual([880]);
-    await player.play();
-    expect(audio.frequencies).toEqual([880,880]);
+    expect(audio.frequency.linearRampToValueAtTime.mock.calls[0][0]).toBe(550);
+    expect(audio.frequency.linearRampToValueAtTime.mock.calls[0][1]).toBeCloseTo(2.4);
+    vi.advanceTimersByTime(12000);
+    expect(progress).toHaveBeenLastCalledWith(1, expect.anything(), .5);
+    vi.advanceTimersByTime(12000);
+    expect(audio.createOscillator).toHaveBeenCalledTimes(1);
+    expect(audio.oscillator.stop).not.toHaveBeenCalled();
+    expect(progress).toHaveBeenLastCalledWith(0, expect.anything(), 0);
     player.pause();
     const calls = progress.mock.calls.length;
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(48000);
     expect(progress).toHaveBeenCalledTimes(calls);
-    player.restart();
-    expect(progress).toHaveBeenLastCalledWith(0,expect.objectContaining({value:25}));
+    expect(audio.oscillator.stop).toHaveBeenCalled();
     player.dispose();
   });
-  it("stops playback when a series is replaced and supports mute",async()=>{
+
+  it("silences explicit missing readings and unsupported long gaps", async () => {
+    vi.useFakeTimers();
+    const audio = audioFixture();
+    const player = new EarthbeatEngine(vi.fn(), vi.fn(), () => audio.context);
+    player.load(earthbeatObservations([
+      {date:"2024-01-01",T2M:25}, {date:"2024-01-02",T2M:null},
+      {date:"2024-01-03",T2M:30}, {date:"2024-01-04",T2M:31}, {date:"2024-01-11",T2M:35},
+    ], "T2M"));
+    await player.play();
+    expect(audio.gain.setValueAtTime.mock.calls.some(([value, time]) => value === 0 && Math.abs(time - 2.4) < 1e-9)).toBe(true);
+    expect(audio.frequency.setValueAtTime).toHaveBeenCalledWith(880, 24);
+    expect(audio.frequency.linearRampToValueAtTime).not.toHaveBeenCalledWith(880, 24);
+    player.dispose();
+  });
+
+  it("inspects points silently and stops the previous location when data is replaced", async () => {
     vi.useFakeTimers();
     const audio = audioFixture();
     const progress = vi.fn();
-    const player = new EarthbeatEngine(progress,vi.fn(),()=>audio.context);
-    player.setVolume(0);
+    const state = vi.fn();
+    const player = new EarthbeatEngine(progress, state, () => audio.context);
     player.load(earthbeatObservations(rows,"T2M"));
+    await player.seek(2);
+    expect(audio.createOscillator).not.toHaveBeenCalled();
+    expect(progress).toHaveBeenLastCalledWith(2, expect.objectContaining({value:35}), 1);
     await player.play();
-    expect(audio.gains[0].value).toBe(0);
     player.load(earthbeatObservations([{date:"2024-02-01",T2M:10}],"T2M"));
-    vi.advanceTimersByTime(1000);
-    expect(progress).toHaveBeenCalledTimes(1);
-    expect(audio.stops).toHaveBeenCalled();
+    const count = progress.mock.calls.length;
+    vi.advanceTimersByTime(48000);
+    expect(progress).toHaveBeenCalledTimes(count);
+    expect(state).toHaveBeenLastCalledWith("paused");
     player.dispose();
     expect(audio.context.close).toHaveBeenCalled();
   });
-  it("cancels a pending audio start when the component is disposed",async()=>{
-    let resolveResume!: () => void;
-    const audio = audioFixture(()=>new Promise<void>(resolve=>{resolveResume=resolve;}));
-    const progress = vi.fn();
-    const player = new EarthbeatEngine(progress,vi.fn(),()=>audio.context);
-    player.load(earthbeatObservations(rows,"T2M"));
-    const play = player.play();
-    player.dispose();
-    resolveResume();
-    await play;
-    expect(progress).not.toHaveBeenCalled();
-    expect(audio.frequencies).toEqual([]);
+
+  it("cancels pending audio startup on stop, replacement or disposal", async () => {
+    for (const action of ["pause", "load", "dispose"] as const) {
+      let resume!: () => void;
+      const audio = audioFixture(() => new Promise<void>(resolve => { resume = resolve; }));
+      const progress = vi.fn();
+      const player = new EarthbeatEngine(progress, vi.fn(), () => audio.context);
+      player.load(earthbeatObservations(rows,"T2M"));
+      const play = player.play();
+      if (action === "load") player.load([]); else player[action]();
+      resume();
+      await play;
+      expect(audio.createOscillator).not.toHaveBeenCalled();
+      expect(progress).not.toHaveBeenCalled();
+      if (action !== "dispose") player.dispose();
+    }
+  });
+});
+
+describe("selected location graph scale", () => {
+  it("rebuilds the domain from township readings instead of retaining the regional scale", () => {
+    const regional = calculateChartDomain([10, 40], "temperature")!;
+    const township = calculateChartDomain([26, 27], "temperature")!;
+    expect(regional.min).toBeLessThan(township.min);
+    expect(regional.max).toBeGreaterThan(township.max);
+    expect(calculateChartDomain([], "temperature")).toBeUndefined();
+    expect(calculateChartDomain([NaN], "temperature")).toBeUndefined();
+    expect(calculateChartDomain([.3, .5], "ndvi")).toEqual({min: -1, max: 1});
   });
 });

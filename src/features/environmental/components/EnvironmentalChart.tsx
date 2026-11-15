@@ -5,18 +5,26 @@ import { calculateStatistics } from "../processing/statistics";
 
 export interface EnvironmentalChartProps {
   series?: DataSeries; locationName: string; startDate: string; endDate: string;
-  loading?: boolean; error?: string; activeDate?: string; interactions?: Record<string, unknown>;
+  loading?: boolean; error?: string; activeDate?: string; activeFraction?: number; interactions?: Record<string, unknown>;
 }
 
-export function EnvironmentalChart({ series, locationName, startDate, endDate, loading = false, error, activeDate, interactions }: EnvironmentalChartProps) {
+// Adapted from the supplied handover; recomputed from each selected location's series.
+export function calculateChartDomain(values: number[], indicator: DataSeries["indicator"]): { min: number; max: number } | undefined {
+  if (!values.length || values.some(value => !Number.isFinite(value))) return undefined;
+  const low = Math.min(...values), high = Math.max(...values);
+  const pad = Math.max((high - low) * .12, Math.abs(high || low || 1) * .02, .02);
+  return { min: indicator === "ndvi" ? Math.min(low - pad, -1) : low - pad, max: indicator === "ndvi" ? Math.max(high + pad, 1) : high + pad };
+}
+
+export function EnvironmentalChart({ series, locationName, startDate, endDate, loading = false, error, activeDate, activeFraction, interactions }: EnvironmentalChartProps) {
   const [hovered, setHovered] = useState<ChartPoint>();
   const points = useMemo(() => series ? toChartPoints(series) : [], [series]);
   if (loading) return <section className="earthbeat-chart earthbeat-chart--state" aria-live="polite">Loading NASA observations…</section>;
   if (error) return <section className="earthbeat-chart earthbeat-chart--state" role="alert">Unable to load environmental data: {error}</section>;
   if (!series || points.length === 0) return <section className="earthbeat-chart earthbeat-chart--state" aria-live="polite">No valid observations for this location and date range.</section>;
-  const values = points.map((point) => point.value); const min = Math.min(...values); const max = Math.max(...values);
+  const values = points.map((point) => point.value);
   const statistics = calculateStatistics(series);
-  const pad = Math.max((max - min) * 0.12, 0.02); const yMin = min - pad; const yMax = max + pad;
+  const domain = calculateChartDomain(values, series.indicator)!; const yMin = domain.min; const yMax = domain.max;
   const width = 900; const height = 360; const left = 64; const right = 24; const top = 28; const bottom = 48;
   const plotWidth = width - left - right; const plotHeight = height - top - bottom;
   const xFor = (index: number) => left + (points.length === 1 ? plotWidth / 2 : ((Date.parse(points[index].date) - Date.parse(points[0].date)) / Math.max(1, Date.parse(points[points.length - 1].date) - Date.parse(points[0].date))) * plotWidth);
@@ -28,6 +36,7 @@ export function EnvironmentalChart({ series, locationName, startDate, endDate, l
   const trendEnd = points.length > 1 ? statistics.mean! + slope * (points.length - 1) / 2 : undefined;
   const areaPath = `${linePath} L${xFor(points.length - 1)},${top + plotHeight} L${xFor(0)},${top + plotHeight} Z`;
   const activeIndex = activeDate ? points.findIndex((point) => point.date === activeDate) : -1;
+  const activeX = activeFraction !== undefined ? left + Math.max(0, Math.min(1, activeFraction)) * plotWidth : activeIndex >= 0 ? xFor(activeIndex) : undefined;
   const minimumPoint = points.reduce((a, b) => b.value < a.value ? b : a);
   const maximumPoint = points.reduce((a, b) => b.value > a.value ? b : a);
   const ticks = [0, .25, .5, .75, 1].map((fraction) => yMin + (yMax - yMin) * (1 - fraction));
@@ -40,7 +49,7 @@ export function EnvironmentalChart({ series, locationName, startDate, endDate, l
       {meanY !== undefined && <line x1={left} x2={width - right} y1={meanY} y2={meanY} stroke="#64748b" strokeWidth="2" strokeDasharray="7 5" />}
       {trendStart !== undefined && trendEnd !== undefined && <line x1={xFor(0)} x2={xFor(points.length - 1)} y1={yFor(trendStart)} y2={yFor(trendEnd)} stroke="#d14d72" strokeWidth="2" strokeDasharray="3 5" />}
       {points.length <= 240 && points.map((point, index) => <circle key={point.date} cx={xFor(index)} cy={yFor(point.value)} r={hovered?.date === point.date ? 7 : 3.5} fill={point.quality === "marginal" ? "#f2a93b" : "#15946a"} stroke="#fff" strokeWidth="2" onMouseEnter={() => setHovered(point)} />)}
-      {activeIndex >= 0 && <line x1={xFor(activeIndex)} x2={xFor(activeIndex)} y1={top} y2={top + plotHeight} stroke="#e15b48" strokeWidth="2" strokeDasharray="5 5" />}
+      {activeX !== undefined && <line x1={activeX} x2={activeX} y1={top} y2={top + plotHeight} stroke="#e15b48" strokeWidth="2" strokeDasharray="5 5" />}
       <text x={left} y={height - 12} fill="#668078" fontSize="12">{points[0].date}</text><text x={width - right} y={height - 12} textAnchor="end" fill="#668078" fontSize="12">{points[points.length - 1].date}</text>
     </svg>{hovered && <div className="earthbeat-chart__tooltip" role="status"><strong>{hovered.date}</strong><br />{series.indicator.toUpperCase()}: {hovered.value.toFixed(4)} {series.observations[0]?.unit ?? ""}<br /><small>{hovered.quality ?? "processed observation"}</small></div>}</div>
     <footer className="earthbeat-chart__footer"><span><i style={{color: series.indicator === "temperature" ? "#e67e22" : series.indicator === "precipitation" ? "#2980b9" : "#15946a"}}>●</i> Observations</span><span><i style={{color: "#64748b"}}>━</i> Mean reference</span><span><i style={{color: "#d14d72"}}>┅</i> Descriptive trend</span>{points.some(point => point.quality === "marginal") && <span><i style={{color: "#f2a93b"}}>●</i> Marginal quality</span>}<span>Min {minimumPoint.value.toFixed(4)} · {minimumPoint.date}</span><span>Max {maximumPoint.value.toFixed(4)} · {maximumPoint.date}</span><span>{series.observations[0]?.unit ?? "Value"}</span></footer>

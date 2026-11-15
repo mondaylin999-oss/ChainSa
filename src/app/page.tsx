@@ -74,7 +74,7 @@ function DataChart({ state, result, error, onRetry }: { state: ChartState; resul
     <div className="chart-plot">
       {result.summary.count === 0 ? (
         <div className="chart-state">NASA returned no valid observations for this period. Missing values are not plotted as zero.</div>
-      ) : <EarthbeatExperience result={result} />}
+      ) : <EarthbeatExperience key={`${result.location?.id ?? result.region.id}:${result.dataset.id}:${result.period.start}:${result.period.end}`} result={result} />}
       <div className="chart-legend"><span className="legend-line" />{result.dataset.description}<span className="legend-unit">{result.dataset.unit}</span></div>
     </div>
   );
