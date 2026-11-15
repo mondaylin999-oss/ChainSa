@@ -1,4 +1,5 @@
 "use client";
+import { GraphExplanation } from "./GraphExplanation";
 
 import { useEffect, useMemo, useRef, useState, type PointerEvent, type KeyboardEvent } from "react";
 import { Volume2, VolumeX } from "lucide-react";
@@ -69,11 +70,9 @@ export function EarthbeatExperience({ result, lang = "en", expandScientificNotes
     if(index!==undefined){event.preventDefault();select(index);}if(event.key===" "||event.key==="Enter"){event.preventDefault();toggle();}
   }
   const current=points[active];
-  const summaryNumber = (value:number|null) => value !== null && Number.isFinite(value)
-    ? new Intl.NumberFormat(lang === "my" ? "my-MM" : "en", {maximumFractionDigits:2}).format(value)
-    : "—";
   return <div className={`earthbeat-experience ${styles.experience}`} lang={lang}>
     <EnvironmentalChart lang={lang} observationTimeline={result.observations} series={series} locationName={locationName} startDate={result.period.start} endDate={result.period.end} activeDate={current?.date} activeFraction={playhead} interactions={{role:"slider",tabIndex:0,"aria-label":t("Interactive observation graph"),"aria-valuemin":0,"aria-valuemax":Math.max(0,points.length-1),"aria-valuenow":Math.max(0,active),"aria-valuetext":current?`${current.date}: ${current.value} ${t(result.dataset.unit)}`:t("No observation selected"),onKeyDown:keyboard,onPointerDown:(event:PointerEvent<SVGSVGElement>)=>{if(event.pointerType==="mouse"&&event.button!==0)return;event.preventDefault();dragging.current=true;event.currentTarget.setPointerCapture(event.pointerId);event.currentTarget.focus();lastIndex.current=pointer(event);select(lastIndex.current);},onPointerMove:(event:PointerEvent<SVGSVGElement>)=>{const index=pointer(event);if(dragging.current&&index!==lastIndex.current){lastIndex.current=index;select(index);}},onPointerUp:()=>{dragging.current=false;},onPointerCancel:()=>{dragging.current=false;},onLostPointerCapture:()=>{dragging.current=false;}}}/>
+    <GraphExplanation result={result} lang={lang}/>
     <div className="earthbeat-controls" aria-label={t("EARTHBEAT sound controls")}>
       <div className="earthbeat-player-heading">
         <div><strong>EARTHBEAT</strong><p>{locationName} · {t(result.dataset.label)} · {result.period.start} — {result.period.end}</p></div>
@@ -87,11 +86,5 @@ export function EarthbeatExperience({ result, lang = "en", expandScientificNotes
       {error && <p role="alert">{t(error)}</p>}
     </div>
     <details className="workspace-advanced-insights" open={expandScientificNotes || undefined}><summary>{lang === "my" ? "အသေးစိတ် စာရင်းအင်းနှင့် သိပ္ပံဆိုင်ရာ မှတ်စုများ" : "Detailed statistics & scientific notes"}</summary><DataTrendInsight lang={lang} series={series} analysis={analysis} locationName={locationName} latitude={location.lat} longitude={location.lon}/></details>
-    <dl className={styles.summary} aria-label={lang === "my" ? "တိုင်းတာချက် အကျဉ်းချုပ်" : "Observation summary"}>
-      <div><dt>{lang === "my" ? "ပျမ်းမျှ" : "Mean"}</dt><dd>{summaryNumber(result.summary.mean)} <small>{result.dataset.unit}</small></dd></div>
-      <div><dt>{t("Minimum")}</dt><dd>{summaryNumber(result.summary.min)} <small>{result.dataset.unit}</small></dd></div>
-      <div><dt>{t("Maximum")}</dt><dd>{summaryNumber(result.summary.max)} <small>{result.dataset.unit}</small></dd></div>
-      <div><dt>{t("Observations")}</dt><dd title={lang === "my" ? "အသုံးပြုနိုင်သော / ရရှိသော တိုင်းတာချက်များ" : "Valid / returned observations"}>{result.summary.count} <small>/ {result.observations.length}</small></dd></div>
-    </dl>
   </div>;
 }

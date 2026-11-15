@@ -57,3 +57,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.explanation{margin-top:18px;padding:20px;border:1px solid var(--et-303e6b);border-radius:16px;background:var(--et-0a1228);color:var(--et-e9edfa);line-height:1.8}
+.explanation h3{font-size:18px;margin:0 0 12px}.explanation p{font-size:13px;color:var(--et-a6b3d0);margin:10px 0}.explanation strong{color:var(--et-e9edfa)}.explanation .summary{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:18px}.explanation .summary p{font-size:12px;margin-bottom:0}@media(max-width:500px){.explanation{padding:16px}.explanation .summary{grid-template-columns:1fr}}
