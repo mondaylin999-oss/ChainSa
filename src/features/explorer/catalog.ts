@@ -67,7 +67,7 @@ export const TOPICS: {
       { label: "Flood Extent", datasetId: "flood-extent", summary: "Satellite-mapped flooded area. Cloud and tree cover hide water from some sensors, and no validated product is connected." },
       { label: "Drought Indicators", datasetId: "drought-indicators", summary: "Rainfall and soil-moisture indices used to flag dry conditions. EarthLens indicators are not official drought declarations, and none is connected." },
       { label: "Hot-day Frequency", datasetId: "hot-day-frequency", summary: "How often daily temperature passes a heat threshold. A counted statistic, not a health warning, and not connected." },
-      { label: "Active Fire / Hotspots", datasetId: "fire-detections", summary: "VIIRS fire detections from NASA FIRMS; requires FIRMS_MAP_KEY and is not an official fire count." },
+      { label: "Active Fire / Hotspots", datasetId: "fire-detections", summary: "NOAA-20 VIIRS detections from the public NASA FIRMS seven-day feed, filtered to the selected boundary. Detections are not an official fire count." },
       { label: "Burned Area", datasetId: "burned-area", summary: "Area mapped as burned after a fire, distinct from active detections. No validated product is connected." },
     ],
     uses: "Use these indicators as context when checking official flood, drought and fire information, and identify recent satellite fire detections.",
