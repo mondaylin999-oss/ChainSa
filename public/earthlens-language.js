@@ -1,5 +1,10 @@
 (function () {
   var translations = {
+    "Map zoom controls": "မြေပုံ အနီးအဝေး ထိန်းချုပ်ရန်",
+    "Zoom in": "ချဲ့ရန်",
+    "Zoom out": "ချုံ့ရန်",
+    "Reset map zoom": "မြေပုံ မြင်ကွင်းကို မူလအတိုင်း ပြန်ထားရန်",
+    "Reset zoom": "မူလမြင်ကွင်းသို့ ပြန်ရန်",
     "Dark mode": "အမှောင်မုဒ်",
     "Light mode": "အလင်းမုဒ်",
     "Switch to dark mode": "အမှောင်မုဒ်သို့ ပြောင်းရန်",

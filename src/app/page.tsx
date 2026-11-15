@@ -325,7 +325,7 @@ export default function Page() {
             <div><p className="eyebrow">Explore Myanmar</p><h1>Map &amp; data workspace</h1><p>Choose a topic, then view a connected observation series and its source details.</p></div>
           </div>
           <div className="explore-grid">
-            <aside className="topic-rail" aria-label="Explore by topic">
+            <aside className="topic-rail" aria-label="Explore by topic" data-area-selected={Boolean(regionId)}>
               {TOPICS.map((topic) => {
                 const Icon = topicIcons[topic.id];
                 const active = activeTopic === topic.id;
@@ -343,6 +343,7 @@ export default function Page() {
                       onClick={() => chooseTopic(topic.id)}
                     >
                       <span className="topic-icon-tile"><Icon size={20} aria-hidden="true" /></span>
+                      {!regionId && <span className="rail-topic-name">{topic.label}</span>}
                     </button>
                     {open && (
                       <div id={`rail-indicators-${topic.id}`} className="rail-indicators" aria-label={`${topic.label} indicators`}>

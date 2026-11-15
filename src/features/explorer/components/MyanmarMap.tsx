@@ -94,6 +94,12 @@ export function MyanmarMap({
 }: MyanmarMapProps) {
   const [townshipData, setTownshipData] = useState<BoundaryCollection | null>(null);
   const [townshipError, setTownshipError] = useState(false);
+  const [manualZoom, setManualZoom] = useState({ key: "", factor: 1 });
+  const selectionKey = `${selectedRegionId ?? ""}:${selectedTownshipId ?? ""}:${focusRegion}`;
+  const zoomFactor = manualZoom.key === selectionKey ? manualZoom.factor : 1;
+  function changeZoom(multiplier: number) {
+    setManualZoom({ key: selectionKey, factor: Math.min(4, Math.max(0.5, zoomFactor * multiplier)) });
+  }
 
   useEffect(() => {
     if (!focusRegion || townshipData) return;
@@ -129,7 +135,13 @@ export function MyanmarMap({
   const viewBox = focusedBounds
     ? `${focusedBounds.minX - padding} ${focusedBounds.minY - padding} ${Math.max(padding * 2, focusedBounds.maxX - focusedBounds.minX + padding * 2)} ${Math.max(padding * 2, focusedBounds.maxY - focusedBounds.minY + padding * 2)}`
     : COUNTRY_VIEWBOX;
-
+  const [viewX, viewY, viewWidth, viewHeight] = viewBox.split(" ").map(Number);
+  const manualViewBox = [
+    viewX + (viewWidth - viewWidth / zoomFactor) / 2,
+    viewY + (viewHeight - viewHeight / zoomFactor) / 2,
+    viewWidth / zoomFactor,
+    viewHeight / zoomFactor,
+  ].join(" ");
 
   let zoom = 1;
   let zoomTransform = "translate(0, 0) scale(1)";
@@ -153,9 +165,14 @@ export function MyanmarMap({
 
   return (
     <div className="map-interactive-wrapper" data-focused={focusRegion}>
+      <div className="map-zoom-controls" role="group" aria-label="Map zoom controls">
+        <button type="button" aria-label="Zoom in" title="Zoom in" disabled={zoomFactor >= 4} onClick={() => changeZoom(1.25)}>+</button>
+        <button type="button" aria-label="Zoom out" title="Zoom out" disabled={zoomFactor <= 0.5} onClick={() => changeZoom(0.8)}>−</button>
+        <button type="button" aria-label="Reset map zoom" title="Reset zoom" onClick={() => setManualZoom({ key: selectionKey, factor: 1 })}>↺</button>
+      </div>
       <svg
         className="myanmar-map"
-        viewBox={viewBox}
+        viewBox={manualViewBox}
         preserveAspectRatio={focusedBounds ? "xMidYMid slice" : "xMidYMid meet"}
         style={{ "--map-zoom": zoom } as CSSProperties}
         role="img"
